@@ -1,0 +1,39 @@
+# Docker .gitignore equivalent - files to exclude from Docker context
+.git
+.gitignore
+.dockerignore
+.env
+.env.local
+.env.*.local
+*.md
+LICENSE
+!docker/
+
+# Node modules (will be installed in container)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Python cache and venv (will be installed in container)
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Git
+.git
+.gitattributes

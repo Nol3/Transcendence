@@ -194,40 +194,41 @@ The project is broken down into three phases:
 
 ## Technical Stack
 
-> 🚧 *To be filled in once the team has agreed on the stack.*
-
 ### Frontend
 
 | Technology | Version | Justification |
 |------------|---------|---------------|
-| \[Framework: React / Vue / Svelte / Angular / Next.js…\] | | |
-| \[CSS: Tailwind / Bootstrap / Material-UI / Styled Components…\] | | |
+| Angular | 18.x | Modern framework with strong typing, dependency injection, and excellent tooling for large applications. |
+| Bootstrap 5 / Tailwind CSS | Latest | Responsive design and quick UI prototyping with utility-first CSS. |
 
 ### Backend
 
 | Technology | Version | Justification |
 |------------|---------|---------------|
-| \[Framework: Express / NestJS / Django / Flask / FastAPI…\] | | |
-| \[ORM (if chosen as module)\] | | |
+| Django | 4.2 LTS | Robust, mature framework with built-in ORM, authentication, and admin panel. |
+| Django REST Framework | 3.14.x | Industry-standard for building REST APIs with Django. |
+| FastAPI (optional modules) | 0.104.x | High-performance async API for real-time features like WebSockets if needed. |
 
 ### Database
 
 | Technology | Justification |
 |------------|---------------|
-| \[PostgreSQL / MySQL / SQLite / MongoDB…\] | |
+| SQLite | Lightweight, zero-configuration database. Perfect for development and deployment in containers. |
 
-### Infrastructure
+### Infrastructure & DevOps
 
 | Technology | Role |
 |------------|------|
-| Docker / Docker Compose | Containerisation — single-command deployment |
-| HTTPS (self-signed / Let's Encrypt) | Secure backend connections |
+| Docker & Docker Compose | Containerised deployment — all services (frontend, backend, DB) run in containers with single-command startup. |
+| Nginx | Reverse proxy for frontend and load balancing. |
+| HTTPS (self-signed in dev) | Secure backend connections. |
 
-### Other significant libraries/tools
+### Development Tools
 
-| Library/Tool | Purpose |
-|-------------|---------|
-| | |
+| Tool | Purpose |
+|------|---------|
+| Git / GitHub | Version control with branch strategy for team collaboration. |
+| Environment variables (.env) | Configuration management for different environments. |
 
 ---
 
@@ -337,52 +338,64 @@ For each custom module, include:
 
 ### Prerequisites
 
-| Requirement | Version |
-|-------------|---------|
-| Docker | ≥ 24.x |
-| Docker Compose | ≥ 2.x |
-| Git | any recent |
+| Requirement | Version | Notes |
+|-------------|---------|-------|
+| Docker | ≥ 24.x | Install from [docker.com](https://www.docker.com) |
+| Docker Compose | ≥ 2.x | Included with Docker Desktop |
+| Git | any recent | For version control |
 
-> No other software needs to be installed locally — everything runs inside containers.
+> **No other software needs to be installed locally** — all frontend and backend dependencies run inside containers with `docker compose up`.
 
-### Setup
+### Quick Start (Docker)
 
 ```bash
-# 1. Clone the repository into an empty folder
+# 1. Clone the repository
 git clone <repo-url> ft_transcendence
 cd ft_transcendence
 
-# 2. Copy environment variables and fill in your values
+# 2. Set up environment
 cp .env.example .env
-# Edit .env with your settings (see .env.example for descriptions)
+chmod +x docker/generate-ssl.sh
+docker/generate-ssl.sh
 
-# 3. Build and start all services with a single command
+# 3. Start all services
 docker compose up --build
 
 # 4. Open the application
-# → https://localhost:<PORT>
+# Frontend: https://localhost:4200
+# Backend API: https://localhost:8000
+# Django Admin: https://localhost:8000/admin
 ```
 
 ### Environment Variables
 
-See `.env.example` for all required variables. Key ones include:
+See `.env.example` for all available variables. Essential ones:
 
-| Variable | Description |
-|----------|-------------|
-| `DB_USER` | Database username |
-| `DB_PASSWORD` | Database password |
-| `DB_NAME` | Database name |
-| `JWT_SECRET` | Secret for JWT signing |
-| `\[OAUTH_CLIENT_ID\]` | OAuth client ID (if OAuth module) |
-| `\[OAUTH_CLIENT_SECRET\]` | OAuth client secret (if OAuth module) |
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `DJANGO_SECRET_KEY` | Django secret key | `your-super-secret-key` |
+| `JWT_SECRET_KEY` | JWT signing key | `your-jwt-secret` |
+| `DJANGO_DEBUG` | Debug mode | `false` (production), `true` (dev) |
+| `CORS_ALLOWED_ORIGINS` | Allowed frontend origins | `http://localhost:4200` |
 
 ### Stopping the Application
 
 ```bash
+# Stop all services
 docker compose down
-# To also remove volumes (wipes database):
+
+# Stop and remove all data (wipes database)
 docker compose down -v
+
+# Stop specific service
+docker compose stop backend
 ```
+
+### Detailed Documentation
+
+- **[DEVELOPMENT.md](docs/DEVELOPMENT.md)** — Complete development guide with project structure, team workflow, API endpoints, troubleshooting
+- **[Backend README](backend/README.md)** — Django app structure and how to extend
+- **[Frontend README](frontend/README.md)** — Angular module structure and component guidelines
 
 ---
 
