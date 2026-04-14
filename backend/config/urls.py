@@ -57,10 +57,15 @@ urlpatterns = [
     path("api/", api_root, name="api-root"),
     # Custom Auth endpoints (frontend compatible)
     path("api/auth/login/", LoginView.as_view(), name="auth-login"),
+    path("api/auth/login", LoginView.as_view(), name="auth-login-no-slash"),
     path("api/auth/register/", RegisterView.as_view(), name="auth-register"),
+    path("api/auth/register", RegisterView.as_view(), name="auth-register-no-slash"),
     path("api/auth/me/", MeView.as_view(), name="auth-me"),
+    path("api/auth/me", MeView.as_view(), name="auth-me-no-slash"),
     path("api/auth/refresh/", RefreshTokenView.as_view(), name="auth-refresh"),
+    path("api/auth/refresh", RefreshTokenView.as_view(), name="auth-refresh-no-slash"),
     path("api/auth/logout/", LogoutView.as_view(), name="auth-logout"),
+    path("api/auth/logout", LogoutView.as_view(), name="auth-logout-no-slash"),
     # API endpoints
     path("api/users/", include("apps.users.urls", namespace="users")),
     path("api/games/", include("apps.games.urls", namespace="games")),
@@ -68,6 +73,7 @@ urlpatterns = [
     path("api/tournament/", include("apps.tournament.urls", namespace="tournament")),
     # Leaderboard
     path("api/leaderboard/", include("apps.users.leaderboard_urls")),
+    path("api/leaderboard", include("apps.users.leaderboard_urls")),
 ]
 
 if settings.DEBUG:
