@@ -1,6 +1,204 @@
 <div class="profile-page animate-fade-in">
-  <div class="arcade-panel profile-placeholder">
-    <p class="font-pixel neon-text-cyan">PLAYER PROFILE</p>
-    <p class="text-secondary text-sm">Coming in Step 5</p>
+  <div class="profile-container">
+    @if (user(); as currentUser) {
+      <div class="profile-grid">
+        <div class="profile-left">
+          <app-card [title]="'PLAYER INFO' | translate" [glowing]="true">
+            <div class="profile-header">
+              <div class="avatar-section">
+                <div class="avatar-wrapper">
+                  @if (avatarPreview()) {
+                    <img [src]="avatarPreview()!" alt="Avatar preview" class="avatar-preview">
+                  } @else {
+                    <app-avatar 
+                      [src]="currentUser.avatar" 
+                      [username]="currentUser.username"
+                      [size]="'xl'">
+                    </app-avatar>
+                  }
+                  @if (isEditing()) {
+                    <label class="avatar-upload">
+                      <input type="file" accept="image/*" (change)="onAvatarChange($event)">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                        <circle cx="12" cy="13" r="4"/>
+                      </svg>
+                    </label>
+                  }
+                </div>
+              </div>
+
+              @if (isEditing()) {
+                <form [formGroup]="profileForm" class="edit-form">
+                  <app-input 
+                    [label]="'profile.username' | translate"
+                    [placeholder]="'auth.register.usernamePlaceholder' | translate"
+                    [error]="getError('username')"
+                    formControlName="username">
+                  </app-input>
+                  
+                  <div class="edit-actions">
+                    <app-button 
+                      variant="primary" 
+                      [loading]="isSaving()"
+                      (clicked)="saveProfile()">
+                      {{ 'common.save' | translate }}
+                    </app-button>
+                    <app-button 
+                      variant="ghost"
+                      [disabled]="isSaving()"
+                      (clicked)="cancelEditing()">
+                      {{ 'common.cancel' | translate }}
+                    </app-button>
+                  </div>
+                </form>
+              } @else {
+                <div class="user-info">
+                  <h2 class="username neon-text-cyan">{{ currentUser.username }}</h2>
+                  <p class="user-email text-secondary">{{ currentUser.email }}</p>
+                  <app-button variant="secondary" size="sm" (clicked)="startEditing()">
+                    {{ 'profile.editProfile' | translate }}
+                  </app-button>
+                </div>
+              }
+            </div>
+          </app-card>
+
+          <app-card [title]="'profile.gameHistory' | translate" [padding]="'md'">
+            @if (historyLoading()) {
+              <div class="loading-state">
+                <app-spinner [size]="'md'"></app-spinner>
+              </div>
+            } @else {
+              <div class="history-list">
+                @for (game of history(); track trackByGame($index, game)) {
+                  <div class="history-item" [class.history-item--win]="game.result === 'win'" [class.history-item--loss]="game.result === 'loss'">
+                    <div class="history-result">
+                      @if (game.result === 'win') {
+                        <app-badge variant="success">{{ 'notifications.youWin' | translate }}</app-badge>
+                      } @else {
+                        <app-badge variant="error">{{ 'notifications.youLose' | translate }}</app-badge>
+                      }
+                    </div>
+                    <div class="history-details">
+                      <span class="history-opponent">{{ 'common.vs' | translate }} {{ game.opponent.username }}</span>
+                      <span class="history-score text-muted">{{ game.score }}</span>
+                    </div>
+                    <div class="history-date text-muted">{{ game.playedAt | date:'short' }}</div>
+                  </div>
+                } @empty {
+                  <div class="empty-history text-secondary">
+                    {{ 'profile.noGames' | translate }}
+                  </div>
+                }
+              </div>
+            }
+          </app-card>
+        </div>
+
+        <div class="profile-right">
+          <app-card [title]="'home.stats' | translate" [glowing]="true">
+            @if (statsLoading()) {
+              <div class="loading-state">
+                <app-spinner [size]="'md'"></app-spinner>
+              </div>
+            } @else if (stats(); as userStats) {
+              <div class="stats-grid">
+                <div class="stat-item stat-item--wins">
+                  <div class="stat-value neon-text-green">{{ userStats.wins }}</div>
+                  <div class="stat-label text-secondary">{{ 'profile.wins' | translate }}</div>
+                </div>
+                
+                <div class="stat-item stat-item--losses">
+                  <div class="stat-value neon-text-magenta">{{ userStats.losses }}</div>
+                  <div class="stat-label text-secondary">{{ 'profile.losses' | translate }}</div>
+                </div>
+                
+                <div class="stat-item stat-item--rank">
+                  <div class="stat-value">#{{ userStats.rank }}</div>
+                  <div class="stat-label text-secondary">{{ 'profile.rank' | translate }}</div>
+                  <app-badge variant="warning" class="rank-badge">
+                    {{ rankLabel() }}
+                  </app-badge>
+                </div>
+                
+                <div class="stat-item stat-item--winrate">
+                  <div class="stat-value neon-text-cyan">{{ userStats.winRate }}%</div>
+                  <div class="stat-label text-secondary">{{ 'profile.winRate' | translate }}</div>
+                </div>
+              </div>
+
+              <app-divider />
+
+              <div class="winrate-bar">
+                <div class="winrate-track">
+                  <div class="winrate-fill" [style.width.%]="userStats.winRate"></div>
+                </div>
+                <div class="winrate-labels">
+                  <span class="text-muted text-sm">0%</span>
+                  <span class="text-muted text-sm">50%</span>
+                  <span class="text-muted text-sm">100%</span>
+                </div>
+              </div>
+
+              <div class="streak-info">
+                <div class="streak-item">
+                  <span class="streak-label text-secondary">Current Streak</span>
+                  <span class="streak-value">{{ userStats.currentStreak }}🔥</span>
+                </div>
+                <div class="streak-item">
+                  <span class="streak-label text-secondary">Best Streak</span>
+                  <span class="streak-value">{{ userStats.longestStreak }}🏆</span>
+                </div>
+              </div>
+            }
+          </app-card>
+
+          <app-card [title]="'profile.achievements' | translate" [padding]="'md'">
+            <div class="achievements-list">
+              <div class="achievement unlocked">
+                <span class="achievement-icon">🏆</span>
+                <span class="achievement-name">{{ 'profile.firstVictory' | translate }}</span>
+              </div>
+              <div class="achievement unlocked">
+                <span class="achievement-icon">🔥</span>
+                <span class="achievement-name">{{ 'profile.winStreak' | translate }}</span>
+              </div>
+              <div class="achievement unlocked">
+                <span class="achievement-icon">⚡</span>
+                <span class="achievement-name">{{ 'profile.speedPlayer' | translate }}</span>
+              </div>
+              @if (stats()?.wins && stats()!.wins >= 10) {
+                <div class="achievement unlocked">
+                  <span class="achievement-icon">🎯</span>
+                  <span class="achievement-name">10 Wins</span>
+                </div>
+              } @else {
+                <div class="achievement locked">
+                  <span class="achievement-icon">🎯</span>
+                  <span class="achievement-name">10 Wins ({{ stats()?.wins ?? 0 }}/10)</span>
+                </div>
+              }
+              @if (stats()?.wins && stats()!.wins >= 50) {
+                <div class="achievement unlocked">
+                  <span class="achievement-icon">💎</span>
+                  <span class="achievement-name">50 Wins</span>
+                </div>
+              } @else {
+                <div class="achievement locked">
+                  <span class="achievement-icon">💎</span>
+                  <span class="achievement-name">50 Wins ({{ stats()?.wins ?? 0 }}/50)</span>
+                </div>
+              }
+            </div>
+          </app-card>
+        </div>
+      </div>
+    } @else {
+      <div class="profile-placeholder arcade-panel">
+        <p class="font-pixel neon-text-cyan">{{ 'profile.title' | translate }}</p>
+        <p class="text-secondary text-sm">{{ 'common.loading' | translate }}</p>
+      </div>
+    }
   </div>
 </div>

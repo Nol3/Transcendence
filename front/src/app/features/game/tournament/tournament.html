@@ -1,6 +1,156 @@
 <div class="tournament-page animate-fade-in">
-  <div class="arcade-panel tournament-placeholder">
-    <p class="font-pixel neon-text-magenta">TOURNAMENT</p>
-    <p class="text-secondary text-sm">Bracket system — Coming in Step 7</p>
-  </div>
+  @if (selectedTournament()) {
+    <div class="tournament-detail">
+      <div class="tournament-detail__header">
+        <button class="back-btn" (click)="selectedTournament.set(null)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back
+        </button>
+        <div class="tournament-detail__title">
+          <h1 class="font-pixel neon-text-magenta">{{ selectedTournament()!.name }}</h1>
+          <app-badge [variant]="getStatusBadge(selectedTournament()!.status).variant">
+            {{ getStatusBadge(selectedTournament()!.status).label }}
+          </app-badge>
+        </div>
+      </div>
+      
+      <app-card [title]="'BRACKET'" [glowing]="true" [padding]="'lg'">
+        @if (selectedTournament()!.rounds.length > 0) {
+          <app-bracket [rounds]="selectedTournament()!.rounds"></app-bracket>
+        } @else {
+          <div class="no-bracket text-secondary">
+            Bracket will be generated when all players are registered
+          </div>
+        }
+      </app-card>
+    </div>
+  } @else {
+    <div class="tournament-container">
+      <div class="tournament-header">
+        <h1 class="font-pixel neon-text-magenta">TOURNAMENTS</h1>
+        <app-button variant="accent" (clicked)="openRegisterModal()">
+          + Create Tournament
+        </app-button>
+      </div>
+
+      <div class="tournament-tabs">
+        <button 
+          class="tab" 
+          [class.tab--active]="selectedTab() === 'active'"
+          (click)="selectTab('active')">
+          Active
+          <span class="tab__count">{{ activeCount() }}</span>
+        </button>
+        <button 
+          class="tab" 
+          [class.tab--active]="selectedTab() === 'upcoming'"
+          (click)="selectTab('upcoming')">
+          Upcoming
+          <span class="tab__count">{{ upcomingCount() }}</span>
+        </button>
+        <button 
+          class="tab" 
+          [class.tab--active]="selectedTab() === 'finished'"
+          (click)="selectTab('finished')">
+          Finished
+          <span class="tab__count">{{ finishedCount() }}</span>
+        </button>
+      </div>
+
+      <div class="tournament-list">
+        @for (tournament of filteredTournaments(); track tournament.id) {
+          <app-card [glowing]="tournament.status === 'active'" [padding]="'md'">
+            <div class="tournament-card">
+              <div class="tournament-card__header">
+                <div class="tournament-card__info">
+                  <h3 class="tournament-name">{{ tournament.name }}</h3>
+                  <div class="tournament-card__meta">
+                    <app-badge [variant]="getStatusBadge(tournament.status).variant">
+                      {{ getStatusBadge(tournament.status).label }}
+                    </app-badge>
+                    <span class="tournament-date text-muted">{{ tournament.startDate }}</span>
+                  </div>
+                </div>
+                @if (tournament.prize) {
+                  <div class="tournament-prize">
+                    <span class="prize-label text-muted">Prize</span>
+                    <span class="prize-value neon-text-yellow">{{ tournament.prize }}</span>
+                  </div>
+                }
+              </div>
+
+              <div class="tournament-card__players">
+                <div class="players-header">
+                  <span class="text-secondary text-sm">Players</span>
+                  <span class="text-sm">{{ tournament.currentPlayers }}/{{ tournament.maxPlayers }}</span>
+                </div>
+                <div class="players-bar">
+                  <div class="players-fill" [style.width.%]="getProgressPercent(tournament)"></div>
+                </div>
+              </div>
+
+              <div class="tournament-card__actions">
+                @if (tournament.status === 'upcoming' && tournament.currentPlayers < tournament.maxPlayers) {
+                  <app-button variant="primary" size="sm" (clicked)="selectTournament(tournament)">
+                    Join Tournament
+                  </app-button>
+                } @else if (tournament.status === 'active') {
+                  <app-button variant="primary" size="sm" (clicked)="selectTournament(tournament)">
+                    View Bracket
+                  </app-button>
+                } @else if (tournament.status === 'finished') {
+                  <app-button variant="secondary" size="sm" (clicked)="selectTournament(tournament)">
+                    View Results
+                  </app-button>
+                }
+              </div>
+            </div>
+          </app-card>
+        } @empty {
+          <div class="empty-state arcade-panel">
+            <p class="font-pixel neon-text-cyan">NO TOURNAMENTS</p>
+            <p class="text-secondary text-sm">Check back later for upcoming events</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (showRegisterModal()) {
+    <div class="modal-overlay" (click)="closeRegisterModal()">
+      <app-card [title]="'JOIN TOURNAMENT'" class="register-modal" (click)="$event.stopPropagation()">
+        <div class="register-form">
+          <p class="text-secondary">Create your own tournament and invite friends to compete!</p>
+          
+          <div class="form-field">
+            <label class="text-sm text-secondary">Tournament Name</label>
+            <input type="text" placeholder="Enter tournament name" class="form-input">
+          </div>
+          
+          <div class="form-field">
+            <label class="text-sm text-secondary">Max Players</label>
+            <select class="form-input">
+              <option value="4">4 Players</option>
+              <option value="8" selected>8 Players</option>
+              <option value="16">16 Players</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label class="text-sm text-secondary">Start Date</label>
+            <input type="date" class="form-input">
+          </div>
+
+          <div class="form-actions">
+            <app-button variant="ghost" (clicked)="closeRegisterModal()">Cancel</app-button>
+            <app-button variant="primary" [loading]="isRegistering()" (clicked)="registerForTournament()">
+              Create Tournament
+            </app-button>
+          </div>
+        </div>
+      </app-card>
+    </div>
+  }
 </div>

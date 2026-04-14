@@ -1,17 +1,16 @@
-<div class="lang-switcher" [class.lang-switcher--open]="open()">
-  <button class="lang-switcher__trigger font-pixel" (click)="toggle()" [attr.aria-expanded]="open()" aria-haspopup="listbox">
-    <span>{{ currentLang.flag }}</span>
-    <span>{{ currentLang.code | uppercase }}</span>
-    <span class="lang-switcher__arrow">{{ open() ? '▲' : '▼' }}</span>
+<div class="lang-switcher" [class.lang-switcher--open]="isOpen()">
+  <button class="lang-switcher__trigger font-pixel" (click)="toggle()">
+    <span>{{ currentLangData.flag }}</span>
+    <span>{{ currentLangData.code | uppercase }}</span>
+    <span class="lang-switcher__arrow">{{ isOpen() ? '▲' : '▼' }}</span>
   </button>
-
-  @if (open()) {
+  @if (isOpen()) {
     <ul class="lang-switcher__dropdown animate-slide-up" role="listbox">
       @for (lang of languages; track lang.code) {
         <li
           role="option"
-          [attr.aria-selected]="lang.code === current()"
-          [class.lang-switcher__option--active]="lang.code === current()"
+          [attr.aria-selected]="lang.code === currentCode"
+          [class.lang-switcher__option--active]="lang.code === currentCode"
           class="lang-switcher__option font-pixel"
           (click)="select(lang.code)"
         >

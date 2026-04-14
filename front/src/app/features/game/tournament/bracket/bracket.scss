@@ -1,0 +1,131 @@
+.bracket {
+  display: flex;
+  gap: var(--space-8);
+  overflow-x: auto;
+  padding: var(--space-4);
+  min-height: 400px;
+}
+
+.bracket__round {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+}
+
+.bracket__round-title {
+  font-size: var(--font-pixel-xs);
+  color: var(--color-neon-cyan);
+  text-align: center;
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+  text-shadow: var(--glow-cyan);
+  letter-spacing: 0.1em;
+}
+
+.bracket__matches {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: var(--space-4);
+}
+
+.bracket__match {
+  position: relative;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+
+  &--live {
+    border-color: var(--color-neon-magenta);
+    box-shadow: var(--glow-magenta);
+    animation: pulse-border 2s ease-in-out infinite;
+  }
+
+  &--completed {
+    opacity: 0.85;
+  }
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(255, 0, 204, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(255, 0, 204, 0.7);
+  }
+}
+
+.live-badge {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  font-size: var(--font-pixel-xs);
+  animation: blink 1s step-end infinite;
+}
+
+.bracket__player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-base);
+
+  &--winner {
+    background: rgba(0, 255, 65, 0.1);
+    
+    .player-name {
+      color: var(--color-neon-green);
+      text-shadow: var(--glow-green);
+    }
+  }
+
+  &--eliminated {
+    opacity: 0.4;
+    
+    .player-name {
+      text-decoration: line-through;
+    }
+  }
+
+  &--bottom {
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.player-name {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  transition: color var(--transition-base);
+}
+
+.player-score {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  min-width: 24px;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.winner-score {
+  color: var(--color-neon-green);
+  text-shadow: var(--glow-green);
+}
+
+.bracket__vs {
+  text-align: center;
+  font-family: var(--font-pixel);
+  font-size: var(--font-pixel-xs);
+  padding: var(--space-1);
+}

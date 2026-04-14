@@ -1,13 +1,20 @@
-import { Component, signal } from '@angular/core';
-import { UpperCasePipe } from '@angular/common';
-
 export type Lang = 'en' | 'es' | 'fr';
 
-export const LANGUAGES: { code: Lang; label: string; flag: string }[] = [
+export interface LanguageOption {
+  code: Lang;
+  label: string;
+  flag: string;
+}
+
+export const LANGUAGES: LanguageOption[] = [
   { code: 'en', label: 'English', flag: '🇬🇧' },
   { code: 'es', label: 'Español', flag: '🇪🇸' },
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
 ];
+
+import { Component, inject, signal, HostListener, ElementRef } from '@angular/core';
+import { UpperCasePipe } from '@angular/common';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'app-language-switcher',
@@ -17,19 +24,34 @@ export const LANGUAGES: { code: Lang; label: string; flag: string }[] = [
   styleUrl: './language-switcher.scss',
 })
 export class LanguageSwitcherComponent {
-  readonly languages = LANGUAGES;
-  readonly current = signal<Lang>('en');
-  readonly open = signal(false);
+  private readonly i18n = inject(I18nService);
+  private readonly el = inject(ElementRef);
 
-  get currentLang() {
-    return this.languages.find((l) => l.code === this.current()) ?? this.languages[0];
+  readonly languages: LanguageOption[] = LANGUAGES;
+  readonly isOpen = signal(false);
+
+  get currentLangData(): LanguageOption {
+    const current = this.i18n.currentLang();
+    return this.languages.find((l: LanguageOption) => l.code === current) ?? this.languages[0];
+  }
+
+  get currentCode(): Lang {
+    return this.i18n.currentLang();
+  }
+
+  toggle() {
+    this.isOpen.update(v => !v);
   }
 
   select(code: Lang) {
-    this.current.set(code);
-    this.open.set(false);
-    // i18n service integration point — Step 6
+    this.i18n.setLang(code);
+    this.isOpen.set(false);
   }
 
-  toggle() { this.open.update((v) => !v); }
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    if (!this.el.nativeElement.contains(event.target)) {
+      this.isOpen.set(false);
+    }
+  }
 }

@@ -12,40 +12,38 @@
       <div class="hero__clock font-mono">{{ time() }}</div>
 
       <app-pixel-title [level]="1" color="cyan" [flicker]="true">
-        TRANSCENDENCE
+        {{ 'home.title' | translate }}
       </app-pixel-title>
 
       <p class="hero__tagline font-pixel animate-pulse-glow">
-        — CARD BATTLE ARENA —
+        {{ 'home.subtitle' | translate }}
       </p>
 
       <p class="hero__description text-secondary">
-        Challenge players worldwide in real-time card battles.
-        Build your deck. Master the strategy. Dominate the leaderboard.
+        {{ 'home.tagline' | translate }}
       </p>
 
       <div class="hero__actions">
         @if (auth.isAuthenticated()) {
           <app-button variant="primary" size="lg" routerLink="/game">
-            ▶ PLAY NOW
+            {{ 'home.play' | translate }}
           </app-button>
           <app-button variant="secondary" size="lg" routerLink="/tournament">
-            ◈ TOURNAMENT
+            {{ 'home.tournament' | translate }}
           </app-button>
         } @else {
           <app-button variant="primary" size="lg" routerLink="/register">
-            INSERT COIN
+            {{ 'home.subtitle' | translate }}
           </app-button>
           <app-button variant="ghost" size="lg" routerLink="/login">
-            CONTINUE
+            {{ 'nav.login' | translate }}
           </app-button>
         }
       </div>
 
-      <!-- Live indicator -->
       <div class="hero__live">
         <span class="hero__live-dot animate-pulse-glow"></span>
-        <span class="font-pixel">SERVERS ONLINE</span>
+        <span class="font-pixel">{{ 'common.ready' | translate }}</span>
       </div>
     </div>
   </section>
@@ -54,17 +52,22 @@
   <section class="stats-bar">
     <div class="container">
       <div class="stats-bar__inner">
-        @for (stat of [
-          { label: 'PLAYERS ONLINE', value: '1,337' },
-          { label: 'MATCHES TODAY',  value: '4,208' },
-          { label: 'CARDS IN PLAY',  value: '52'    },
-          { label: 'TOURNAMENTS',    value: '3'     }
-        ]; track stat.label) {
-          <div class="stats-bar__item">
-            <span class="stats-bar__value font-pixel neon-text-cyan">{{ stat.value }}</span>
-            <span class="stats-bar__label font-pixel">{{ stat.label }}</span>
-          </div>
-        }
+        <div class="stats-bar__item">
+          <span class="stats-bar__value font-pixel neon-text-cyan">{{ totalPlayers() | number }}</span>
+          <span class="stats-bar__label font-pixel">{{ 'home.totalPlayers' | translate }}</span>
+        </div>
+        <div class="stats-bar__item">
+          <span class="stats-bar__value font-pixel neon-text-cyan">{{ gamesPlayed() | number }}</span>
+          <span class="stats-bar__label font-pixel">{{ 'home.gamesPlayed' | translate }}</span>
+        </div>
+        <div class="stats-bar__item">
+          <span class="stats-bar__value font-pixel neon-text-cyan">52</span>
+          <span class="stats-bar__label font-pixel">CARDS</span>
+        </div>
+        <div class="stats-bar__item">
+          <span class="stats-bar__value font-pixel neon-text-cyan">{{ leaderboard().length }}</span>
+          <span class="stats-bar__label font-pixel">{{ 'tournament.title' | translate }}</span>
+        </div>
       </div>
     </div>
   </section>
@@ -74,28 +77,38 @@
     <div class="main-content__grid">
 
       <!-- Leaderboard -->
-      <app-card title="LEADERBOARD" [glowing]="true" class="leaderboard-card">
-        <div class="leaderboard">
-          @for (entry of leaderboard(); track entry.rank) {
-            <div class="leaderboard__row" [class.leaderboard__row--top]="entry.rank <= 3">
-              <div class="leaderboard__rank">
-                <app-badge [variant]="rankBadge(entry.rank)">
-                  {{ rankIcon(entry.rank) }}
-                </app-badge>
+      <app-card [title]="'home.leaderboard' | translate" [glowing]="true" class="leaderboard-card">
+        @if (leaderboardLoading()) {
+          <div class="loading-state">
+            <app-spinner [size]="'md'"></app-spinner>
+          </div>
+        } @else {
+          <div class="leaderboard">
+            @for (entry of leaderboard(); track trackByEntry($index, entry)) {
+              <div class="leaderboard__row" [class.leaderboard__row--top]="entry.rank <= 3">
+                <div class="leaderboard__rank">
+                  <app-badge [variant]="rankBadge(entry.rank)">
+                    {{ rankIcon(entry.rank) }}
+                  </app-badge>
+                </div>
+                <span class="leaderboard__name font-pixel">{{ entry.user?.username || 'Unknown' }}</span>
+                <div class="leaderboard__stats">
+                  <span class="leaderboard__wins neon-text-green font-mono">{{ entry.wins }}W</span>
+                  <span class="leaderboard__losses text-muted font-mono">{{ entry.losses }}L</span>
+                  <span class="leaderboard__rate font-mono">{{ entry.winRate }}%</span>
+                </div>
               </div>
-              <span class="leaderboard__name font-pixel">{{ entry.username }}</span>
-              <div class="leaderboard__stats">
-                <span class="leaderboard__wins neon-text-green font-mono">{{ entry.wins }}W</span>
-                <span class="leaderboard__losses text-muted font-mono">{{ entry.losses }}L</span>
-                <span class="leaderboard__rate font-mono">{{ winRate(entry) }}%</span>
+            } @empty {
+              <div class="empty-state text-secondary">
+                {{ 'common.noResults' | translate }}
               </div>
-            </div>
-          }
-        </div>
+            }
+          </div>
+        }
 
         <div class="leaderboard__footer">
           <a routerLink="/tournament" class="font-pixel neon-text-cyan">
-            VIEW FULL RANKINGS →
+            {{ 'home.rankings' | translate }} →
           </a>
         </div>
       </app-card>
@@ -127,17 +140,17 @@
         }
 
         <!-- How to play -->
-        <app-card title="HOW TO PLAY">
+        <app-card [title]="'home.howToPlay' | translate">
           <ol class="how-to-play">
             @for (step of [
-              { n: '01', text: 'Create your account and log in' },
-              { n: '02', text: 'Join a match or enter a tournament' },
-              { n: '03', text: 'Play cards strategically each round' },
-              { n: '04', text: 'Win matches to climb the leaderboard' }
+              { n: '01', text: 'auth.register.title' },
+              { n: '02', text: 'home.tournament' },
+              { n: '03', text: 'game.title' },
+              { n: '04', text: 'home.leaderboard' }
             ]; track step.n) {
               <li class="how-to-play__step">
                 <span class="how-to-play__num font-pixel neon-text-cyan">{{ step.n }}</span>
-                <span class="how-to-play__text text-secondary">{{ step.text }}</span>
+                <span class="how-to-play__text text-secondary">{{ step.text | translate }}</span>
               </li>
             }
           </ol>
@@ -145,17 +158,17 @@
 
         <!-- Quick match CTA -->
         <div class="cta-panel arcade-panel arcade-panel--glowing">
-          <p class="font-pixel neon-text-yellow cta-panel__title animate-blink">▶ QUICK MATCH</p>
+          <p class="font-pixel neon-text-yellow cta-panel__title animate-blink">{{ 'game.title' | translate }}</p>
           <p class="text-secondary text-sm cta-panel__desc">
-            Jump into a ranked match instantly. Matchmaking finds an opponent at your level.
+            {{ 'home.howToPlayDesc' | translate }}
           </p>
           @if (auth.isAuthenticated()) {
             <app-button variant="primary" [fullWidth]="true" routerLink="/game">
-              FIND MATCH
+              {{ 'home.play' | translate }}
             </app-button>
           } @else {
             <app-button variant="ghost" [fullWidth]="true" routerLink="/login">
-              LOGIN TO PLAY
+              {{ 'nav.login' | translate }}
             </app-button>
           }
         </div>

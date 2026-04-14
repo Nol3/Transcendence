@@ -9,22 +9,69 @@
 
     <!-- Desktop nav -->
     <nav class="header__nav" aria-label="Main navigation">
-      <a routerLink="/"           routerLinkActive="header__nav-link--active" [routerLinkActiveOptions]="{exact:true}" class="header__nav-link font-pixel">HOME</a>
-      <a routerLink="/game"       routerLinkActive="header__nav-link--active" class="header__nav-link font-pixel">PLAY</a>
-      <a routerLink="/tournament" routerLinkActive="header__nav-link--active" class="header__nav-link font-pixel">TOURNAMENT</a>
+      <a routerLink="/"           routerLinkActive="header__nav-link--active" [routerLinkActiveOptions]="{exact:true}" class="header__nav-link font-pixel">{{ 'nav.home' | translate }}</a>
+      <a routerLink="/game"       routerLinkActive="header__nav-link--active" class="header__nav-link font-pixel">{{ 'nav.game' | translate }}</a>
+      <a routerLink="/tournament" routerLinkActive="header__nav-link--active" class="header__nav-link font-pixel">{{ 'nav.tournament' | translate }}</a>
       @if (auth.isAuthenticated()) {
-        <a routerLink="/profile" routerLinkActive="header__nav-link--active" class="header__nav-link font-pixel">PROFILE</a>
+        <a routerLink="/profile" routerLinkActive="header__nav-link--active" class="header__nav-link font-pixel">{{ 'nav.profile' | translate }}</a>
       }
     </nav>
 
     <!-- Language switcher + Auth actions -->
     <div class="header__actions">
       <app-language-switcher />
+      
       @if (auth.isAuthenticated()) {
-        <button class="header__btn header__btn--ghost font-pixel" (click)="auth.logout()">LOGOUT</button>
+        <div class="notif-wrapper">
+          <button class="header__notif-btn" (click)="toggleNotifications()" [class.header__notif-btn--active]="notif.showPanel()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            @if (notif.unreadCount() > 0) {
+              <span class="notif-badge">{{ notif.unreadCount() > 9 ? '9+' : notif.unreadCount() }}</span>
+            }
+          </button>
+
+          @if (notif.showPanel()) {
+            <div class="notif-panel animate-slide-up">
+              <div class="notif-panel__header">
+                <h4 class="font-pixel">{{ 'notifications.title' | translate }}</h4>
+                @if (notif.unreadCount() > 0) {
+                  <button class="notif-mark-all" (click)="markAllRead()">Mark all read</button>
+                }
+              </div>
+              
+              <div class="notif-panel__list">
+                @for (notif of notif.realTimeNotifications(); track trackByNotif($index, notif)) {
+                  <div class="notif-item" [class.notif-item--unread]="!notif.read" (click)="markAsRead(notif.id)">
+                    <span class="notif-icon">{{ getNotificationIcon(notif.type) }}</span>
+                    <div class="notif-content">
+                      <p class="notif-title">{{ notif.title }}</p>
+                      <p class="notif-message">{{ notif.message }}</p>
+                      <span class="notif-time">{{ formatTime(notif.timestamp) }}</span>
+                    </div>
+                    <button class="notif-delete" (click)="deleteNotification(notif.id, $event)">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                      </svg>
+                    </button>
+                  </div>
+                } @empty {
+                  <div class="notif-empty">
+                    <span class="notif-empty-icon">🔔</span>
+                    <p>{{ 'notifications.noNotifications' | translate }}</p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <button class="header__btn header__btn--ghost font-pixel" (click)="auth.logout()">{{ 'nav.logout' | translate }}</button>
       } @else {
-        <a routerLink="/login"    class="header__btn header__btn--ghost font-pixel">LOGIN</a>
-        <a routerLink="/register" class="header__btn header__btn--primary font-pixel">REGISTER</a>
+        <a routerLink="/login"    class="header__btn header__btn--ghost font-pixel">{{ 'nav.login' | translate }}</a>
+        <a routerLink="/register" class="header__btn header__btn--primary font-pixel">{{ 'nav.register' | translate }}</a>
       }
     </div>
 
@@ -37,15 +84,15 @@
   <!-- Mobile menu -->
   @if (menuOpen()) {
     <div class="header__mobile-menu animate-slide-up">
-      <a routerLink="/"           (click)="closeMenu()" class="header__mobile-link font-pixel">HOME</a>
-      <a routerLink="/game"       (click)="closeMenu()" class="header__mobile-link font-pixel">PLAY</a>
-      <a routerLink="/tournament" (click)="closeMenu()" class="header__mobile-link font-pixel">TOURNAMENT</a>
+      <a routerLink="/"           (click)="closeMenu()" class="header__mobile-link font-pixel">{{ 'nav.home' | translate }}</a>
+      <a routerLink="/game"       (click)="closeMenu()" class="header__mobile-link font-pixel">{{ 'nav.game' | translate }}</a>
+      <a routerLink="/tournament" (click)="closeMenu()" class="header__mobile-link font-pixel">{{ 'nav.tournament' | translate }}</a>
       @if (auth.isAuthenticated()) {
-        <a routerLink="/profile"  (click)="closeMenu()" class="header__mobile-link font-pixel">PROFILE</a>
-        <button class="header__mobile-link header__mobile-link--danger font-pixel" (click)="auth.logout(); closeMenu()">LOGOUT</button>
+        <a routerLink="/profile"  (click)="closeMenu()" class="header__mobile-link font-pixel">{{ 'nav.profile' | translate }}</a>
+        <button class="header__mobile-link header__mobile-link--danger font-pixel" (click)="auth.logout(); closeMenu()">{{ 'nav.logout' | translate }}</button>
       } @else {
-        <a routerLink="/login"    (click)="closeMenu()" class="header__mobile-link font-pixel">LOGIN</a>
-        <a routerLink="/register" (click)="closeMenu()" class="header__mobile-link header__mobile-link--accent font-pixel">REGISTER</a>
+        <a routerLink="/login"    (click)="closeMenu()" class="header__mobile-link font-pixel">{{ 'nav.login' | translate }}</a>
+        <a routerLink="/register" (click)="closeMenu()" class="header__mobile-link header__mobile-link--accent font-pixel">{{ 'nav.register' | translate }}</a>
       }
     </div>
   }

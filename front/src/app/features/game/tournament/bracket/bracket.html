@@ -1,0 +1,39 @@
+<div class="bracket">
+  @for (round of rounds; track trackByRound($index, round)) {
+    <div class="bracket__round">
+      <h4 class="bracket__round-title font-pixel">{{ round.name }}</h4>
+      <div class="bracket__matches">
+        @for (match of round.matches; track trackByMatch($index, match)) {
+          <div class="bracket__match" [class.bracket__match--live]="match.status === 'live'" [class.bracket__match--completed]="match.status === 'completed'">
+            @if (match.status === 'live') {
+              <app-badge variant="error" class="live-badge">LIVE</app-badge>
+            }
+            <div class="bracket__player" [class.bracket__player--winner]="match.winner === 1" [class.bracket__player--eliminated]="match.player1.isEliminated">
+              <div class="player-info">
+                <app-avatar [src]="match.player1.avatarUrl" [username]="match.player1.username" [size]="'sm'"></app-avatar>
+                <span class="player-name">{{ match.player1.username }}</span>
+              </div>
+              @if (match.score) {
+                <span class="player-score" [class.winner-score]="match.winner === 1">{{ match.score.split('-')[0] }}</span>
+              } @else {
+                <span class="player-score">-</span>
+              }
+            </div>
+            <div class="bracket__vs text-muted">VS</div>
+            <div class="bracket__player bracket__player--bottom" [class.bracket__player--winner]="match.winner === 2" [class.bracket__player--eliminated]="match.player2.isEliminated">
+              <div class="player-info">
+                <app-avatar [src]="match.player2.avatarUrl" [username]="match.player2.username" [size]="'sm'"></app-avatar>
+                <span class="player-name">{{ match.player2.username }}</span>
+              </div>
+              @if (match.score) {
+                <span class="player-score" [class.winner-score]="match.winner === 2">{{ match.score.split('-')[1] }}</span>
+              } @else {
+                <span class="player-score">-</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

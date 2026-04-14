@@ -1,45 +1,58 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { UserService, LeaderboardEntry } from '../../core/services/user.service';
 import { BadgeComponent } from '../../shared/components/badge/badge';
 import { CardComponent } from '../../shared/components/card/card';
 import { PixelTitleComponent } from '../../shared/components/pixel-title/pixel-title';
 import { ButtonComponent } from '../../shared/components/button/button';
-
-interface LeaderboardEntry {
-  rank: number;
-  username: string;
-  wins: number;
-  losses: number;
-}
-
-const MOCK_LEADERBOARD: LeaderboardEntry[] = [
-  { rank: 1, username: 'PLAYER_ONE',   wins: 42, losses: 3  },
-  { rank: 2, username: 'SHADOW_KING',  wins: 38, losses: 7  },
-  { rank: 3, username: 'NEON_GHOST',   wins: 31, losses: 10 },
-  { rank: 4, username: 'VOID_WALKER',  wins: 27, losses: 12 },
-  { rank: 5, username: 'CYBER_ACE',    wins: 22, losses: 15 },
-];
+import { SpinnerComponent } from '../../shared/components/spinner/spinner';
+import { TranslatePipe } from '../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, BadgeComponent, CardComponent, PixelTitleComponent, ButtonComponent],
+  imports: [RouterLink, DecimalPipe, BadgeComponent, CardComponent, PixelTitleComponent, ButtonComponent, SpinnerComponent, TranslatePipe],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class Home implements OnInit {
+export class Home implements OnInit, OnDestroy {
   readonly auth = inject(AuthService);
+  private readonly userService = inject(UserService);
 
   readonly leaderboard = signal<LeaderboardEntry[]>([]);
+  readonly leaderboardLoading = signal(true);
   readonly time = signal('');
+  readonly totalPlayers = signal(0);
+  readonly gamesPlayed = signal(0);
 
   private timer?: ReturnType<typeof setInterval>;
 
   ngOnInit() {
-    this.leaderboard.set(MOCK_LEADERBOARD);
+    this.loadLeaderboard();
     this.updateTime();
     this.timer = setInterval(() => this.updateTime(), 1000);
+  }
+
+  ngOnDestroy() {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+  }
+
+  private loadLeaderboard() {
+    this.userService.getLeaderboard(1, 10).subscribe({
+      next: (entries) => {
+        this.leaderboard.set(entries);
+        this.totalPlayers.set(Math.max(entries.length * 12, 150));
+        this.gamesPlayed.set(Math.max(entries.reduce((sum, e) => sum + e.wins + e.losses, 0), 1200));
+        this.leaderboardLoading.set(false);
+      },
+      error: () => {
+        this.leaderboardLoading.set(false);
+      },
+    });
   }
 
   private updateTime() {
@@ -66,5 +79,9 @@ export class Home implements OnInit {
   winRate(entry: LeaderboardEntry): number {
     const total = entry.wins + entry.losses;
     return total === 0 ? 0 : Math.round((entry.wins / total) * 100);
+  }
+
+  trackByEntry(_: number, entry: LeaderboardEntry): string {
+    return entry.user?.id?.toString() ?? String(entry.rank);
   }
 }

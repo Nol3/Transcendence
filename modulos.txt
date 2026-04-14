@@ -45,3 +45,11 @@ Card games, etc.).
 ◦Matchmaking system for tournament participants.
 ◦Tournament registration and management
 ◦ Minor: Game customization options
+
+player1 / password123
+player2 / password123
+player3 / password123
+admin / admin123
+
+Email: player1@test.com
+Password: password123
