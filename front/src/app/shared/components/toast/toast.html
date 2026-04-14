@@ -1,0 +1,14 @@
+<div class="toast-container" aria-live="polite" aria-label="Notifications">
+  @for (n of notif.notifications(); track trackById($index, n)) {
+    <div [class]="'toast toast--' + n.type + ' animate-slide-up'">
+      <span class="toast__icon font-mono">{{ iconFor(n.type) }}</span>
+      <div class="toast__content">
+        <p class="toast__title font-pixel">{{ n.title }}</p>
+        @if (n.message) {
+          <p class="toast__message">{{ n.message }}</p>
+        }
+      </div>
+      <button class="toast__dismiss" (click)="notif.dismiss(n.id)" aria-label="Dismiss">✕</button>
+    </div>
+  }
+</div>

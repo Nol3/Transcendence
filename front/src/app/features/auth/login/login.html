@@ -1,0 +1,71 @@
+<div class="auth-page animate-fade-in">
+
+  <!-- Arcade decoration -->
+  <div class="auth-page__deco" aria-hidden="true">
+    <span class="font-pixel neon-text-cyan animate-pulse-glow">▲</span>
+    <span class="font-pixel neon-text-magenta animate-pulse-glow">●</span>
+    <span class="font-pixel neon-text-yellow animate-pulse-glow">■</span>
+  </div>
+
+  <div class="auth-card arcade-panel">
+
+    <!-- Header -->
+    <div class="auth-card__header">
+      <app-pixel-title [level]="2" color="cyan">LOGIN</app-pixel-title>
+      <p class="auth-card__subtitle text-secondary text-sm">Enter your credentials to continue</p>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-card__form" novalidate>
+
+      <app-input
+        formControlName="email"
+        label="EMAIL"
+        type="email"
+        placeholder="player@example.com"
+        autocomplete="email"
+        [error]="fieldError('email')"
+      />
+
+      <app-input
+        formControlName="password"
+        label="PASSWORD"
+        type="password"
+        placeholder="••••••••"
+        autocomplete="current-password"
+        [error]="fieldError('password')"
+      />
+
+      @if (error()) {
+        <div class="auth-card__error">
+          <span class="font-mono">✕</span>
+          {{ error() }}
+        </div>
+      }
+
+      <app-button
+        type="submit"
+        variant="primary"
+        [loading]="loading()"
+        [fullWidth]="true"
+      >
+        SIGN IN
+      </app-button>
+
+    </form>
+
+    <!-- Footer -->
+    <div class="auth-card__footer">
+      <app-divider label="OR" color="muted" />
+      <p class="auth-card__switch text-secondary text-sm">
+        No account?
+        <a routerLink="/register" class="auth-card__link font-pixel">REGISTER</a>
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Bottom decoration -->
+  <p class="auth-page__hint font-pixel animate-blink">INSERT COIN ▮</p>
+
+</div>

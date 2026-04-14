@@ -1,18 +1,10 @@
-<style>
-  :host {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      Helvetica, Arial, sans-serif;
-    box-sizing: border-box;
-    display: block;
-    height: 100dvh;
-  }
+<div class="arcade-scanlines" aria-hidden="true"></div>
+<div class="arcade-vignette"  aria-hidden="true"></div>
 
-  main {
-    width: 100%;
-    height: 100%;
-  }
-</style>
+<app-header />
 
-<main>
+<main class="app-main">
   <router-outlet />
 </main>
+
+<app-toast />

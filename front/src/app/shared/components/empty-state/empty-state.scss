@@ -1,0 +1,27 @@
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-12) var(--space-8);
+  text-align: center;
+
+  &__icon {
+    font-size: 3rem;
+    color: var(--color-neon-cyan);
+    text-shadow: var(--glow-cyan);
+    line-height: 1;
+  }
+
+  &__title {
+    font-size: var(--font-pixel-sm);
+    letter-spacing: 0.1em;
+  }
+
+  &__message {
+    font-size: var(--font-size-sm);
+    max-width: 320px;
+    line-height: 1.6;
+  }
+}

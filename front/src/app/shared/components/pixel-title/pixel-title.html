@@ -1,0 +1,17 @@
+@switch (level) {
+  @case (1) {
+    <h1 [class]="'pixel-title pixel-title--' + color + ' pixel-title--h1' + (flicker ? ' animate-flicker' : '')">
+      <ng-content />
+    </h1>
+  }
+  @case (2) {
+    <h2 [class]="'pixel-title pixel-title--' + color + ' pixel-title--h2' + (flicker ? ' animate-flicker' : '')">
+      <ng-content />
+    </h2>
+  }
+  @case (3) {
+    <h3 [class]="'pixel-title pixel-title--' + color + ' pixel-title--h3' + (flicker ? ' animate-flicker' : '')">
+      <ng-content />
+    </h3>
+  }
+}

@@ -1,0 +1,25 @@
+.card {
+  &--p-sm { padding: var(--space-4); }
+  &--p-md { padding: var(--space-6); }
+  &--p-lg { padding: var(--space-8); }
+
+  &__header {
+    margin-bottom: var(--space-4);
+  }
+
+  &__title {
+    font-size: var(--font-pixel-sm);
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-3);
+  }
+
+  &__header-divider {
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      var(--color-neon-cyan),
+      rgba(0, 229, 255, 0.1),
+      transparent
+    );
+  }
+}

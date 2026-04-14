@@ -1,0 +1,11 @@
+<div [class]="'card arcade-panel card--p-' + padding + (glowing ? ' arcade-panel--glowing' : '')">
+  @if (title) {
+    <div class="card__header">
+      <h3 class="card__title font-pixel neon-text-cyan">{{ title }}</h3>
+      <div class="card__header-divider"></div>
+    </div>
+  }
+  <div class="card__body">
+    <ng-content />
+  </div>
+</div>

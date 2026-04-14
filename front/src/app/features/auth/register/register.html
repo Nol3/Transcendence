@@ -1,0 +1,90 @@
+<div class="auth-page animate-fade-in">
+
+  <!-- Arcade decoration -->
+  <div class="auth-page__deco" aria-hidden="true">
+    <span class="font-pixel neon-text-magenta animate-pulse-glow">▲</span>
+    <span class="font-pixel neon-text-cyan animate-pulse-glow">●</span>
+    <span class="font-pixel neon-text-green animate-pulse-glow">■</span>
+  </div>
+
+  <div class="auth-card arcade-panel auth-card--register">
+
+    <!-- Header -->
+    <div class="auth-card__header">
+      <app-pixel-title [level]="2" color="magenta">REGISTER</app-pixel-title>
+      <p class="auth-card__subtitle text-secondary text-sm">Create your player profile</p>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-card__form" novalidate>
+
+      <app-input
+        formControlName="username"
+        label="USERNAME"
+        type="text"
+        placeholder="player_one"
+        autocomplete="username"
+        [error]="fieldError('username')"
+        hint="Letters, numbers and _ only"
+      />
+
+      <app-input
+        formControlName="email"
+        label="EMAIL"
+        type="email"
+        placeholder="player@example.com"
+        autocomplete="email"
+        [error]="fieldError('email')"
+      />
+
+      <app-input
+        formControlName="password"
+        label="PASSWORD"
+        type="password"
+        placeholder="••••••••"
+        autocomplete="new-password"
+        [error]="fieldError('password')"
+        hint="Minimum 8 characters"
+      />
+
+      <app-input
+        formControlName="confirmPassword"
+        label="CONFIRM PASSWORD"
+        type="password"
+        placeholder="••••••••"
+        autocomplete="new-password"
+        [error]="fieldError('confirmPassword')"
+      />
+
+      @if (error()) {
+        <div class="auth-card__error">
+          <span class="font-mono">✕</span>
+          {{ error() }}
+        </div>
+      }
+
+      <app-button
+        type="submit"
+        variant="accent"
+        [loading]="loading()"
+        [fullWidth]="true"
+      >
+        CREATE ACCOUNT
+      </app-button>
+
+    </form>
+
+    <!-- Footer -->
+    <div class="auth-card__footer">
+      <app-divider label="OR" color="muted" />
+      <p class="auth-card__switch text-secondary text-sm">
+        Already have an account?
+        <a routerLink="/login" class="auth-card__link font-pixel">LOGIN</a>
+      </p>
+    </div>
+
+  </div>
+
+  <p class="auth-page__hint font-pixel animate-blink">INSERT COIN ▮</p>
+
+</div>

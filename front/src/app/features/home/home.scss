@@ -1,0 +1,289 @@
+// ── Hero ──────────────────────────────────────────────────────
+.hero {
+  position: relative;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+
+  &__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  // Perspective grid
+  &__grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0, 229, 255, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 229, 255, 0.06) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+  }
+
+  // Ambient neon glows
+  &__glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.12;
+    pointer-events: none;
+
+    &--left {
+      left: -200px;
+      top: -100px;
+      background: var(--color-neon-cyan);
+    }
+
+    &--right {
+      right: -200px;
+      bottom: -100px;
+      background: var(--color-neon-magenta);
+    }
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-6);
+    padding-block: var(--space-20);
+  }
+
+  &__clock {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    letter-spacing: 0.2em;
+    border: 1px solid var(--color-border);
+    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-full);
+  }
+
+  &__tagline {
+    font-size: var(--font-pixel-sm);
+    color: var(--color-text-secondary);
+    letter-spacing: 0.25em;
+    margin-top: calc(var(--space-2) * -1);
+  }
+
+  &__description {
+    max-width: 560px;
+    font-size: var(--font-size-md);
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: var(--space-2);
+  }
+
+  &__live {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-pixel-xs);
+    color: var(--color-neon-green);
+    text-shadow: var(--glow-green);
+    letter-spacing: 0.1em;
+    margin-top: var(--space-4);
+  }
+
+  &__live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-neon-green);
+    box-shadow: var(--glow-green);
+    display: inline-block;
+    flex-shrink: 0;
+  }
+}
+
+// ── Stats bar ──────────────────────────────────────────────────
+.stats-bar {
+  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) 0;
+
+  &__inner {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  &__value {
+    font-size: var(--font-pixel-md);
+    letter-spacing: 0.05em;
+  }
+
+  &__label {
+    font-size: var(--font-pixel-xs);
+    color: var(--color-text-muted);
+    letter-spacing: 0.12em;
+  }
+}
+
+// ── Main content ───────────────────────────────────────────────
+.main-content {
+  padding-block: var(--space-12);
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: var(--space-8);
+    align-items: start;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// ── Leaderboard ────────────────────────────────────────────────
+.leaderboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-3);
+    border-radius: var(--radius-md);
+    transition: background var(--transition-fast);
+
+    &:hover { background: rgba(255,255,255,0.03); }
+
+    &--top {
+      background: rgba(0, 229, 255, 0.03);
+    }
+  }
+
+  &__rank { flex-shrink: 0; }
+
+  &__name {
+    flex: 1;
+    font-size: var(--font-pixel-xs);
+    letter-spacing: 0.05em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__stats {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-shrink: 0;
+    font-size: var(--font-size-sm);
+  }
+
+  &__wins   { color: var(--color-neon-green); }
+  &__losses { font-size: var(--font-size-xs); }
+  &__rate   { color: var(--color-text-secondary); font-size: var(--font-size-xs); width: 38px; text-align: right; }
+
+  &__footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+
+    a {
+      font-size: var(--font-pixel-xs);
+      letter-spacing: 0.08em;
+      transition: text-shadow var(--transition-base);
+      &:hover { text-shadow: var(--glow-cyan); }
+    }
+  }
+}
+
+// ── Side panel ─────────────────────────────────────────────────
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+// ── Player status ──────────────────────────────────────────────
+.player-status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--font-size-sm);
+  }
+
+  &__online {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+}
+
+// ── How to play ────────────────────────────────────────────────
+.how-to-play {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  counter-reset: none;
+
+  &__step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  &__num {
+    font-size: var(--font-pixel-xs);
+    flex-shrink: 0;
+    width: 28px;
+  }
+
+  &__text {
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+  }
+}
+
+// ── CTA panel ─────────────────────────────────────────────────
+.cta-panel {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  &__title {
+    font-size: var(--font-pixel-sm);
+    letter-spacing: 0.1em;
+  }
+
+  &__desc {
+    line-height: 1.6;
+  }
+}

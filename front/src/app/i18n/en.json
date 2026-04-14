@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "home": "Home",
+    "game": "Play",
+    "tournament": "Tournament",
+    "profile": "Profile",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout"
+  },
+  "home": {
+    "subtitle": "Insert coin to play",
+    "play": "Play Now",
+    "tournament": "Tournament"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign In",
+      "noAccount": "No account? Register"
+    },
+    "register": {
+      "title": "Register",
+      "username": "Username",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Create Account",
+      "hasAccount": "Have account? Login"
+    }
+  },
+  "game": {
+    "title": "Card Game",
+    "insertCoin": "Insert Coin"
+  },
+  "tournament": {
+    "title": "Tournament",
+    "bracket": "Bracket"
+  },
+  "profile": {
+    "title": "Player Profile",
+    "wins": "Wins",
+    "losses": "Losses"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  }
+}

@@ -1,0 +1,52 @@
+<header class="header">
+  <div class="header__inner container">
+
+    <!-- Logo -->
+    <a routerLink="/" class="header__logo" (click)="closeMenu()">
+      <span class="header__logo-text font-pixel neon-text-cyan">TRANS</span>
+      <span class="header__logo-text font-pixel neon-text-magenta">CENDENCE</span>
+    </a>
+
+    <!-- Desktop nav -->
+    <nav class="header__nav" aria-label="Main navigation">
+      <a routerLink="/"           routerLinkActive="header__nav-link--active" [routerLinkActiveOptions]="{exact:true}" class="header__nav-link font-pixel">HOME</a>
+      <a routerLink="/game"       routerLinkActive="header__nav-link--active" class="header__nav-link font-pixel">PLAY</a>
+      <a routerLink="/tournament" routerLinkActive="header__nav-link--active" class="header__nav-link font-pixel">TOURNAMENT</a>
+      @if (auth.isAuthenticated()) {
+        <a routerLink="/profile" routerLinkActive="header__nav-link--active" class="header__nav-link font-pixel">PROFILE</a>
+      }
+    </nav>
+
+    <!-- Language switcher + Auth actions -->
+    <div class="header__actions">
+      <app-language-switcher />
+      @if (auth.isAuthenticated()) {
+        <button class="header__btn header__btn--ghost font-pixel" (click)="auth.logout()">LOGOUT</button>
+      } @else {
+        <a routerLink="/login"    class="header__btn header__btn--ghost font-pixel">LOGIN</a>
+        <a routerLink="/register" class="header__btn header__btn--primary font-pixel">REGISTER</a>
+      }
+    </div>
+
+    <!-- Mobile hamburger -->
+    <button class="header__hamburger" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen()" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <!-- Mobile menu -->
+  @if (menuOpen()) {
+    <div class="header__mobile-menu animate-slide-up">
+      <a routerLink="/"           (click)="closeMenu()" class="header__mobile-link font-pixel">HOME</a>
+      <a routerLink="/game"       (click)="closeMenu()" class="header__mobile-link font-pixel">PLAY</a>
+      <a routerLink="/tournament" (click)="closeMenu()" class="header__mobile-link font-pixel">TOURNAMENT</a>
+      @if (auth.isAuthenticated()) {
+        <a routerLink="/profile"  (click)="closeMenu()" class="header__mobile-link font-pixel">PROFILE</a>
+        <button class="header__mobile-link header__mobile-link--danger font-pixel" (click)="auth.logout(); closeMenu()">LOGOUT</button>
+      } @else {
+        <a routerLink="/login"    (click)="closeMenu()" class="header__mobile-link font-pixel">LOGIN</a>
+        <a routerLink="/register" (click)="closeMenu()" class="header__mobile-link header__mobile-link--accent font-pixel">REGISTER</a>
+      }
+    </div>
+  }
+</header>

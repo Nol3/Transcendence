@@ -1,0 +1,167 @@
+<div class="home animate-fade-in">
+
+  <!-- ── Hero ──────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero__bg" aria-hidden="true">
+      <div class="hero__grid"></div>
+      <div class="hero__glow hero__glow--left"></div>
+      <div class="hero__glow hero__glow--right"></div>
+    </div>
+
+    <div class="hero__content container">
+      <div class="hero__clock font-mono">{{ time() }}</div>
+
+      <app-pixel-title [level]="1" color="cyan" [flicker]="true">
+        TRANSCENDENCE
+      </app-pixel-title>
+
+      <p class="hero__tagline font-pixel animate-pulse-glow">
+        — CARD BATTLE ARENA —
+      </p>
+
+      <p class="hero__description text-secondary">
+        Challenge players worldwide in real-time card battles.
+        Build your deck. Master the strategy. Dominate the leaderboard.
+      </p>
+
+      <div class="hero__actions">
+        @if (auth.isAuthenticated()) {
+          <app-button variant="primary" size="lg" routerLink="/game">
+            ▶ PLAY NOW
+          </app-button>
+          <app-button variant="secondary" size="lg" routerLink="/tournament">
+            ◈ TOURNAMENT
+          </app-button>
+        } @else {
+          <app-button variant="primary" size="lg" routerLink="/register">
+            INSERT COIN
+          </app-button>
+          <app-button variant="ghost" size="lg" routerLink="/login">
+            CONTINUE
+          </app-button>
+        }
+      </div>
+
+      <!-- Live indicator -->
+      <div class="hero__live">
+        <span class="hero__live-dot animate-pulse-glow"></span>
+        <span class="font-pixel">SERVERS ONLINE</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Stats bar ─────────────────────────────────────────── -->
+  <section class="stats-bar">
+    <div class="container">
+      <div class="stats-bar__inner">
+        @for (stat of [
+          { label: 'PLAYERS ONLINE', value: '1,337' },
+          { label: 'MATCHES TODAY',  value: '4,208' },
+          { label: 'CARDS IN PLAY',  value: '52'    },
+          { label: 'TOURNAMENTS',    value: '3'     }
+        ]; track stat.label) {
+          <div class="stats-bar__item">
+            <span class="stats-bar__value font-pixel neon-text-cyan">{{ stat.value }}</span>
+            <span class="stats-bar__label font-pixel">{{ stat.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Main content ──────────────────────────────────────── -->
+  <section class="main-content container">
+    <div class="main-content__grid">
+
+      <!-- Leaderboard -->
+      <app-card title="LEADERBOARD" [glowing]="true" class="leaderboard-card">
+        <div class="leaderboard">
+          @for (entry of leaderboard(); track entry.rank) {
+            <div class="leaderboard__row" [class.leaderboard__row--top]="entry.rank <= 3">
+              <div class="leaderboard__rank">
+                <app-badge [variant]="rankBadge(entry.rank)">
+                  {{ rankIcon(entry.rank) }}
+                </app-badge>
+              </div>
+              <span class="leaderboard__name font-pixel">{{ entry.username }}</span>
+              <div class="leaderboard__stats">
+                <span class="leaderboard__wins neon-text-green font-mono">{{ entry.wins }}W</span>
+                <span class="leaderboard__losses text-muted font-mono">{{ entry.losses }}L</span>
+                <span class="leaderboard__rate font-mono">{{ winRate(entry) }}%</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="leaderboard__footer">
+          <a routerLink="/tournament" class="font-pixel neon-text-cyan">
+            VIEW FULL RANKINGS →
+          </a>
+        </div>
+      </app-card>
+
+      <!-- Quick actions + How to play -->
+      <div class="side-panel">
+
+        @if (auth.isAuthenticated()) {
+          <!-- Player card -->
+          <app-card title="YOUR STATUS">
+            <div class="player-status">
+              <div class="player-status__row">
+                <span class="text-secondary font-mono">RANK</span>
+                <app-badge variant="warning">CHALLENGER</app-badge>
+              </div>
+              <div class="player-status__row">
+                <span class="text-secondary font-mono">STREAK</span>
+                <span class="neon-text-green font-pixel">3 WINS</span>
+              </div>
+              <div class="player-status__row">
+                <span class="text-secondary font-mono">STATUS</span>
+                <div class="player-status__online">
+                  <span class="hero__live-dot animate-pulse-glow"></span>
+                  <span class="neon-text-green font-pixel">ONLINE</span>
+                </div>
+              </div>
+            </div>
+          </app-card>
+        }
+
+        <!-- How to play -->
+        <app-card title="HOW TO PLAY">
+          <ol class="how-to-play">
+            @for (step of [
+              { n: '01', text: 'Create your account and log in' },
+              { n: '02', text: 'Join a match or enter a tournament' },
+              { n: '03', text: 'Play cards strategically each round' },
+              { n: '04', text: 'Win matches to climb the leaderboard' }
+            ]; track step.n) {
+              <li class="how-to-play__step">
+                <span class="how-to-play__num font-pixel neon-text-cyan">{{ step.n }}</span>
+                <span class="how-to-play__text text-secondary">{{ step.text }}</span>
+              </li>
+            }
+          </ol>
+        </app-card>
+
+        <!-- Quick match CTA -->
+        <div class="cta-panel arcade-panel arcade-panel--glowing">
+          <p class="font-pixel neon-text-yellow cta-panel__title animate-blink">▶ QUICK MATCH</p>
+          <p class="text-secondary text-sm cta-panel__desc">
+            Jump into a ranked match instantly. Matchmaking finds an opponent at your level.
+          </p>
+          @if (auth.isAuthenticated()) {
+            <app-button variant="primary" [fullWidth]="true" routerLink="/game">
+              FIND MATCH
+            </app-button>
+          } @else {
+            <app-button variant="ghost" [fullWidth]="true" routerLink="/login">
+              LOGIN TO PLAY
+            </app-button>
+          }
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</div>

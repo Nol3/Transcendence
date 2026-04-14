@@ -1,0 +1,30 @@
+<div class="field" [class.field--error]="error">
+  @if (label) {
+    <label [for]="id" class="field__label font-mono">{{ label }}</label>
+  }
+
+  <div class="field__wrapper">
+    <input
+      [id]="id"
+      [type]="inputType"
+      [placeholder]="placeholder"
+      [value]="value"
+      [disabled]="disabled"
+      [autocomplete]="autocomplete"
+      class="field__input"
+      (input)="onInput($event)"
+      (blur)="onBlur()"
+    />
+    @if (type === 'password') {
+      <button type="button" class="field__toggle" (click)="togglePassword()" [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+        {{ showPassword ? '👁' : '🙈' }}
+      </button>
+    }
+  </div>
+
+  @if (error) {
+    <span class="field__error">{{ error }}</span>
+  } @else if (hint) {
+    <span class="field__hint">{{ hint }}</span>
+  }
+</div>

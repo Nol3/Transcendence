@@ -1,0 +1,7 @@
+<div [class]="'avatar avatar--' + size" [attr.aria-label]="username">
+  @if (showImage) {
+    <img [src]="src" [alt]="username" class="avatar__img" (error)="onImgError()" />
+  } @else {
+    <span class="avatar__initials font-pixel">{{ initials }}</span>
+  }
+</div>

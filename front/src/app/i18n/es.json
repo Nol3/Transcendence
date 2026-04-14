@@ -1,0 +1,55 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "game": "Jugar",
+    "tournament": "Torneo",
+    "profile": "Perfil",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión"
+  },
+  "home": {
+    "subtitle": "Inserta moneda para jugar",
+    "play": "Jugar ahora",
+    "tournament": "Torneo"
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar sesión",
+      "email": "Correo",
+      "password": "Contraseña",
+      "submit": "Entrar",
+      "noAccount": "¿Sin cuenta? Regístrate"
+    },
+    "register": {
+      "title": "Registrarse",
+      "username": "Usuario",
+      "email": "Correo",
+      "password": "Contraseña",
+      "submit": "Crear cuenta",
+      "hasAccount": "¿Tienes cuenta? Inicia sesión"
+    }
+  },
+  "game": {
+    "title": "Juego de cartas",
+    "insertCoin": "Inserta moneda"
+  },
+  "tournament": {
+    "title": "Torneo",
+    "bracket": "Cuadro"
+  },
+  "profile": {
+    "title": "Perfil del jugador",
+    "wins": "Victorias",
+    "losses": "Derrotas"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "retry": "Reintentar",
+    "back": "Volver",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar"
+  }
+}
