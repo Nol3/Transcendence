@@ -85,3 +85,15 @@
     &:hover { opacity: 0.8; }
   }
 }
+
+// Google button host — centers the GSI-rendered iframe button
+.google-btn-host {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+
+  // Override Google's default white background to blend with dark theme
+  iframe {
+    color-scheme: dark;
+  }
+}

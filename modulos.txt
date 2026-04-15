@@ -53,3 +53,21 @@ admin / admin123
 
 Email: player1@test.com
 Password: password123
+
+Usuario: testuser o admin@transcendence.local
+Contraseña: test123 o admin123
+
+Credenciales activas:                                                                                                                                                                                           
+                                                                                                                                                                                                                  
+  ┌───────────┬──────────────────────────────┬─────────────┬───────────────────┐                                                                                                                                  
+  │  Usuario  │            Email             │ Contraseña  │        Rol        │                                                                                                                                  
+  ├───────────┼──────────────────────────────┼─────────────┼───────────────────┤                                                                                                                                  
+  │ testuser  │ testuser@transcendence.local │ test123     │ normal            │
+  ├───────────┼──────────────────────────────┼─────────────┼───────────────────┤                                                                                                                                  
+  │ admin     │ admin@transcendence.local    │ admin123    │ staff + superuser │                                                                                                                                  
+  ├───────────┼──────────────────────────────┼─────────────┼───────────────────┤                                                                                                                                  
+  │ player1–5 │ player1@test.com             │ password123 │ normal            │                                                                                                                                  
+  └───────────┴──────────────────────────────┴─────────────┴───────────────────┘
+
+ID_CLIENTE  1067739742379-t0t8p1agm0eoej2l2tjklk80igc30t6k.apps.googleusercontent.com
+SECRETO_DE_CLIENTE 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

@@ -56,7 +56,14 @@
 
     <!-- Footer -->
     <div class="auth-card__footer">
-      <app-divider label="OR" color="muted" />
+
+      @if (googleEnabled) {
+        <app-divider label="OR" color="muted" />
+        <!-- Google Identity Services renders the button here -->
+        <div #googleBtn class="google-btn-host"></div>
+      }
+
+      <app-divider color="muted" />
       <p class="auth-card__switch text-secondary text-sm">
         No account?
         <a routerLink="/register" class="auth-card__link font-pixel">REGISTER</a>

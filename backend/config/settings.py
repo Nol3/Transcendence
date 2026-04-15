@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "apps.games",
     "apps.chat",
     "apps.tournament",
+    "apps.public_api",
 ]
 
 MIDDLEWARE = [
@@ -132,6 +133,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # REST Framework Configuration
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "apps.public_api.authentication.ApiKeyAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
@@ -143,6 +145,16 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "60/hour",
+        "user": "1000/hour",
+        "api_key": "100/hour",
+        "api_key_burst": "20/minute",
+    },
 }
 
 # JWT Configuration
@@ -187,6 +199,9 @@ EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+
+# Google OAuth2
+GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID", default="")
 
 APPEND_SLASH = False
 

@@ -16,6 +16,7 @@ from apps.users.auth_views import (
     MeView,
     RefreshTokenView,
     LogoutView,
+    GoogleLoginView,
 )
 
 
@@ -66,6 +67,8 @@ urlpatterns = [
     path("api/auth/refresh", RefreshTokenView.as_view(), name="auth-refresh-no-slash"),
     path("api/auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("api/auth/logout", LogoutView.as_view(), name="auth-logout-no-slash"),
+    path("api/auth/google/", GoogleLoginView.as_view(), name="auth-google"),
+    path("api/auth/google", GoogleLoginView.as_view(), name="auth-google-no-slash"),
     # API endpoints
     path("api/users/", include("apps.users.urls", namespace="users")),
     path("api/games/", include("apps.games.urls", namespace="games")),
@@ -74,6 +77,8 @@ urlpatterns = [
     # Leaderboard
     path("api/leaderboard/", include("apps.users.leaderboard_urls")),
     path("api/leaderboard", include("apps.users.leaderboard_urls")),
+    # Public API (API key authenticated)
+    path("api/public/", include("apps.public_api.urls", namespace="public_api")),
 ]
 
 if settings.DEBUG:

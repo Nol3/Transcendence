@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
@@ -7,6 +7,7 @@ import { ButtonComponent } from '../../../shared/components/button/button';
 import { InputComponent } from '../../../shared/components/input/input';
 import { DividerComponent } from '../../../shared/components/divider/divider';
 import { PixelTitleComponent } from '../../../shared/components/pixel-title/pixel-title';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -15,19 +16,28 @@ import { PixelTitleComponent } from '../../../shared/components/pixel-title/pixe
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login {
+export class Login implements AfterViewInit {
+  @ViewChild('googleBtn') googleBtnRef!: ElementRef<HTMLDivElement>;
+
   private readonly fb      = inject(FormBuilder);
   private readonly auth    = inject(AuthService);
   private readonly router  = inject(Router);
   private readonly notif   = inject(NotificationService);
 
-  readonly loading = this.auth.loading;
-  readonly error   = signal('');
+  readonly loading        = this.auth.loading;
+  readonly error          = signal('');
+  readonly googleEnabled  = !!environment.googleClientId;
 
   readonly form = this.fb.group({
     email:    ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
+
+  ngAfterViewInit(): void {
+    if (this.googleEnabled && this.googleBtnRef?.nativeElement) {
+      this.auth.renderGoogleButton(this.googleBtnRef.nativeElement);
+    }
+  }
 
   fieldError(field: 'email' | 'password'): string {
     const ctrl = this.form.get(field);
