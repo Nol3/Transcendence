@@ -4,6 +4,9 @@
 
 ---
 
+setup.ps1	Windows	.\setup.ps1 o .\setup.ps1 -Dev
+setup.sh	Linux/macOS	./setup.sh o ./setup.sh --dev
+
 ## Table of Contents
 
 1. [Description](#description)
@@ -365,6 +368,95 @@ docker compose up --build
 # Frontend: https://localhost:4200
 # Backend API: https://localhost:8000
 # Django Admin: https://localhost:8000/admin
+```
+
+### Local Development (Without Docker)
+
+#### Prerequisites
+
+| Requirement | Version | Notes |
+|-------------|---------|-------|
+| Python | ≥ 3.10 | For Django backend |
+| Node.js | ≥ 18.x | For Angular frontend |
+| npm | ≥ 9.x | Comes with Node.js |
+
+#### Backend Setup
+
+```bash
+# 1. Navigate to backend directory
+cd backend
+
+# 2. Create virtual environment
+python -m venv venv
+
+# 3. Activate virtual environment (Windows)
+venv\Scripts\activate
+# Or on macOS/Linux: source venv/bin/activate
+
+# 4. Install dependencies
+pip install -r requirements.txt
+
+# 5. Run migrations
+python manage.py migrate
+
+# 6. Create superuser (optional)
+python manage.py createsuperuser
+
+# 7. Start the development server
+python manage.py runserver 8000
+```
+
+#### Frontend Setup
+
+```bash
+# 1. Open a new terminal and navigate to frontend directory
+cd frontend
+
+# 2. Install dependencies
+npm install
+
+# 3. Start the development server
+npm start
+```
+
+#### Access the Application
+
+- **Frontend:** http://localhost:4200
+- **Backend API:** http://localhost:8000
+- **Django Admin:** http://localhost:8000/admin
+
+#### Test Users
+
+After running migrations, you can create test users:
+
+```bash
+cd backend
+python manage.py shell -c "
+from django.contrib.auth.models import User
+from apps.users.models import UserProfile
+
+# Create test user
+user = User.objects.create_user(username='testuser', email='test@test.com', password='test123')
+UserProfile.objects.create(user=user)
+print('Test user created: testuser / test123')
+"
+```
+
+#### Troubleshooting
+
+**Frontend can't connect to backend:**
+- Ensure backend is running on port 8000
+- Check CORS settings in `backend/config/settings.py`
+
+**Port already in use:**
+```bash
+# Windows
+netstat -ano | findstr :8000
+taskkill /PID <pid> /F
+
+# macOS/Linux
+lsof -i :8000
+kill -9 <pid>
 ```
 
 ### Environment Variables
