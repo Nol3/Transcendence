@@ -27,7 +27,7 @@ const MOCK_ROOMS: RoomEntry[] = [
 @Component({
   selector: 'app-game-board',
   standalone: true,
-  imports: [RouterLink, BadgeComponent, ButtonComponent, CardComponent, PixelTitleComponent, SpinnerComponent],
+  imports: [BadgeComponent, ButtonComponent, CardComponent, PixelTitleComponent, SpinnerComponent],
   templateUrl: './game-board.html',
   styleUrl: './game-board.scss',
 })

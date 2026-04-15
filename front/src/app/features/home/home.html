@@ -91,7 +91,7 @@
                     {{ rankIcon(entry.rank) }}
                   </app-badge>
                 </div>
-                <span class="leaderboard__name font-pixel">{{ entry.user?.username || 'Unknown' }}</span>
+                <span class="leaderboard__name font-pixel">{{ entry.user.username || 'Unknown' }}</span>
                 <div class="leaderboard__stats">
                   <span class="leaderboard__wins neon-text-green font-mono">{{ entry.wins }}W</span>
                   <span class="leaderboard__losses text-muted font-mono">{{ entry.losses }}L</span>
