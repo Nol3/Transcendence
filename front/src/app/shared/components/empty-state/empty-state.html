@@ -1,0 +1,8 @@
+<div class="empty-state">
+  <div class="empty-state__icon animate-pulse-glow">{{ icon }}</div>
+  <p class="empty-state__title font-pixel neon-text-cyan">{{ title }}</p>
+  @if (message) {
+    <p class="empty-state__message text-secondary">{{ message }}</p>
+  }
+  <ng-content />
+</div>

@@ -1,0 +1,7 @@
+@use '../login/login.scss';
+
+.auth-card--register {
+  max-width: 480px;
+  border-top-color: var(--color-neon-magenta) !important;
+  box-shadow: var(--shadow-card), 0 -2px 20px rgba(255, 0, 204, 0.15) !important;
+}

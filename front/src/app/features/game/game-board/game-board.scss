@@ -1,0 +1,256 @@
+// ── Layout ──────────────────────────────────────────────────
+.lobby {
+  padding-bottom: var(--space-16);
+
+  &__header {
+    padding-block: var(--space-8) var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  &__body { }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: var(--space-8);
+    align-items: start;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+}
+
+// ── Arcade Cabinet ──────────────────────────────────────────
+.game-area {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cabinet {
+  border: 2px solid var(--color-neon-yellow);
+  border-radius: var(--radius-xl);
+  background: var(--color-bg-secondary);
+  box-shadow: var(--glow-yellow), var(--shadow-card);
+  overflow: hidden;
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-5);
+    background: var(--color-bg-elevated);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__label {
+    font-size: var(--font-pixel-xs);
+    letter-spacing: 0.15em;
+  }
+
+  &__lights {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  &__light {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+
+    &--cyan    { background: var(--color-neon-cyan);    box-shadow: var(--glow-cyan);    animation-delay: 0s;    }
+    &--magenta { background: var(--color-neon-magenta); box-shadow: var(--glow-magenta); animation-delay: 0.4s;  }
+    &--yellow  { background: var(--color-neon-yellow);  box-shadow: var(--glow-yellow);  animation-delay: 0.8s;  }
+  }
+
+  &__screen {
+    min-height: 420px;
+    background: #020204;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-8);
+    position: relative;
+
+    // Subtle inner glow
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(0, 229, 255, 0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
+  }
+
+  &__bottom {
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-bg-elevated);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: center;
+  }
+
+  &__controls {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  &__btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+
+    &--red    { background: #ff3355; }
+    &--blue   { background: #0099ff; }
+    &--yellow { background: #ffe600; }
+    &--green  { background: #00ff41; }
+  }
+}
+
+// ── Cabinet screen states ───────────────────────────────────
+.cabinet__idle,
+.cabinet__searching,
+.cabinet__found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  text-align: center;
+  width: 100%;
+}
+
+.cabinet__game-title {
+  font-size: var(--font-pixel-lg);
+  letter-spacing: 0.1em;
+  line-height: 1.4;
+}
+
+.cabinet__subtitle {
+  font-size: var(--font-pixel-sm);
+  letter-spacing: 0.2em;
+  margin-top: calc(var(--space-3) * -1);
+}
+
+.cabinet__coin-insert {
+  font-size: var(--font-pixel-xs);
+  color: var(--color-neon-yellow);
+  text-shadow: var(--glow-yellow);
+  letter-spacing: 0.1em;
+  margin-top: var(--space-2);
+}
+
+.cabinet__deco {
+  font-size: 2.5rem;
+  display: flex;
+  gap: var(--space-8);
+  margin-block: var(--space-2);
+}
+
+.cabinet__placeholder {
+  padding: var(--space-4) var(--space-6);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-2);
+}
+
+.cabinet__found-title {
+  font-size: var(--font-pixel-md);
+  letter-spacing: 0.08em;
+}
+
+// ── Rooms ───────────────────────────────────────────────────
+.rooms {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  &__footer {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+.room-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+
+  &:hover { background: rgba(255,255,255,0.03); }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__host {
+    font-size: var(--font-pixel-xs);
+    letter-spacing: 0.05em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-shrink: 0;
+  }
+}
+
+// ── Rules ───────────────────────────────────────────────────
+.rules {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  &__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    font-size: var(--font-size-sm);
+  }
+}
+
+// ── My stats ────────────────────────────────────────────────
+.my-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    span:last-child {
+      font-size: var(--font-pixel-xs);
+      letter-spacing: 0.05em;
+    }
+  }
+}

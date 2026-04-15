@@ -1,0 +1,99 @@
+.auth-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100dvh - var(--header-height));
+  padding: var(--space-8) var(--space-4);
+  gap: var(--space-6);
+
+  &__deco {
+    display: flex;
+    gap: var(--space-6);
+    font-size: var(--font-pixel-md);
+  }
+
+  &__hint {
+    font-size: var(--font-pixel-xs);
+    color: var(--color-text-muted);
+    letter-spacing: 0.15em;
+    margin-top: var(--space-4);
+  }
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  padding: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+
+  // Neon top border accent
+  border-top: 2px solid var(--color-neon-cyan) !important;
+  box-shadow: var(--shadow-card), 0 -2px 20px rgba(0, 229, 255, 0.15) !important;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__subtitle {
+    letter-spacing: 0.05em;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: rgba(255, 51, 102, 0.08);
+    border: 1px solid rgba(255, 51, 102, 0.3);
+    border-radius: var(--radius-md);
+    color: var(--color-danger);
+    font-size: var(--font-size-sm);
+  }
+
+  &__footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  &__switch {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+  }
+
+  &__link {
+    font-size: var(--font-pixel-xs);
+    color: var(--color-neon-magenta);
+    letter-spacing: 0.08em;
+    text-shadow: var(--glow-magenta);
+    transition: opacity var(--transition-fast);
+
+    &:hover { opacity: 0.8; }
+  }
+}
+
+// Google button host — centers the GSI-rendered iframe button
+.google-btn-host {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+
+  // Override Google's default white background to blend with dark theme
+  iframe {
+    color-scheme: dark;
+  }
+}

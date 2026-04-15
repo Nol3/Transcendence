@@ -1,0 +1,14 @@
+.pixel-title {
+  font-family: var(--font-pixel);
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+
+  &--h1 { font-size: clamp(var(--font-pixel-md), 4vw, var(--font-pixel-xl)); }
+  &--h2 { font-size: clamp(var(--font-pixel-sm), 3vw, var(--font-pixel-lg)); }
+  &--h3 { font-size: var(--font-pixel-sm); }
+
+  &--cyan    { color: var(--color-neon-cyan);    text-shadow: var(--glow-cyan); }
+  &--magenta { color: var(--color-neon-magenta); text-shadow: var(--glow-magenta); }
+  &--yellow  { color: var(--color-neon-yellow);  text-shadow: var(--glow-yellow); }
+  &--green   { color: var(--color-neon-green);   text-shadow: var(--glow-green); }
+}

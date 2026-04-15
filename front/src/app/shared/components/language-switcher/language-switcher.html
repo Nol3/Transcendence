@@ -1,0 +1,23 @@
+<div class="lang-switcher" [class.lang-switcher--open]="isOpen()">
+  <button class="lang-switcher__trigger font-pixel" (click)="toggle()">
+    <span>{{ currentLangData.flag }}</span>
+    <span>{{ currentLangData.code | uppercase }}</span>
+    <span class="lang-switcher__arrow">{{ isOpen() ? '▲' : '▼' }}</span>
+  </button>
+  @if (isOpen()) {
+    <ul class="lang-switcher__dropdown animate-slide-up" role="listbox">
+      @for (lang of languages; track lang.code) {
+        <li
+          role="option"
+          [attr.aria-selected]="lang.code === currentCode"
+          [class.lang-switcher__option--active]="lang.code === currentCode"
+          class="lang-switcher__option font-pixel"
+          (click)="select(lang.code)"
+        >
+          <span>{{ lang.flag }}</span>
+          <span>{{ lang.label }}</span>
+        </li>
+      }
+    </ul>
+  }
+</div>

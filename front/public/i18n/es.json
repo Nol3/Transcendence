@@ -1,0 +1,233 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "game": "Jugar",
+    "tournament": "Torneo",
+    "profile": "Perfil",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión"
+  },
+  "footer": {
+    "tagline": "La experiencia definitiva de batallas de cartas",
+    "game": "Juego",
+    "account": "Cuenta",
+    "legal": "Legal",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio",
+    "rights": "Todos los derechos reservados."
+  },
+  "home": {
+    "title": "Transcendence",
+    "subtitle": "Inserta moneda para jugar",
+    "tagline": "La experiencia definitiva de batallas de cartas",
+    "play": "Jugar ahora",
+    "tournament": "Torneo",
+    "leaderboard": "Clasificación",
+    "stats": "Estadísticas",
+    "totalPlayers": "Jugadores totales",
+    "gamesPlayed": "Partidas jugadas",
+    "howToPlay": "Cómo jugar",
+    "howToPlayDesc": "Desafía a tus oponentes en épicas batallas de cartas. Construye tu mazo, supera a tu rival y escala posiciones para convertirte en el campeón definitivo.",
+    "rankings": "Clasificación",
+    "player": "Jugador",
+    "wins": "Victorias",
+    "winRate": "Ratio de victoria"
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar sesión",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "Introduce tu correo",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Introduce tu contraseña",
+      "submit": "Entrar",
+      "noAccount": "¿Sin cuenta? Regístrate",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "invalidCredentials": "Correo o contraseña inválidos",
+      "required": "Este campo es obligatorio",
+      "invalidEmail": "Introduce un correo válido"
+    },
+    "register": {
+      "title": "Registrarse",
+      "username": "Nombre de usuario",
+      "usernamePlaceholder": "Elige un nombre de usuario",
+      "email": "Correo electrónico",
+      "emailPlaceholder": "Introduce tu correo",
+      "password": "Contraseña",
+      "passwordPlaceholder": "Crea una contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "confirmPasswordPlaceholder": "Confirma tu contraseña",
+      "submit": "Crear cuenta",
+      "hasAccount": "¿Tienes cuenta? Inicia sesión",
+      "passwordMismatch": "Las contraseñas no coinciden",
+      "usernameTaken": "El nombre de usuario ya está en uso",
+      "emailTaken": "El correo ya está registrado"
+    }
+  },
+  "game": {
+    "title": "Juego de cartas",
+    "insertCoin": "Inserta moneda",
+    "findingMatch": "Buscando oponente...",
+    "matchFound": "¡Oponente encontrado!",
+    "yourTurn": "Tu turno",
+    "opponentTurn": "Turno del oponente",
+    "victory": "¡Victoria!",
+    "defeat": "Derrota",
+    "draw": "Empate",
+    "playAgain": "Jugar de nuevo",
+    "exitGame": "Salir del juego",
+    "rules": "Reglas",
+    "rulesText": "Empareja cartas por rango. La carta más alta gana la ronda. ¡El primero en ganar 3 rondas gana la partida!"
+  },
+  "tournament": {
+    "title": "Torneo",
+    "bracket": "Cuadro",
+    "register": "Registrarse",
+    "joinTournament": "Unirse al torneo",
+    "active": "Activo",
+    "upcoming": "Próximo",
+    "finished": "Finalizado",
+    "participants": "Participantes",
+    "round": "Ronda",
+    "finals": "Final",
+    "semiFinals": "Semifinales",
+    "quarterFinals": "Cuartos de final",
+    "noTournaments": "No hay torneos disponibles",
+    "createTournament": "Crear torneo",
+    "tournamentName": "Nombre del torneo",
+    "maxPlayers": "Jugadores máximos",
+    "startDate": "Fecha de inicio"
+  },
+  "profile": {
+    "title": "Perfil del jugador",
+    "editProfile": "Editar perfil",
+    "wins": "Victorias",
+    "losses": "Derrotas",
+    "rank": "Rango",
+    "winRate": "Ratio de victoria",
+    "gameHistory": "Historial de partidas",
+    "achievements": "Logros",
+    "noGames": "Aún no hay partidas jugadas",
+    "saveChanges": "Guardar cambios",
+    "cancelEdit": "Cancelar",
+    "username": "Nombre de usuario",
+    "avatar": "Avatar",
+    "uploadAvatar": "Subir nuevo avatar",
+    "achievementUnlocked": "¡Logro desbloqueado!",
+    "firstVictory": "Primera victoria",
+    "winStreak": "Racha de victorias x5",
+    "speedPlayer": "Jugador rápido",
+    "champion": "Campeón",
+    "hundredWins": "100 victorias"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ha ocurrido un error",
+    "retry": "Reintentar",
+    "back": "Volver",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "ascending": "Ascendente",
+    "descending": "Descendente",
+    "noResults": "No se encontraron resultados",
+    "vs": "vs",
+    "ready": "Listo"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "noNotifications": "Sin notificaciones",
+    "matchInvite": "Invitación de partida",
+    "tournamentStart": "Inicio del torneo",
+    "opponentFound": "Oponente encontrado",
+    "gameResult": "Resultado de partida",
+    "youWin": "¡Ganaste!",
+    "youLose": "Perdiste"
+  },
+  "privacy": {
+    "title": "Política de Privacidad",
+    "lastUpdated": "Última actualización: 14 de abril de 2026",
+    "section1": {
+      "title": "Información que Recopilamos",
+      "p1": "Recopilamos información que nos proporcionas directamente, incluyendo:",
+      "li1": "Información de cuenta (nombre de usuario, correo, contraseña) al registrarte",
+      "li2": "Datos de juego incluyendo partidas, puntuaciones y participación en torneos",
+      "li3": "Comunicaciones y mensajes enviados a través de nuestra plataforma",
+      "li4": "Información de perfil incluyendo avatar y configuraciones"
+    },
+    "section2": {
+      "title": "Cómo Utilizamos Tu Información",
+      "p1": "Utilizamos la información recopilada para:",
+      "li1": "Proporcionar, mantener y mejorar nuestros servicios",
+      "li2": "Procesar transacciones y enviar información relacionada",
+      "li3": "Enviarte avisos técnicos y mensajes de soporte"
+    },
+    "section3": {
+      "title": "Compartición de Información",
+      "p1": "No vendemos, intercambiamos ni transferimos tu información personal a terceros sin tu consentimiento, excepto según se describe en esta política. Podemos compartir información con:",
+      "li1": "Proveedores de servicios que nos ayudan en nuestras operaciones",
+      "li2": "Otros usuarios (como parte de funciones públicas de juego)",
+      "li3": "Autoridades legales cuando lo requiera la ley"
+    },
+    "section4": {
+      "title": "Seguridad de Datos",
+      "p1": "Implementamos medidas técnicas y organizativas apropiadas para proteger tu información personal contra acceso no autorizado, alteración, divulgación o destrucción.",
+      "p2": "Sin embargo, ningún método de transmisión por Internet es 100% seguro, y no podemos garantizar seguridad absoluta."
+    },
+    "section5": {
+      "title": "Tus Derechos",
+      "p1": "Tienes derecho a acceder, corregir o eliminar tus datos personales. También puedes optar por no recibir ciertas comunicaciones. Para ejercer estos derechos, contáctanos a través de la plataforma.",
+      "p2": "Puedes eliminar tu cuenta en cualquier momento, lo cual eliminará tu información personal de nuestros servidores."
+    },
+    "section6": {
+      "title": "Contáctanos",
+      "p1": "Si tienes alguna pregunta sobre esta Política de Privacidad, contáctanos:",
+      "contact": "Email: privacy@transcendence.game | Dirección: 42 School, París, Francia"
+    }
+  },
+  "terms": {
+    "title": "Términos de Servicio",
+    "lastUpdated": "Última actualización: 14 de abril de 2026",
+    "section1": {
+      "title": "Aceptación de los Términos",
+      "p1": "Al acceder o usar Transcendence, aceptas estar sujeto a estos Términos de Servicio y todas las leyes y regulaciones aplicables.",
+      "p2": "Si no estás de acuerdo con alguna parte de estos términos, no podrás usar nuestros servicios."
+    },
+    "section2": {
+      "title": "Conducta del Usuario",
+      "p1": "Aceptas usar Transcendence solo para fines legales y de acuerdo con estos Términos. Eres responsable de:",
+      "li1": "Mantener la confidencialidad de tu cuenta",
+      "li2": "Todas las actividades que ocurran bajo tu cuenta",
+      "li3": "No participar en trampa, hackeo o explotación",
+      "li4": "Tratar a otros jugadores con respeto",
+      "li5": "No transmitir contenido dañino o inapropiado"
+    },
+    "section3": {
+      "title": "Reglas del Juego",
+      "p1": "Todas las partidas jugadas en Transcendence deben seguir principios de juego limpio. Cualquier forma de trampa, explotación de errores o modificaciones no autorizadas está estrictamente prohibida.",
+      "p2": "Los jugadores que violen las reglas del juego pueden recibir advertencias, suspensiones temporales o suspensión permanente de la cuenta."
+    },
+    "section4": {
+      "title": "Propiedad Intelectual",
+      "p1": "Todo el contenido, características y funcionalidad de Transcendence son propiedad nuestra y están protegidos por leyes de propiedad intelectual, marcas registradas y otras leyes aplicables. Retienes la propiedad del contenido que creas.",
+      "li1": "No puedes reproducir, distribuir o crear trabajos derivados",
+      "li2": "El contenido generado por usuarios no debe infringir los derechos de otros",
+      "li3": "Reporta cualquier violación de propiedad intelectual a nuestro equipo"
+    },
+    "section5": {
+      "title": "Limitación de Responsabilidad",
+      "p1": "Transcendence se proporciona 'tal cual' sin garantías de ningún tipo. No somos responsables de ningún daño indirecto, incidental o consecuente derivado de tu uso del servicio.",
+      "p2": "No garantizamos un servicio ininterrumpido o libre de errores."
+    },
+    "section6": {
+      "title": "Cambios a los Términos",
+      "p1": "Nos reservamos el derecho de modificar estos Términos en cualquier momento. El uso continuo del servicio después de los cambios constituye la aceptación de los nuevos términos.",
+      "contact": "Para preguntas sobre estos Términos, contáctanos en: legal@transcendence.game"
+    }
+  }
+}

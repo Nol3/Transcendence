@@ -1,0 +1,21 @@
+@if (open) {
+  <div class="modal-overlay" (click)="close()" role="dialog" aria-modal="true" [attr.aria-label]="title">
+    <div class="modal-box arcade-panel animate-slide-up" (click)="$event.stopPropagation()">
+
+      <div class="modal-box__header">
+        @if (title) {
+          <h3 class="modal-box__title font-pixel neon-text-cyan">{{ title }}</h3>
+        }
+        @if (closable) {
+          <button class="modal-box__close" (click)="close()" aria-label="Close modal">✕</button>
+        }
+      </div>
+
+      <div class="modal-box__body">
+        <ng-content />
+      </div>
+
+      <ng-content select="[modal-footer]" />
+    </div>
+  </div>
+}

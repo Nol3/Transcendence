@@ -1,0 +1,13 @@
+<button
+  [type]="type"
+  [disabled]="disabled || loading"
+  [class]="'btn btn--' + variant + ' btn--' + size + (fullWidth ? ' btn--full' : '')"
+  (click)="onClick($event)"
+>
+  @if (loading) {
+    <app-spinner size="sm" />
+  }
+  <span [class.btn__label--hidden]="loading">
+    <ng-content />
+  </span>
+</button>
