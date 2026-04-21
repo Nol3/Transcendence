@@ -26,8 +26,6 @@ services:
              python manage.py runserver 0.0.0.0:8000"
     networks:
       - transcendence-network
-    depends_on:
-      - nginx
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/health/"]
       interval: 30s
@@ -40,8 +38,8 @@ services:
   # ==========================================
   frontend:
     build:
-      context: ./frontend
-      dockerfile: ../docker/Dockerfile.frontend
+      context: .
+      dockerfile: docker/Dockerfile.frontend
     container_name: ft_transcendence_frontend
     ports:
       - "${FRONTEND_PORT:-4200}:4200"
