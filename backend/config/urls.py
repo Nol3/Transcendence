@@ -4,6 +4,7 @@ URL Configuration for ft_transcendence project.
 
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.views import APIView
@@ -77,6 +78,8 @@ urlpatterns = [
     # Leaderboard
     path("api/leaderboard/", include("apps.users.leaderboard_urls")),
     path("api/leaderboard", include("apps.users.leaderboard_urls")),
+    # Redirect root to game embedding MVP
+    path("", RedirectView.as_view(url="/game/", permanent=False)),
     # Public API (API key authenticated)
     path("api/public/", include("apps.public_api.urls", namespace="public_api")),
 ]
