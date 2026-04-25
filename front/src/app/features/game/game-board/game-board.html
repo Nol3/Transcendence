@@ -7,7 +7,7 @@
       <app-badge variant="success">ONLINE</app-badge>
     </div>
     <p class="text-secondary text-sm">
-      Find a match, join an open room, or challenge a friend.
+      Card Wars — pick up where the deck left off.
     </p>
   </div>
 
@@ -29,52 +29,14 @@
           </div>
 
           <div class="cabinet__screen">
-
-            @switch (lobbyState()) {
-              @case ('idle') {
-                <div class="cabinet__idle">
-                  <p class="font-pixel neon-text-cyan cabinet__game-title">CARD WARS</p>
-                  <p class="font-pixel text-secondary cabinet__subtitle">ONLINE EDITION</p>
-                  <div class="cabinet__coin-insert animate-blink">
-                    <span class="font-pixel">▶ INSERT COIN TO PLAY ◀</span>
-                  </div>
-                  <div class="cabinet__deco" aria-hidden="true">
-                    <span class="neon-text-cyan animate-flicker">♠</span>
-                    <span class="neon-text-magenta animate-flicker" style="animation-delay:.3s">♥</span>
-                    <span class="neon-text-yellow  animate-flicker" style="animation-delay:.6s">♦</span>
-                    <span class="neon-text-green   animate-flicker" style="animation-delay:.9s">♣</span>
-                  </div>
-                  <!-- Integration point: game component goes here -->
-                  <div class="cabinet__placeholder">
-                    <span class="text-muted text-sm font-mono">
-                      [ GAME COMPONENT — awaiting implementation ]
-                    </span>
-                  </div>
-                </div>
-              }
-
-              @case ('searching') {
-                <div class="cabinet__searching">
-                  <app-spinner size="lg" />
-                  <p class="font-pixel neon-text-cyan">SEARCHING...</p>
-                  <p class="text-secondary text-sm">Finding an opponent at your level</p>
-                  <app-button variant="ghost" size="sm" (clicked)="cancelSearch()">
-                    CANCEL
-                  </app-button>
-                </div>
-              }
-
-              @case ('found') {
-                <div class="cabinet__found">
-                  <p class="font-pixel neon-text-green cabinet__found-title animate-flicker">
-                    MATCH FOUND!
-                  </p>
-                  <p class="text-secondary text-sm">Preparing game board...</p>
-                  <app-spinner size="md" />
-                </div>
-              }
-            }
-
+            <iframe
+              [src]="gameSrc"
+              title="Card Wars - WASM Game"
+              class="cabinet__game-frame"
+              loading="lazy"
+              sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups"
+              allow="autoplay; clipboard-write; clipboard-read; fullscreen"
+            ></iframe>
           </div>
 
           <div class="cabinet__bottom">
@@ -87,66 +49,15 @@
           </div>
         </div>
 
-        <!-- Quick match button -->
-        @if (lobbyState() === 'idle') {
-          <app-button variant="primary" size="lg" [fullWidth]="true" (clicked)="findMatch()">
-            ▶ QUICK MATCH
-          </app-button>
-        }
-
       </div>
 
       <!-- ── Right: sidebar ───────────────────────────────── -->
       <div class="lobby__sidebar">
 
-        <!-- Open rooms -->
-        <app-card title="OPEN ROOMS">
-          <div class="rooms">
-            @for (room of rooms(); track room.id) {
-              <div class="room-row">
-                <div class="room-row__info">
-                  <span class="room-row__host font-pixel">{{ room.host }}</span>
-                  <span class="room-row__players text-secondary text-sm font-mono">
-                    {{ room.players }}/{{ room.maxPlayers }}
-                  </span>
-                </div>
-                <div class="room-row__actions">
-                  <app-badge [variant]="roomBadge(room.status)">
-                    {{ room.status === 'waiting' ? 'OPEN' : 'LIVE' }}
-                  </app-badge>
-                  <app-button
-                    size="sm"
-                    [variant]="room.status === 'waiting' ? 'secondary' : 'ghost'"
-                    (clicked)="joinRoom(room)"
-                  >
-                    {{ room.status === 'waiting' ? 'JOIN' : 'WATCH' }}
-                  </app-button>
-                </div>
-              </div>
-            }
-
-            @if (rooms().length === 0) {
-              <p class="text-muted text-sm font-mono">No open rooms right now.</p>
-            }
-          </div>
-
-          <div class="rooms__footer">
-            <app-button variant="ghost" size="sm" [fullWidth]="true">
-              + CREATE ROOM
-            </app-button>
-          </div>
-        </app-card>
-
         <!-- Game rules -->
         <app-card title="GAME RULES">
           <ul class="rules">
-            @for (rule of [
-              'Each player starts with 5 cards',
-              'Draw 1 card per turn',
-              'Play cards to attack or defend',
-              'Reduce opponent HP to 0 to win',
-              'Special cards have unique effects'
-            ]; track rule) {
+            @for (rule of rules; track rule) {
               <li class="rules__item">
                 <span class="neon-text-cyan font-mono">›</span>
                 <span class="text-secondary text-sm">{{ rule }}</span>
@@ -158,12 +69,7 @@
         <!-- Your stats -->
         <app-card title="YOUR STATS">
           <div class="my-stats">
-            @for (stat of [
-              { label: 'RANK',   value: '#42',  color: 'neon-text-yellow' },
-              { label: 'WINS',   value: '12',   color: 'neon-text-green'  },
-              { label: 'LOSSES', value: '4',    color: 'text-secondary'   },
-              { label: 'W-RATE', value: '75%',  color: 'neon-text-cyan'   }
-            ]; track stat.label) {
+            @for (stat of stats(); track stat.label) {
               <div class="my-stats__row">
                 <span class="text-muted font-mono text-sm">{{ stat.label }}</span>
                 <span [class]="'font-pixel ' + stat.color">{{ stat.value }}</span>

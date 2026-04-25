@@ -60,7 +60,7 @@ export class Login implements AfterViewInit {
       next: () => {
         this.notif.success('WELCOME BACK', `Logged in as ${email}`);
         // After login, navigate to the embedded game wrapper (MVP)
-        this.router.navigate(['/game-wrap']);
+        this.router.navigate(['/']);
       },
       error: (err) => {
         const msg = err?.error?.error ?? 'Login failed. Check your credentials.';

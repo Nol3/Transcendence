@@ -217,7 +217,13 @@ void UpdateStateSetupPlayers(Game* game) {
     static int currentOption = 0;  // 0=jugadores, 1=rondas, 2=puntuacion
     int screenW = GetScreenWidth();
     int screenH = GetScreenHeight();
-    
+
+    // Botón ATRAS / ESC vuelve al menú principal
+    if (IsKeyPressed(KEY_ESCAPE) || IsButtonClicked("ATRAS", 20, 20, 120, 40)) {
+        game->state = STATE_MENU;
+        return;
+    }
+
     // Cambiar entre opciones con TAB
     if (IsKeyPressed(KEY_TAB)) {
         currentOption = (currentOption + 1) % 3;

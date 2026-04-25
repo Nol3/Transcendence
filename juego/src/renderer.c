@@ -414,7 +414,10 @@ void DrawStateSetupPlayers(Game* game) {
     
     // Instrucciones
     DrawCenteredText("Usa TAB para cambiar opcion, FLECHAS para ajustar", screenH - 140, 18, LIGHTGRAY);
-    
+
+    // Botón ATRAS (esquina superior izquierda)
+    DrawButton("ATRAS", 20, 20, 120, 40, (Color){60, 60, 60, 220}, WHITE);
+
     // Botón CONTINUAR
     DrawButton("CONTINUAR", screenW/2 - 100, screenH - 90, 200, 55, (Color){0, 100, 40, 255}, WHITE);
 }
