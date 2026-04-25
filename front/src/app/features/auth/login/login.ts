@@ -29,7 +29,7 @@ export class Login implements AfterViewInit {
   readonly googleEnabled  = !!environment.googleClientId;
 
   readonly form = this.fb.group({
-    email:    ['', [Validators.required, Validators.email]],
+    email:    ['', [Validators.required]],
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
@@ -43,7 +43,6 @@ export class Login implements AfterViewInit {
     const ctrl = this.form.get(field);
     if (!ctrl || !ctrl.touched || !ctrl.errors) return '';
     if (ctrl.errors['required'])  return 'Required';
-    if (ctrl.errors['email'])     return 'Invalid email format';
     if (ctrl.errors['minlength']) return `Min ${ctrl.errors['minlength'].requiredLength} characters`;
     return '';
   }
@@ -55,10 +54,12 @@ export class Login implements AfterViewInit {
     }
     this.error.set('');
     const { email, password } = this.form.getRawValue();
-
+    // Accept either username or email on the login field
+    // Backend handles both cases
     this.auth.login(email!, password!).subscribe({
       next: () => {
         this.notif.success('WELCOME BACK', `Logged in as ${email}`);
+        // After login, navigate to the embedded game wrapper (MVP)
         this.router.navigate(['/']);
       },
       error: (err) => {

@@ -49,7 +49,9 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # XFrameOptions removed globally — clickjacking protection now per-view via
+    # @xframe_options_deny / CSP frame-ancestors. The /game/ iframe needs cross-origin
+    # framing from Angular dev (:4200), which blanket DENY blocks.
 ]
 
 ROOT_URLCONF = "config.urls"

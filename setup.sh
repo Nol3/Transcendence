@@ -81,7 +81,13 @@ echo_success "Python: $(${PYTHON_CMD} --version)"
 
 # Check Node.js
 if ! command -v node &> /dev/null; then
-    echo_error "Node.js is not installed. Please install Node.js 18+"
+    echo_error "Node.js is not installed. Please install Node.js 20.19+ or 22.12+"
+    exit 1
+fi
+NODE_VERSION=$(node --version | sed 's/v//')
+REQUIRED_VERSION="20.19"
+if ! [ "$(printf '%s\n' "$REQUIRED_VERSION" "$NODE_VERSION" | sort -V | head -n1)" = "$REQUIRED_VERSION" ]; then
+    echo_error "Node.js version $NODE_VERSION is too old. Please install Node.js 20.19+ or 22.12+"
     exit 1
 fi
 echo_success "Node.js: $(node --version)"
@@ -114,22 +120,13 @@ VENV_PIP="$VENV_DIR/bin/pip"
 # Install dependencies
 echo_step "Installing Python dependencies..."
 if [ "$SKIP_DEPS" = false ]; then
-    # Use --break-system-packages for WSL/Linux systems that block global pip
-    PIP_FLAGS="--break-system-packages"
-    $VENV_PIP install --upgrade pip $PIP_FLAGS
-    $VENV_PIP install -r "$BACKEND_DIR/requirements.txt" $PIP_FLAGS
-    echo_success "Python dependencies installed"
-else
-    echo_warn "Skipping dependency installation"
-fi
-
-# Install dependencies
-echo_step "Installing Python dependencies..."
-if [ "$SKIP_DEPS" = false ]; then
-    # Use --break-system-packages for WSL/Linux systems that block global pip
-    PIP_FLAGS="--break-system-packages"
-    pip install --upgrade pip $PIP_FLAGS
-    pip install -r "$BACKEND_DIR/requirements.txt" $PIP_FLAGS
+    # Upgrade pip first
+    $VENV_PIP install --upgrade pip || true
+    # Install requirements (try with --break-system-packages if needed)
+    if ! $VENV_PIP install -r "$BACKEND_DIR/requirements.txt"; then
+        echo_warn "Retrying with --break-system-packages flag..."
+        $VENV_PIP install --break-system-packages -r "$BACKEND_DIR/requirements.txt" || true
+    fi
     echo_success "Python dependencies installed"
 else
     echo_warn "Skipping dependency installation"
@@ -138,12 +135,12 @@ fi
 # Run migrations
 echo_step "Running database migrations..."
 cd "$BACKEND_DIR"
-$PYTHON_CMD manage.py migrate --noinput
+$VENV_PYTHON manage.py migrate --noinput
 echo_success "Database migrations completed"
 
 # Create test users
 echo_step "Creating test users..."
-$PYTHON_CMD manage.py shell << 'EOF'
+$VENV_PYTHON manage.py shell << 'EOF'
 from django.contrib.auth.models import User
 from apps.users.models import UserProfile
 
@@ -177,7 +174,7 @@ echo_success "Test users created"
 
 echo_step "Setting up Frontend..."
 
-FRONTEND_DIR="$PROJECT_ROOT/frontend"
+FRONTEND_DIR="$PROJECT_ROOT/front"
 cd "$FRONTEND_DIR"
 
 if [ "$SKIP_DEPS" = false ]; then
@@ -237,7 +234,7 @@ else
     echo -e "  python manage.py runserver 8000"
     echo ""
     echo -e "  # Terminal 2 - Frontend"
-    echo -e "  cd frontend"
+    echo -e "  cd front"
     echo -e "  npm start"
     echo ""
     echo -e "Or simply run: ./setup.sh --dev"

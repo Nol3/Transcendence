@@ -1,9 +1,9 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, tap, map } from 'rxjs';
-import { ApiService } from './api.service';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-export type TournamentStatus = 'registration' | 'active' | 'finished';
+export type TournamentStatus = 'pending' | 'in_progress' | 'finished';
 export type MatchStatus = 'pending' | 'live' | 'completed';
 
 export interface TournamentParticipant {
@@ -46,70 +46,126 @@ export interface Tournament {
 export interface CreateTournamentPayload {
   name: string;
   description?: string;
-  maxPlayers: number;
-  startDate: string;
+  max_players: number;
   prize?: string;
 }
 
+interface BackendUser {
+  id: number;
+  username: string;
+  avatar?: string;
+}
+
+interface BackendParticipant {
+  id: number;
+  user: BackendUser;
+  joined_at: string;
+}
+
+interface BackendTournament {
+  id: number;
+  name: string;
+  description?: string;
+  creator: BackendUser;
+  max_players: number;
+  status: TournamentStatus;
+  created_at: string;
+  started_at: string | null;
+  finished_at: string | null;
+  participants: BackendParticipant[];
+}
+
+const ACCESS_TOKEN_KEY = 'access_token';
+
 @Injectable({ providedIn: 'root' })
 export class TournamentService {
-  private readonly api = inject(ApiService);
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = `${environment.apiUrl}/tournament`;
   private readonly _currentTournament = signal<Tournament | null>(null);
   private ws: WebSocket | null = null;
 
   readonly currentTournament = this._currentTournament.asReadonly();
 
-  getTournaments(status?: TournamentStatus): Observable<Tournament[]> {
-    const params: Record<string, string> = {};
-    if (status) {
-      params['status'] = status;
+  private currentUserId(): number | null {
+    if (typeof localStorage === 'undefined') return null;
+    const raw = localStorage.getItem('user');
+    if (!raw) return null;
+    try {
+      const u = JSON.parse(raw);
+      return typeof u?.id === 'number' ? u.id : null;
+    } catch {
+      return null;
     }
-    return this.api.getPaginated<Tournament>('/tournaments', params).pipe(
-      map((res) => res.data)
+  }
+
+  private adapt(t: BackendTournament): Tournament {
+    const startDate = t.started_at ?? t.created_at;
+    const myId = this.currentUserId();
+    return {
+      id: String(t.id),
+      name: t.name,
+      description: t.description,
+      status: t.status,
+      maxPlayers: t.max_players,
+      currentPlayers: t.participants?.length ?? 0,
+      prize: undefined,
+      startDate: startDate.slice(0, 10),
+      rounds: [],
+      isRegistered: myId != null && (t.participants ?? []).some((p) => p.user?.id === myId),
+    };
+  }
+
+  getTournaments(status?: TournamentStatus): Observable<Tournament[]> {
+    return this.http.get<BackendTournament[]>(`${this.baseUrl}/`).pipe(
+      map((list) => {
+        const adapted = list.map((t) => this.adapt(t));
+        return status ? adapted.filter((t) => t.status === status) : adapted;
+      }),
     );
   }
 
   getTournament(id: string): Observable<Tournament> {
-    return this.api.get<{ tournament: Tournament }>(`/tournaments/${id}`).pipe(
-      tap((res) => {
-        if (res.data) {
-          this._currentTournament.set(res.data.tournament);
-        }
+    return this.http.get<BackendTournament>(`${this.baseUrl}/${id}/`).pipe(
+      map((t) => {
+        const adapted = this.adapt(t);
+        this._currentTournament.set(adapted);
+        return adapted;
       }),
-      map((res) => res.data!.tournament)
     );
   }
 
   createTournament(payload: CreateTournamentPayload): Observable<Tournament> {
-    return this.api.post<{ tournament: Tournament }>('/tournaments', payload).pipe(
-      map((res) => res.data!.tournament)
-    );
+    return this.http
+      .post<BackendTournament>(`${this.baseUrl}/create_tournament/`, payload)
+      .pipe(map((t) => this.adapt(t)));
   }
 
-  registerForTournament(id: string): Observable<Tournament> {
-    return this.api.post<{ tournament: Tournament }>(`/tournaments/${id}/register`, {}).pipe(
-      map((res) => res.data!.tournament)
-    );
+  joinTournament(id: string): Observable<void> {
+    return this.http.post<unknown>(`${this.baseUrl}/${id}/join/`, {}).pipe(map(() => undefined));
   }
 
-  unregisterFromTournament(id: string): Observable<void> {
-    return this.api.post<null>(`/tournaments/${id}/unregister`, {}).pipe(
-      map(() => undefined)
-    );
+  leaveTournament(id: string): Observable<void> {
+    return this.http.post<unknown>(`${this.baseUrl}/${id}/leave/`, {}).pipe(map(() => undefined));
   }
 
-  connectToTournamentUpdates(tournamentId: string, onUpdate: (tournament: Tournament) => void): void {
-    const token = localStorage.getItem('access_token');
+  connectToTournamentUpdates(
+    tournamentId: string,
+    onUpdate: (tournament: Tournament) => void,
+  ): void {
+    const token =
+      typeof localStorage !== 'undefined' ? localStorage.getItem(ACCESS_TOKEN_KEY) : null;
     if (!token) return;
 
     this.ws = new WebSocket(`${environment.wsUrl}/tournaments/${tournamentId}?token=${token}`);
 
     this.ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'tournament_update') {
-        onUpdate(data.tournament);
-      } else if (data.type === 'match_update') {
-        onUpdate(data.tournament);
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === 'tournament_update' || data.type === 'match_update') {
+          onUpdate(data.tournament);
+        }
+      } catch {
+        // ignore malformed payloads
       }
     };
 
