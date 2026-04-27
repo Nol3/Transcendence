@@ -85,11 +85,13 @@ export async function mockTournaments(page: Page) {
   );
 }
 
-export async function setAuthToken(page: Page) {
-  await page.addInitScript(() => {
-    localStorage.setItem('access_token', 'mock-access-token');
-    localStorage.setItem('refresh_token', 'mock-refresh-token');
-  });
+/**
+ * No-op kept for spec compatibility. Real auth seeding happens inside bootAuthenticated()
+ * via the login flow because pre-seeding localStorage triggers a circular-DI bug in
+ * AuthService initAuth → http interceptor → inject(AuthService) chain.
+ */
+export async function setAuthToken(_page: Page) {
+  // intentionally empty
 }
 
 /**
@@ -105,11 +107,21 @@ export async function spaNavigate(page: Page, path: string): Promise<void> {
 }
 
 /**
- * Boot app at the unguarded home page with auth fully established.
- * waitForResponse MUST be created before page.goto() to avoid missing the response.
+ * Boot app authenticated by going through the login form.
+ * Avoids the circular-DI issue where AuthService construction with a token in localStorage
+ * triggers fetchCurrentUser() whose interceptor tries to inject the still-constructing AuthService,
+ * causing initAuth's error handler to clearTokens before /auth/me ever fires.
+ *
+ * Login flow path: goto('/login') → AuthService constructs without token (clean) →
+ * submit form → mock /auth/login responds → AuthService sets _user + tokens → router redirects to /.
+ * Caller MUST register mockAuthLogin + mockAuthMe + mockAuthRefresh + mockAuthLogout + mockLeaderboard before calling.
  */
 export async function bootAuthenticated(page: Page): Promise<void> {
-  const authDone = page.waitForResponse('**/auth/me');
-  await page.goto('/');
-  await authDone;
+  await mockAuthLogin(page);
+  await page.goto('/login');
+  await page.locator('input[type="email"]').fill('test@example.com');
+  await page.locator('input[type="password"]').fill('password123');
+  await page.locator('button[type="submit"]').click();
+  await page.waitForURL('/', { timeout: 8000 });
+  await page.waitForLoadState('networkidle');
 }

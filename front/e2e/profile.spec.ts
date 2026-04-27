@@ -48,6 +48,6 @@ test.describe('Profile — authenticated', () => {
   test('renders profile page', async ({ page }) => {
     await spaNavigate(page, '/profile');
     await expect(page).toHaveURL('/profile', { timeout: 5000 });
-    await expect(page.locator('app-profile, .profile-page')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('app-profile').first()).toBeVisible({ timeout: 5000 });
   });
 });

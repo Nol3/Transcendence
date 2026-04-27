@@ -33,7 +33,7 @@ test.describe('Tournaments — authenticated', () => {
   test('renders tournament page', async ({ page }) => {
     await spaNavigate(page, '/tournament');
     await expect(page).toHaveURL('/tournament', { timeout: 5000 });
-    await expect(page.locator('app-tournament, .tournament-page')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('app-tournament').first()).toBeVisible({ timeout: 5000 });
   });
 
   test('shows empty state when no tournaments', async ({ page }) => {
