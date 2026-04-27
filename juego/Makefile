@@ -26,7 +26,7 @@ SOURCES := $(wildcard $(SRC_DIR)/*.c)
 # Windows con MinGW
 ifeq ($(PLATFORM_OS),WINDOWS)
     CC := gcc
-    RAYLIB_DIR := ../raylib-6.0_win64_mingw-w64
+    RAYLIB_DIR := raylib-6.0_win64_mingw-w64
     CFLAGS := -Wall -std=c99 -O2 -I$(RAYLIB_DIR)/include
     LDFLAGS := -L$(RAYLIB_DIR)/lib -lraylib -lopengl32 -lgdi32 -lwinmm
     TARGET := $(BUILD_DIR)/$(PROJECT_NAME).exe
@@ -63,8 +63,8 @@ endif
 
 # Emscripten
 EMCC := emcc
-EMFLAGS := -Wall -std=gnu99 -O2 -I. -I../raylib-6.0/src --post-js poker_api_post.js
-EM_LDFLAGS := -L. -L../raylib-6.0/src \
+EMFLAGS := -Wall -std=gnu99 -O2 -I. -Iraylib-6.0/src --post-js poker_api_post.js
+EM_LDFLAGS := -L. -Lraylib-6.0/src \
     -s USE_GLFW=3 \
     -s ASYNCIFY \
     -s TOTAL_MEMORY=67108864 \
@@ -74,7 +74,7 @@ EM_LDFLAGS := -L. -L../raylib-6.0/src \
     --preload-file assets@/assets \
     --preload-file fonts@/fonts \
     -DPLATFORM_WEB \
-    ../raylib-6.0/src/libraylib.web.a
+    raylib-6.0/src/libraylib.web.a
 WEB_TARGET := $(WEB_DIR)/index.html
 
 # === REGLAS ===
@@ -131,5 +131,5 @@ endif
 
 # Compilar raylib para web (ejecutar una vez)
 build-raylib-web:
-	cd ../raylib-6.0/src && make PLATFORM=PLATFORM_WEB -B OUTPUT_NAME=raylib.web
+	cd raylib-6.0/src && make PLATFORM=PLATFORM_WEB -B OUTPUT_NAME=raylib.web
 	@echo "Raylib compilado para web"

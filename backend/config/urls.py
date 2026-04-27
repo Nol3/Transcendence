@@ -29,8 +29,10 @@ from apps.users.auth_views import (
 )
 
 
-GAME_WEB_DIR = Path(__file__).resolve().parent.parent.parent / "juego" / "web"
-GAME_ASSETS_DIR = Path(__file__).resolve().parent.parent.parent / "juego" / "assets"
+BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = BASE_DIR.parent
+GAME_WEB_DIR = PROJECT_ROOT / "juego" / "web"
+GAME_ASSETS_DIR = PROJECT_ROOT / "juego" / "assets"
 IMMUTABLE_GAME_EXTS = (".wasm", ".js", ".data", ".png", ".otf", ".ttf", ".wav", ".mp3", ".ogg")
 GAME_FRAME_ANCESTORS = "frame-ancestors 'self' http://localhost:4200 http://127.0.0.1:4200"
 

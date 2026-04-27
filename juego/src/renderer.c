@@ -328,6 +328,9 @@ void DrawStateInstructions(Game* game) {
     panelY += lineHeight;
     DrawText("Enter: Tambien puedes presionar ENTER", startX + 20, panelY, 20, LIGHTGRAY);
     
+    // Botón ATRAS (esquina superior derecha)
+    DrawButton("ATRAS", screenW - 140, 20, 120, 40, (Color){60, 60, 60, 220}, WHITE);
+
     // Botón VOLVER
     DrawButton("VOLVER", screenW/2 - 100, screenH - 80, 200, 50, (Color){0, 100, 40, 255}, WHITE);
 }
@@ -376,6 +379,9 @@ void DrawStateConfig(Game* game) {
     
     DrawCenteredText("Usa las flechas o botones + y - para ajustar", screenH - 120, 20, BLACK);
     
+    // Botón ATRAS (esquina superior derecha)
+    DrawButton("ATRAS", screenW - 140, 20, 120, 40, (Color){60, 60, 60, 220}, WHITE);
+
     // Botón VOLVER
     DrawButton("VOLVER", centerX - 100, screenH - 80, 200, 50, GOLD, BLACK);
 }
@@ -415,8 +421,8 @@ void DrawStateSetupPlayers(Game* game) {
     // Instrucciones
     DrawCenteredText("Usa TAB para cambiar opcion, FLECHAS para ajustar", screenH - 140, 18, LIGHTGRAY);
 
-    // Botón ATRAS (esquina superior izquierda)
-    DrawButton("ATRAS", 20, 20, 120, 40, (Color){60, 60, 60, 220}, WHITE);
+    // Botón ATRAS (esquina superior derecha)
+    DrawButton("ATRAS", screenW - 140, 20, 120, 40, (Color){60, 60, 60, 220}, WHITE);
 
     // Botón CONTINUAR
     DrawButton("CONTINUAR", screenW/2 - 100, screenH - 90, 200, 55, (Color){0, 100, 40, 255}, WHITE);
