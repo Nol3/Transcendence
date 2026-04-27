@@ -25,6 +25,7 @@ extern bool g_fontsLoaded;   // Indica si las fuentes están cargadas
 // Gestión de fuentes
 void LoadGameFonts(void);
 void UnloadGameFonts(void);
+void LoadTableTexture(void);
 void DrawTableBackground(void);
 
 // Funciones de renderizado

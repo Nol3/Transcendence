@@ -160,7 +160,7 @@ void UpdateStateMenu(Game* game) {
 }
 
 void UpdateStateInstructions(Game* game) {
-    if (IsKeyPressed(KEY_ESCAPE) || IsButtonClicked("VOLVER", GetScreenWidth()/2 - 100, GetScreenHeight() - 80, 200, 50)) {
+    if (IsKeyPressed(KEY_ESCAPE) || IsButtonClicked("VOLVER", GetScreenWidth()/2 - 100, GetScreenHeight() - 80, 200, 50) || IsButtonClicked("ATRAS", GetScreenWidth() - 140, 20, 120, 40)) {
         game->state = STATE_MENU;
     }
 }
@@ -170,7 +170,7 @@ void UpdateStateConfig(Game* game) {
     int screenH = GetScreenHeight();
     int centerX = screenW / 2;
     
-    if (IsKeyPressed(KEY_ESCAPE) || IsButtonClicked("VOLVER", centerX - 100, screenH - 80, 200, 50)) {
+    if (IsKeyPressed(KEY_ESCAPE) || IsButtonClicked("VOLVER", centerX - 100, screenH - 80, 200, 50) || IsButtonClicked("ATRAS", screenW - 140, 20, 120, 40)) {
         game->state = STATE_MENU;
     }
     
@@ -219,7 +219,7 @@ void UpdateStateSetupPlayers(Game* game) {
     int screenH = GetScreenHeight();
 
     // Botón ATRAS / ESC vuelve al menú principal
-    if (IsKeyPressed(KEY_ESCAPE) || IsButtonClicked("ATRAS", 20, 20, 120, 40)) {
+    if (IsKeyPressed(KEY_ESCAPE) || IsButtonClicked("ATRAS", GetScreenWidth() - 140, 20, 120, 40)) {
         game->state = STATE_MENU;
         return;
     }
