@@ -14,6 +14,15 @@ frontend/.vscode/
 backend/.venv/
 backend/venv/
 backend/__pycache__/
+backend/apps/chat/__pycache__/
+backend/apps/chat/migrations/__pycache__/
+backend/apps/games/__pycache__/
+backend/apps/games/migrations/__pycache__/
+backend/apps/public_api/__pycache__/
+backend/apps/public_api/migrations/__pycache__/
+backend/apps/users/__pycache__/
+backend/apps/users/migrations/__pycache__/
+backend/config/__pycache__/
 backend/*.pyc
 backend/*.pyo
 backend/*.egg-info/
