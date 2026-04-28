@@ -97,6 +97,61 @@ Transcendence/
 
 ---
 
+## Database Schema
+
+```
+User (Django built-in)
+├── id (PK)
+├── username (unique)
+├── email (unique)
+├── password (hashed)
+└── profile (1:1 → UserProfile)
+
+UserProfile
+├── id (PK)
+├── user_id (FK → User, 1:1)
+├── avatar
+├── bio
+├── win_count
+├── loss_count
+├── elo_rating
+├── is_online
+└── created_at, updated_at
+
+Game
+├── id (PK)
+├── player1_id (FK → User)
+├── player2_id (FK → User)
+├── winner_id (FK → User, nullable)
+├── status (pending/in_progress/finished)
+├── player1_score
+├── player2_score
+├── played_at
+└── finished_at
+
+Tournament
+├── id (PK)
+├── name
+├── creator_id (FK → User)
+├── max_players
+├── status (pending/in_progress/finished)
+├── created_at, started_at, finished_at
+└── participants (1:M → TournamentParticipant)
+
+TournamentParticipant
+├── id (PK)
+├── tournament_id (FK → Tournament)
+├── user_id (FK → User)
+├── joined_at
+└── unique_together(tournament, user)
+
+APIKey
+├── id (PK)
+├── user_id (FK → User)
+├── key (unique, hashed)
+└── created_at
+```
+
 ## Puntos acumulados (evaluación 42)
 
 | Módulo | Puntos | Estado |
@@ -111,10 +166,40 @@ Transcendence/
 | ORM (Django ORM) | 1 | ✅ |
 | Public API (5+ endpoints) | 2 | ✅ |
 | Google OAuth2 | +1 | ✅ |
-| Web-based Game (WASM embedding) | 2 | ✅ |
-| **Subtotal** | **15** | ✅ |
+| Browser Compatibility (Chrome/Firefox/Edge) | 1 | ✅ |
+| **Subtotal** | **14** | ✅ |
 
-**Objetivo mínimo: 14 puntos** — Ya superado (15 pts). El WAF completaría los pts restantes.
+**Objetivo mínimo: 14 puntos** — ✅ Alcanzado
+
+---
+
+## Performance & Security
+
+### API Documentation
+- **Swagger/OpenAPI**: http://localhost:8000/api/docs/
+- **Schema**: http://localhost:8000/api/schema/
+
+### Security Headers
+All requests are protected with:
+- HSTS (Strict-Transport-Security)
+- CSP (Content-Security-Policy)
+- X-Frame-Options (clickjacking protection)
+- X-Content-Type-Options (MIME sniffing protection)
+- Permissions-Policy (feature restrictions)
+
+### Performance Audits
+```bash
+# Frontend Lighthouse audit
+./scripts/run-lighthouse.sh http://localhost:4200
+
+# Backend API performance test
+node scripts/backend-performance-test.js
+
+# View results
+open lighthouse-reports/lighthouse-*.html
+```
+
+See `docs/PERFORMANCE_AUDIT.md` for detailed metrics and targets.
 
 ---
 

@@ -19,6 +19,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.exceptions import TokenError
+from drf_spectacular.views import SpectacularSwaggerView, SpectacularAPIView
 from apps.users.auth_views import (
     LoginView,
     RegisterView,
@@ -158,6 +159,9 @@ urlpatterns = [
     path("", RedirectView.as_view(url="/game/", permanent=False)),
     # Public API (API key authenticated)
     path("api/public/", include("apps.public_api.urls", namespace="public_api")),
+    # Swagger/OpenAPI documentation
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
 ]
 
 if settings.DEBUG:

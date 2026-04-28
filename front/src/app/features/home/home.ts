@@ -36,6 +36,7 @@ export class Home implements OnInit, OnDestroy {
   readonly totalPlayers = signal(0);
   readonly gamesPlayed = signal(0);
   readonly userStats = signal<UserStats | null>(null);
+  readonly userOnlineStatus = signal(true);
 
   readonly homeRankLabel = computed(() => {
     const rank = this.userStats()?.rank ?? 0;

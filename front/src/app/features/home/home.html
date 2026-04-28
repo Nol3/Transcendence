@@ -116,23 +116,23 @@
       <!-- Quick actions + How to play -->
       <div class="side-panel">
 
-        @if (auth.isAuthenticated()) {
+        @if (auth.isAuthenticated() && userStats()) {
           <!-- Player card -->
-          <app-card title="YOUR STATUS">
+          <app-card [title]="'home.yourStatus' | translate">
             <div class="player-status">
               <div class="player-status__row">
-                <span class="text-secondary font-mono">RANK</span>
-                <app-badge variant="warning">CHALLENGER</app-badge>
+                <span class="text-secondary font-mono">{{ 'home.rank' | translate }}</span>
+                <app-badge [variant]="homeRankVariant()">{{ homeRankLabel() }}</app-badge>
               </div>
               <div class="player-status__row">
-                <span class="text-secondary font-mono">STREAK</span>
-                <span class="neon-text-green font-pixel">3 WINS</span>
+                <span class="text-secondary font-mono">{{ 'home.streak' | translate }}</span>
+                <span class="neon-text-green font-pixel">{{ userStats()!.currentStreak }} WINS</span>
               </div>
               <div class="player-status__row">
-                <span class="text-secondary font-mono">STATUS</span>
+                <span class="text-secondary font-mono">{{ 'common.status' | translate }}</span>
                 <div class="player-status__online">
                   <span class="hero__live-dot animate-pulse-glow"></span>
-                  <span class="neon-text-green font-pixel">ONLINE</span>
+                  <span class="neon-text-green font-pixel">{{ userOnlineStatus() ? 'ONLINE' : 'OFFLINE' }}</span>
                 </div>
               </div>
             </div>

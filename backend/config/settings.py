@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     # Third-party apps
     "rest_framework",
     "corsheaders",
+    "drf_spectacular",
     # Local apps
     "apps.users",
     "apps.games",
@@ -157,6 +158,7 @@ REST_FRAMEWORK = {
         "api_key": "100/hour",
         "api_key_burst": "20/minute",
     },
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 # JWT Configuration
@@ -204,6 +206,26 @@ EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
 # Google OAuth2
 GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID", default="")
+
+# Swagger/OpenAPI Configuration
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Transcendence API",
+    "DESCRIPTION": "RESTful API for ft_transcendence card game platform",
+    "VERSION": "1.0.0",
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
+    "SERVERS": [
+        {"url": "http://localhost:8000", "description": "Development"},
+        {"url": "https://example.com", "description": "Production"},
+    ],
+    "TAGS": [
+        {"name": "auth", "description": "Authentication endpoints"},
+        {"name": "users", "description": "User management"},
+        {"name": "games", "description": "Game records"},
+        {"name": "tournaments", "description": "Tournament management"},
+        {"name": "leaderboard", "description": "Rankings"},
+        {"name": "public_api", "description": "Public API with API keys"},
+    ],
+}
 
 APPEND_SLASH = False
 
