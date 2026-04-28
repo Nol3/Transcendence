@@ -1,8 +1,8 @@
-import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
-import { UserService, LeaderboardEntry } from '../../core/services/user.service';
+import { UserService, LeaderboardEntry, UserStats } from '../../core/services/user.service';
 import { BadgeComponent } from '../../shared/components/badge/badge';
 import { CardComponent } from '../../shared/components/card/card';
 import { PixelTitleComponent } from '../../shared/components/pixel-title/pixel-title';
@@ -13,7 +13,16 @@ import { TranslatePipe } from '../../i18n/translate.pipe';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, DecimalPipe, BadgeComponent, CardComponent, PixelTitleComponent, ButtonComponent, SpinnerComponent, TranslatePipe],
+  imports: [
+    RouterLink,
+    DecimalPipe,
+    BadgeComponent,
+    CardComponent,
+    PixelTitleComponent,
+    ButtonComponent,
+    SpinnerComponent,
+    TranslatePipe,
+  ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -26,11 +35,31 @@ export class Home implements OnInit, OnDestroy {
   readonly time = signal('');
   readonly totalPlayers = signal(0);
   readonly gamesPlayed = signal(0);
+  readonly userStats = signal<UserStats | null>(null);
+
+  readonly homeRankLabel = computed(() => {
+    const rank = this.userStats()?.rank ?? 0;
+    if (rank === 1) return 'CHAMPION';
+    if (rank === 2) return 'MASTER';
+    if (rank <= 5) return 'EXPERT';
+    if (rank <= 10) return 'SKILLED';
+    return 'ROOKIE';
+  });
+
+  readonly homeRankVariant = computed((): 'warning' | 'info' | 'default' => {
+    const rank = this.userStats()?.rank ?? 0;
+    if (rank === 1) return 'warning';
+    if (rank <= 5) return 'info';
+    return 'default';
+  });
 
   private timer?: ReturnType<typeof setInterval>;
 
   ngOnInit() {
     this.loadLeaderboard();
+    if (this.auth.isAuthenticated()) {
+      this.loadUserStats();
+    }
     this.updateTime();
     this.timer = setInterval(() => this.updateTime(), 1000);
   }
@@ -43,15 +72,22 @@ export class Home implements OnInit, OnDestroy {
 
   private loadLeaderboard() {
     this.userService.getLeaderboard(1, 10).subscribe({
-      next: (entries) => {
+      next: ({ entries, total }) => {
         this.leaderboard.set(entries);
-        this.totalPlayers.set(Math.max(entries.length * 12, 150));
-        this.gamesPlayed.set(Math.max(entries.reduce((sum, e) => sum + e.wins + e.losses, 0), 1200));
+        this.totalPlayers.set(total);
+        this.gamesPlayed.set(entries.reduce((sum, e) => sum + e.wins + e.losses, 0));
         this.leaderboardLoading.set(false);
       },
       error: () => {
         this.leaderboardLoading.set(false);
       },
+    });
+  }
+
+  private loadUserStats() {
+    this.userService.getUserStats().subscribe({
+      next: (stats) => this.userStats.set(stats),
+      error: () => {},
     });
   }
 

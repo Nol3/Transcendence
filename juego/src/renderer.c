@@ -725,12 +725,8 @@ void DrawStateGameOver(Game* game) {
     // Instrucción
     DrawCenteredText("Presiona ENTER o R para reiniciar", screenH - marginBottom + 20, 20, LIGHTGRAY);
     
-    // Botón COMPARTIR
-    float shareY = screenH - marginBottom - 100;
-    DrawButton("COMPARTIR", screenW/2 - 120/2 - 70, shareY, 140, 45, (Color){100, 100, 100, 255}, WHITE);
-    
-    // Botón JUGAR DE NUEVO (al fondo, separado del texto)
-    DrawButton("JUGAR DE NUEVO", screenW/2 - 120, screenH - marginBottom - 30, 240, 55, (Color){0, 120, 50, 255}, WHITE);
+    // Botón JUGAR DE NUEVO
+    DrawButton("JUGAR DE NUEVO", screenW/2 - 120, screenH - marginBottom - 65, 240, 55, (Color){0, 120, 50, 255}, WHITE);
 }
 
 // ========== UTILIDADES DE UI ==========

@@ -16,6 +16,14 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'msedge',
+      use: { ...devices['Desktop Edge'], channel: 'msedge' },
+    },
   ],
   webServer: {
     command: 'npm run start',

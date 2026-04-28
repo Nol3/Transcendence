@@ -9,9 +9,6 @@
 
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
-    EM_JS(void, CopyToClipboard, (const char* text), {
-        navigator.clipboard.writeText(UTF8ToString(text));
-    });
 #endif
 
 // Funciones de notificación vacías para desktop
@@ -535,7 +532,6 @@ void UpdateStateShop(Game* game) {
 
 void UpdateStateGameOver(Game* game) {
     static bool highScoresProcessed = false;
-    static bool shared = false;
     int screenW = GetScreenWidth();
     int screenH = GetScreenHeight();
     int marginBottom = 120;
@@ -556,36 +552,9 @@ void UpdateStateGameOver(Game* game) {
         highScoresProcessed = true;
     }
     
-    // Botón COMPARTIR: copiar resultado al clipboard
-    if (!shared && IsButtonClicked("COMPARTIR", screenW/2 - 120/2 - 70, screenH - marginBottom - 100, 140, 45)) {
-        char shareText[512];
-        int len = 0;
-        len += snprintf(shareText + len, sizeof(shareText) - len, "🎴 Poker Race - Juego de Cartas\n");
-        
-        if (game->winnerId >= 0) {
-            len += snprintf(shareText + len, sizeof(shareText) - len, "🏆 Ganador: %s (%d pts)\n\n",
-                game->players[game->winnerId].name, game->players[game->winnerId].score);
-        }
-        
-        for (int i = 0; i < game->playerCount; i++) {
-            len += snprintf(shareText + len, sizeof(shareText) - len, "%s: %d pts (%d rondas)\n",
-                game->players[i].name, game->players[i].score, game->players[i].totalRoundsWon);
-        }
-        
-        #if defined(PLATFORM_WEB)
-        CopyToClipboard(shareText);
-        #else
-        // En desktop, mostrar en consola
-        printf("%s", shareText);
-        #endif
-        
-        shared = true;
-    }
-    
     if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_R) ||
-        IsButtonClicked("JUGAR DE NUEVO", screenW/2 - 120, screenH - marginBottom - 30, 240, 55)) {
+        IsButtonClicked("JUGAR DE NUEVO", screenW/2 - 120, screenH - marginBottom - 65, 240, 55)) {
         highScoresProcessed = false;
-        shared = false;
         GameInit(game);
     }
 }
