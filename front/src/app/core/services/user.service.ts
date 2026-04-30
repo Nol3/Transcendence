@@ -45,7 +45,7 @@ export class UserService {
 
   getUserStats(userId?: number): Observable<UserStats> {
     const endpoint = userId ? `/users/${userId}/stats` : '/users/me/stats';
-    return this.api.get<{ stats: UserStats }>(endpoint).pipe(map((res) => res.data!.stats));
+    return this.api.get<UserStats>(endpoint).pipe(map((res) => res.data!));
   }
 
   getUserHistory(userId?: number, page = 1, limit = 20): Observable<GameHistoryEntry[]> {

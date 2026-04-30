@@ -63,16 +63,19 @@ endif
 
 # Emscripten
 EMCC := emcc
-EMFLAGS := -Wall -std=gnu99 -O2 -I. -Iraylib-6.0/src --post-js poker_api_post.js
+EMFLAGS := -Wall -std=gnu99 -O2 -I. -Iraylib-6.0/src
 EM_LDFLAGS := -L. -Lraylib-6.0/src \
     -s USE_GLFW=3 \
     -s ASYNCIFY \
     -s TOTAL_MEMORY=67108864 \
     -s FORCE_FILESYSTEM=1 \
     -s EXPORTED_RUNTIME_METHODS=ccall \
+    -s EXPORTED_FUNCTIONS=_malloc,_free \
     --shell-file minshell.html \
     --preload-file assets@/assets \
     --preload-file fonts@/fonts \
+    --pre-js emscripten_wrapper.js \
+    --post-js poker_api_post.js \
     -DPLATFORM_WEB \
     raylib-6.0/src/libraylib.web.a
 WEB_TARGET := $(WEB_DIR)/index.html

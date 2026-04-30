@@ -200,7 +200,7 @@ if [ "$DEV_MODE" = true ]; then
 
     echo -e "${YELLOW}[BACKEND] Starting Django server on http://localhost:8000${NC}"
     cd "$BACKEND_DIR"
-    $PYTHON_CMD manage.py runserver 8000 &
+    $VENV_PYTHON manage.py runserver 0.0.0.0:8000 &
     BACKEND_PID=$!
 
     echo -e "${YELLOW}[FRONTEND] Starting Angular server on http://localhost:4200${NC}"

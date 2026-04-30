@@ -1,8 +1,14 @@
 import { Injectable, signal, computed, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { environment } from '../../../environments/environment';
 
 export type NotificationType = 'success' | 'error' | 'warning' | 'info';
-export type RealTimeNotificationType = 'match_invite' | 'tournament_start' | 'opponent_found' | 'game_result' | 'friend_request';
+export type RealTimeNotificationType =
+  | 'match_invite'
+  | 'tournament_start'
+  | 'opponent_found'
+  | 'game_result'
+  | 'friend_request';
 
 export interface Notification {
   id: string;
@@ -35,8 +41,8 @@ export class NotificationService implements OnDestroy {
   readonly notifications = this._notifications.asReadonly();
   readonly realTimeNotifications = this._realTimeNotifications.asReadonly();
 
-  readonly unreadCount = computed(() =>
-    this._realTimeNotifications().filter((n) => !n.read).length
+  readonly unreadCount = computed(
+    () => this._realTimeNotifications().filter((n) => !n.read).length,
   );
 
   readonly isConnected = signal(false);
@@ -59,7 +65,7 @@ export class NotificationService implements OnDestroy {
     const token = this.getToken();
     if (!token) return;
 
-    const url = `/api/notifications/sse?token=${token}`;
+    const url = `${environment.apiUrl}/notifications/sse?token=${token}`;
     this.eventSource = new EventSource(url);
 
     this.eventSource.onopen = () => {
@@ -104,22 +110,23 @@ export class NotificationService implements OnDestroy {
   }
 
   private showToast(notification: RealTimeNotification): void {
-    const type: NotificationType = notification.type === 'game_result'
-      ? (notification.message.includes('win') ? 'success' : 'error')
-      : 'info';
+    const type: NotificationType =
+      notification.type === 'game_result'
+        ? notification.message.includes('win')
+          ? 'success'
+          : 'error'
+        : 'info';
     this.show(type, notification.title, notification.message, 5000);
   }
 
   markAsRead(id: string): void {
     this._realTimeNotifications.update((list) =>
-      list.map((n) => (n.id === id ? { ...n, read: true } : n))
+      list.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
   }
 
   markAllAsRead(): void {
-    this._realTimeNotifications.update((list) =>
-      list.map((n) => ({ ...n, read: true }))
-    );
+    this._realTimeNotifications.update((list) => list.map((n) => ({ ...n, read: true })));
   }
 
   deleteNotification(id: string): void {
@@ -145,10 +152,18 @@ export class NotificationService implements OnDestroy {
     }
   }
 
-  success(title: string, message?: string) { this.show('success', title, message); }
-  error(title: string, message?: string)   { this.show('error',   title, message); }
-  warning(title: string, message?: string) { this.show('warning', title, message); }
-  info(title: string, message?: string)   { this.show('info',    title, message); }
+  success(title: string, message?: string) {
+    this.show('success', title, message);
+  }
+  error(title: string, message?: string) {
+    this.show('error', title, message);
+  }
+  warning(title: string, message?: string) {
+    this.show('warning', title, message);
+  }
+  info(title: string, message?: string) {
+    this.show('info', title, message);
+  }
 
   dismiss(id: string): void {
     this._notifications.update((list) => list.filter((n) => n.id !== id));

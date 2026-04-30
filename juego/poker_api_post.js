@@ -1,25 +1,43 @@
-mergeInto(LibraryManager.library, {
-    pokerRaceNotify: function(type, data) {
-        if (typeof window !== 'undefined' && window.parent !== window) {
-            try {
-                var typeStr = (typeof type === 'number') ? Pointer_stringify(type) : type;
-                var payload = { type: typeStr, source: 'poker-race' };
-                if (data !== 0) {
-                    payload.data = (typeof data === 'number') ? Pointer_stringify(data) : data;
+// Defensive mergeInto call with fallback for browsers without LibraryManager
+(function() {
+    var pokerRaceLibrary = {
+        pokerRaceNotify: function(type, data) {
+            if (typeof window !== 'undefined' && window.parent !== window) {
+                try {
+                    var typeStr = (typeof type === 'number') ? Pointer_stringify(type) : type;
+                    var payload = { type: typeStr, source: 'poker-race' };
+                    if (data !== 0) {
+                        payload.data = (typeof data === 'number') ? Pointer_stringify(data) : data;
+                    }
+                    window.parent.postMessage(payload, '*');
+                } catch (e) {
+                    console.error('pokerRaceNotify error:', e);
                 }
-                window.parent.postMessage(payload, '*');
-            } catch (e) {}
+            }
+        },
+        pokerRaceNotifyInt: function(type, value) {
+            if (typeof window !== 'undefined' && window.parent !== window) {
+                try {
+                    var typeStr = (typeof type === 'number') ? Pointer_stringify(type) : type;
+                    window.parent.postMessage({ type: typeStr, value: value, source: 'poker-race' }, '*');
+                } catch (e) {
+                    console.error('pokerRaceNotifyInt error:', e);
+                }
+            }
         }
-    },
-    pokerRaceNotifyInt: function(type, value) {
-        if (typeof window !== 'undefined' && window.parent !== window) {
-            try {
-                var typeStr = (typeof type === 'number') ? Pointer_stringify(type) : type;
-                window.parent.postMessage({ type: typeStr, value: value, source: 'poker-race' }, '*');
-            } catch (e) {}
-        }
+    };
+
+    // Try to merge into Emscripten's LibraryManager
+    if (typeof mergeInto !== 'undefined' && typeof LibraryManager !== 'undefined') {
+        mergeInto(LibraryManager.library, pokerRaceLibrary);
     }
-});
+
+    // Also attach to Module for direct access
+    if (typeof Module !== 'undefined') {
+        Module.pokerRaceNotify = pokerRaceLibrary.pokerRaceNotify;
+        Module.pokerRaceNotifyInt = pokerRaceLibrary.pokerRaceNotifyInt;
+    }
+})();
 
 var PokerRaceAPI = {
     pause: function() { if (Module && Module._gamePause) Module._gamePause(1); },

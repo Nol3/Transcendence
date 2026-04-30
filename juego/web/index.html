@@ -1,1 +1,236 @@
-<!doctypehtml><html lang=es><head><meta charset=UTF-8><meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"name=viewport><meta content=yes name=apple-mobile-web-app-capable><meta content=yes name=mobile-web-app-capable><title>Poker Race - Juego de Cartas</title><style>*{touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}body{margin:0;padding:0;overflow:hidden;background-color:#0d4a1c;display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial,sans-serif}#canvas-container{position:relative;width:100%;height:100%;max-width:1280px;max-height:720px}canvas{display:block;width:100%;height:100%}#loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:24px;text-align:center;pointer-events:none}.hidden{display:none!important}</style></head><body><div id=canvas-container><canvas id=canvas oncontextmenu=event.preventDefault()></canvas><div id=loading>Cargando Poker Race...</div></div><script>Module={canvas:document.getElementById("canvas"),onRuntimeInitialized:function(){document.getElementById("loading").classList.add("hidden")}}</script><script async src=index.js></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Poker Race - Juego de Cartas</title>
+  <style>
+    * {
+      touch-action: none;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #0d4a1c;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+    }
+
+    #canvas-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 1280px;
+      max-height: 720px;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    #loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 24px;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container">
+    <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    <div id="loading">Cargando Poker Race...</div>
+  </div>
+
+  <!-- Inline critical initialization FIRST (before ANY async scripts) -->
+  <script>
+    'use strict';
+    // Absolute minimum setup before anything else loads
+    if (typeof Module === 'undefined') { window.Module = {}; }
+    if (typeof LibraryManager === 'undefined') { window.LibraryManager = { library: {} }; }
+    if (typeof mergeInto === 'undefined') {
+      window.mergeInto = function(t,l) { if(t)for(var k in l)t[k]=l[k]; };
+    }
+    if (typeof Pointer_stringify === 'undefined') {
+      window.Pointer_stringify = function(p,m) {
+        if (!p) return '';
+        if (typeof UTF8ToString !== 'undefined') return UTF8ToString(p,m);
+        var s='',i=0,v;
+        if(Module.HEAPU8) v=new Uint8Array(Module.HEAPU8.buffer,p,m||4096);
+        while(v&&v[i]!==0&&(!m||i<m)){s+=String.fromCharCode(v[i]);i++;}
+        return s;
+      };
+    }
+    window.Module.canvas = document.getElementById('canvas');
+    window.Module.onRuntimeInitialized = function() {
+      document.getElementById('loading').classList.add('hidden');
+    };
+  </script>
+
+  <!-- Load Emscripten-compiled game SYNCHRONOUSLY (after inline init) -->
+  <script src="index.js"></script>
+
+  <!-- Additional setup after game loads -->
+  <script>
+    (function() {
+      // Poker Race API setup
+      window.PokerRaceAPI = {
+        pause: function() { if (Module && Module._gamePause) Module._gamePause(1); },
+        resume: function() { if (Module && Module._gamePause) Module._gamePause(0); },
+        setVolume: function(m, mu, s) { if (Module && Module._gameSetVolume) Module._gameSetVolume(m, mu, s); },
+        restart: function() { if (Module && Module._gameRestart) Module._gameRestart(); },
+        getState: function() { if (Module && Module._gameGetState) return Module._gameGetState(); return -1; }
+      };
+
+      window.addEventListener('message', function(event) {
+        if (!event.data || event.data.source === 'poker-race') return;
+        var type = event.data.type;
+        var data = event.data;
+        switch (type) {
+          case 'pause':
+            if (window.PokerRaceAPI) window.PokerRaceAPI.pause();
+            break;
+          case 'resume':
+            if (window.PokerRaceAPI) window.PokerRaceAPI.resume();
+            break;
+          case 'setVolume':
+            if (window.PokerRaceAPI && data) {
+              window.PokerRaceAPI.setVolume(data.master || 1, data.music || 1, data.sfx || 1);
+            }
+            break;
+          case 'restart':
+            if (window.PokerRaceAPI) window.PokerRaceAPI.restart();
+            break;
+        }
+      });
+
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'poker-race-ready', source: 'poker-race' }, '*');
+      }
+    })();
+  </script>
+
+  <!-- Poker Race API and interop -->
+  <script>
+    (function() {
+      var _pokerRaceReady = false;
+      var _pendingMessages = [];
+
+      // Ensure LibraryManager functions are properly merged
+      function setupPokerRaceAPI() {
+        if (typeof LibraryManager === 'undefined' || !LibraryManager.library) {
+          return false;
+        }
+
+        // Merge Poker Race functions into library
+        var pokerFuncs = {
+          pokerRaceNotify: function(type, data) {
+            if (typeof window !== 'undefined' && window.parent !== window) {
+              try {
+                var typeStr = (typeof type === 'number') ? Pointer_stringify(type) : type;
+                var payload = { type: typeStr, source: 'poker-race' };
+                if (data !== 0) {
+                  payload.data = (typeof data === 'number') ? Pointer_stringify(data) : data;
+                }
+                window.parent.postMessage(payload, '*');
+              } catch (e) {
+                console.error('pokerRaceNotify error:', e);
+              }
+            }
+          },
+          pokerRaceNotifyInt: function(type, value) {
+            if (typeof window !== 'undefined' && window.parent !== window) {
+              try {
+                var typeStr = (typeof type === 'number') ? Pointer_stringify(type) : type;
+                window.parent.postMessage({ type: typeStr, value: value, source: 'poker-race' }, '*');
+              } catch (e) {
+                console.error('pokerRaceNotifyInt error:', e);
+              }
+            }
+          }
+        };
+
+        if (typeof mergeInto === 'function') {
+          mergeInto(LibraryManager.library, pokerFuncs);
+        } else {
+          Object.keys(pokerFuncs).forEach(function(key) {
+            LibraryManager.library[key] = pokerFuncs[key];
+          });
+        }
+
+        // Public API
+        window.PokerRaceAPI = {
+          pause: function() { if (Module && Module._gamePause) Module._gamePause(1); },
+          resume: function() { if (Module && Module._gamePause) Module._gamePause(0); },
+          setVolume: function(m, mu, s) { if (Module && Module._gameSetVolume) Module._gameSetVolume(m, mu, s); },
+          restart: function() { if (Module && Module._gameRestart) Module._gameRestart(); },
+          getState: function() { if (Module && Module._gameGetState) return Module._gameGetState(); return -1; }
+        };
+
+        // Notify parent frame when ready
+        if (window.parent !== window) {
+          window.parent.postMessage({ type: 'poker-race-ready', source: 'poker-race' }, '*');
+        }
+
+        _pokerRaceReady = true;
+        return true;
+      }
+
+      // Try to setup immediately
+      setupPokerRaceAPI();
+
+      // Also setup when module initializes
+      var origInit = Module.onRuntimeInitialized;
+      Module.onRuntimeInitialized = function() {
+        if (typeof origInit === 'function') origInit.call(this);
+        setupPokerRaceAPI();
+      };
+
+      // Message handler for parent frame commands
+      window.addEventListener('message', function(event) {
+        if (!event.data || event.data.source === 'poker-race') return;
+
+        var type = event.data.type;
+        var data = event.data;
+
+        switch (type) {
+          case 'pause':
+            if (window.PokerRaceAPI) window.PokerRaceAPI.pause();
+            break;
+          case 'resume':
+            if (window.PokerRaceAPI) window.PokerRaceAPI.resume();
+            break;
+          case 'setVolume':
+            if (window.PokerRaceAPI && data) {
+              window.PokerRaceAPI.setVolume(data.master || 1, data.music || 1, data.sfx || 1);
+            }
+            break;
+          case 'restart':
+            if (window.PokerRaceAPI) window.PokerRaceAPI.restart();
+            break;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
