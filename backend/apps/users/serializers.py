@@ -25,8 +25,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
             try:
                 request = self.context.get("request")
                 if request:
-                    return request.build_absolute_uri(obj.avatar.url)
-                return f"/media/{obj.avatar.name}"
+                    # Build absolute URL - ensures host:port are included
+                    scheme = request.scheme
+                    host = request.get_host()  # Gets host with port
+                    path = obj.avatar.url
+                    return f"{scheme}://{host}{path}"
+                # Fallback if no request context
+                from django.conf import settings
+                backend_url = getattr(settings, 'BACKEND_URL', 'http://localhost:8000')
+                return f"{backend_url}{obj.avatar.url}"
             except Exception:
                 return None
         return None

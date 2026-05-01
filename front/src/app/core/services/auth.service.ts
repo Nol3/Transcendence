@@ -220,7 +220,14 @@ export class AuthService {
     return this.api.post<{ avatarUrl: string }>('/users/me/upload_avatar/', formData).pipe(
       tap((res) => {
         if (res.data && this._user()) {
-          this._user.set({ ...this._user()!, avatar: res.data.avatarUrl });
+          const currentUser = this._user()!;
+          this._user.set({ 
+            ...currentUser, 
+            profile: { 
+              ...currentUser.profile, 
+              avatar: res.data.avatarUrl 
+            } 
+          });
         }
       }),
       map((res) => res.data?.avatarUrl)

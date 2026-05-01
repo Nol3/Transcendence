@@ -9,7 +9,7 @@ export type AvatarSize = 'sm' | 'md' | 'lg' | 'xl';
   styleUrl: './avatar.scss',
 })
 export class AvatarComponent {
-  @Input() src?: string;
+  @Input() src?: string | null;
   @Input() username = '';
   @Input() size: AvatarSize = 'md';
 

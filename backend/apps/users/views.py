@@ -232,7 +232,12 @@ class UserViewSet(viewsets.ModelViewSet):
             profile.avatar = avatar
             profile.save()
 
-            avatar_url = request.build_absolute_uri(profile.avatar.url)
+            # Build absolute URL with scheme, host, and port
+            scheme = request.scheme
+            host = request.get_host()  # Gets host with port
+            path = profile.avatar.url
+            avatar_url = f"{scheme}://{host}{path}"
+            
             return Response({
                 "data": {"avatarUrl": avatar_url},
                 "error": None
