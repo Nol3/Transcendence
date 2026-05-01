@@ -1,4 +1,13 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService, UserStats } from '../../../core/services/user.service';
@@ -19,11 +28,21 @@ export class GameBoard implements OnInit {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly userService = inject(UserService);
 
+  @ViewChild('gameFrame') private readonly gameFrame!: ElementRef<HTMLIFrameElement>;
+  private readonly gameOrigin = new URL(environment.gameUrl).origin;
+
   readonly gameSrc: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
     environment.gameUrl,
   );
 
   readonly userStats = signal<UserStats | null>(null);
+
+  constructor() {
+    effect(() => {
+      const user = this.auth.user();
+      if (user?.username) this.sendUsernameToGame(user.username);
+    });
+  }
 
   readonly stats = computed(() => {
     const stats = this.userStats();
@@ -59,4 +78,15 @@ export class GameBoard implements OnInit {
     'Reduce opponent HP to 0 to win',
     'Special cards have unique effects',
   ];
+
+  onGameFrameLoad(): void {
+    const user = this.auth.user();
+    if (user?.username) this.sendUsernameToGame(user.username);
+  }
+
+  private sendUsernameToGame(username: string): void {
+    const iframe = this.gameFrame?.nativeElement;
+    if (!iframe?.contentWindow) return;
+    iframe.contentWindow.postMessage({ type: 'set-username', username }, this.gameOrigin);
+  }
 }

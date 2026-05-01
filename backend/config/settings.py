@@ -124,7 +124,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Media files
 MEDIA_URL = "/media/"
@@ -238,3 +237,6 @@ if not DEBUG:
     SECURE_CONTENT_SECURITY_POLICY = {
         "default-src": ("'self'",),
     }
+
+# Allow Google Sign-In popups to communicate with parent window
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"

@@ -44,12 +44,12 @@ export class UserService {
   }
 
   getUserStats(userId?: number): Observable<UserStats> {
-    const endpoint = userId ? `/users/${userId}/stats` : '/users/me/stats';
+    const endpoint = userId ? `/users/${userId}/stats/` : '/users/me/stats/';
     return this.api.get<UserStats>(endpoint).pipe(map((res) => res.data!));
   }
 
   getUserHistory(userId?: number, page = 1, limit = 20): Observable<GameHistoryEntry[]> {
-    const endpoint = userId ? `/users/${userId}/history` : '/users/me/history';
+    const endpoint = userId ? `/users/${userId}/history/` : '/users/me/history/';
     return this.api
       .getPaginated<GameHistoryEntry>(endpoint, { page: String(page), limit: String(limit) })
       .pipe(map((res) => res.data));

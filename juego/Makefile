@@ -69,8 +69,8 @@ EM_LDFLAGS := -L. -Lraylib-6.0/src \
     -s ASYNCIFY \
     -s TOTAL_MEMORY=67108864 \
     -s FORCE_FILESYSTEM=1 \
-    -s EXPORTED_RUNTIME_METHODS=ccall \
-    -s EXPORTED_FUNCTIONS=_malloc,_free \
+    -s EXPORTED_RUNTIME_METHODS=ccall,cwrap \
+    -s EXPORTED_FUNCTIONS=_malloc,_free,_set_player_name_from_json,_main \
     --shell-file minshell.html \
     --preload-file assets@/assets \
     --preload-file fonts@/fonts \
@@ -101,6 +101,7 @@ $(BUILD_DIR):
 web: $(WEB_TARGET)
 
 $(WEB_TARGET): $(SOURCES) minshell.html | $(WEB_DIR)
+	@mkdir -p $(WEB_DIR)
 	$(EMCC) $(SOURCES) -o $@ $(EMFLAGS) $(EM_LDFLAGS)
 	@echo "Compilado para web: $@"
 

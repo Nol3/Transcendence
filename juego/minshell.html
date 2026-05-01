@@ -63,11 +63,30 @@
     </div>
     
     <script>
-        // Ocultar loading cuando esté listo
+        var _pendingUsername = null;
+
+        // Recibir username desde Angular (parent frame) via postMessage
+        window.addEventListener('message', function(event) {
+            if (!event.data || event.data.type !== 'set-username') return;
+            var username = event.data.username;
+            if (!username) return;
+            if (typeof Module !== 'undefined' && typeof Module.ccall === 'function') {
+                Module.ccall('set_player_name_from_json', null, ['string'],
+                    [JSON.stringify({ username: username })]);
+            } else {
+                _pendingUsername = username;
+            }
+        });
+
         Module = {
             canvas: document.getElementById('canvas'),
             onRuntimeInitialized: function() {
                 document.getElementById('loading').classList.add('hidden');
+                if (_pendingUsername) {
+                    Module.ccall('set_player_name_from_json', null, ['string'],
+                        [JSON.stringify({ username: _pendingUsername })]);
+                    _pendingUsername = null;
+                }
             }
         };
     </script>
