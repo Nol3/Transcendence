@@ -226,7 +226,7 @@ SPECTACULAR_SETTINGS = {
     ],
 }
 
-APPEND_SLASH = False
+APPEND_SLASH = True
 
 # Security settings for production
 if not DEBUG:
