@@ -30,12 +30,14 @@
 
           <div class="cabinet__screen">
             <iframe
+              #gameFrame
               [src]="gameSrc"
               title="Card Wars - WASM Game"
               class="cabinet__game-frame"
               loading="lazy"
-              sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups"
+              sandbox="allow-scripts allow-pointer-lock allow-popups"
               allow="autoplay; clipboard-write; clipboard-read; fullscreen"
+              (load)="onGameFrameLoad()"
             ></iframe>
           </div>
 

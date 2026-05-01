@@ -2,6 +2,7 @@
 #include "renderer.h"
 #include "audio.h"
 #include "joker.h"
+#include "cJSON.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,6 +10,8 @@
 
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
+#else
+    #define EMSCRIPTEN_KEEPALIVE
 #endif
 
 // Funciones de notificación vacías para desktop
@@ -16,6 +19,38 @@
 #define NOTIFY(t) ((void)0)
 #define NOTIFY_INT(t, v) ((void)0)
 #endif
+
+static char g_player_name[128] = "Jugador 1";
+
+extern Game game;
+
+EMSCRIPTEN_KEEPALIVE
+void set_player_name_from_json(const char* json_string) {
+    if (!json_string) return;
+    cJSON* root = cJSON_Parse(json_string);
+    if (!root) return;
+
+    cJSON* username = cJSON_GetObjectItemCaseSensitive(root, "username");
+    if (!cJSON_IsString(username) || !username->valuestring) {
+        cJSON* data = cJSON_GetObjectItemCaseSensitive(root, "data");
+        if (cJSON_IsObject(data)) {
+            cJSON* user = cJSON_GetObjectItemCaseSensitive(data, "user");
+            if (cJSON_IsObject(user)) {
+                username = cJSON_GetObjectItemCaseSensitive(user, "username");
+            }
+        }
+    }
+
+    if (cJSON_IsString(username) && username->valuestring) {
+        strncpy(g_player_name, username->valuestring, sizeof(g_player_name) - 1);
+        g_player_name[sizeof(g_player_name) - 1] = '\0';
+
+        strncpy(game.players[0].name, g_player_name, sizeof(game.players[0].name) - 1);
+        game.players[0].name[sizeof(game.players[0].name) - 1] = '\0';
+    }
+
+    cJSON_Delete(root);
+}
 
 void GameInit(Game* game) {
     memset(game, 0, sizeof(Game));
@@ -31,7 +66,12 @@ void GameInit(Game* game) {
     // Inicializar jugadores con nombres por defecto
     for (int i = 0; i < MAX_PLAYERS; i++) {
         game->players[i].id = i;
-        snprintf(game->players[i].name, sizeof(game->players[i].name), "Jugador %d", i + 1);
+        if (i == 0) {
+            strncpy(game->players[i].name, g_player_name, sizeof(game->players[i].name) - 1);
+            game->players[i].name[sizeof(game->players[i].name) - 1] = '\0';
+        } else {
+            snprintf(game->players[i].name, sizeof(game->players[i].name), "Jugador %d", i + 1);
+        }
         game->players[i].score = 0;
         game->players[i].totalRoundsWon = 0;
         game->players[i].handCount = 0;

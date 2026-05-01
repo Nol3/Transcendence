@@ -53,40 +53,44 @@ export class AuthService {
 
   login(email: string, password: string) {
     this._loading.set(true);
-    return this.api.post<{ user: User; tokens: AuthTokens }>('/auth/login', { email, password }).pipe(
-      tap({
-        next: (res) => {
-          if (res.data) {
-            this._user.set(res.data.user);
-            this.setTokens(res.data.tokens);
-          }
-          this._loading.set(false);
-        },
-        error: () => {
-          this._loading.set(false);
-        },
-      }),
-      map((res) => res.data)
-    );
+    return this.api
+      .post<{ user: User; tokens: AuthTokens }>('/auth/login', { email, password })
+      .pipe(
+        tap({
+          next: (res) => {
+            if (res.data) {
+              this._user.set(res.data.user);
+              this.setTokens(res.data.tokens);
+            }
+            this._loading.set(false);
+          },
+          error: () => {
+            this._loading.set(false);
+          },
+        }),
+        map((res) => res.data),
+      );
   }
 
   register(username: string, email: string, password: string) {
     this._loading.set(true);
-    return this.api.post<{ user: User; tokens: AuthTokens }>('/auth/register', { username, email, password }).pipe(
-      tap({
-        next: (res) => {
-          if (res.data) {
-            this._user.set(res.data.user);
-            this.setTokens(res.data.tokens);
-          }
-          this._loading.set(false);
-        },
-        error: () => {
-          this._loading.set(false);
-        },
-      }),
-      map((res) => res.data)
-    );
+    return this.api
+      .post<{ user: User; tokens: AuthTokens }>('/auth/register', { username, email, password })
+      .pipe(
+        tap({
+          next: (res) => {
+            if (res.data) {
+              this._user.set(res.data.user);
+              this.setTokens(res.data.tokens);
+            }
+            this._loading.set(false);
+          },
+          error: () => {
+            this._loading.set(false);
+          },
+        }),
+        map((res) => res.data),
+      );
   }
 
   logout(): void {
@@ -120,7 +124,7 @@ export class AuthService {
       catchError(() => {
         this.clearTokens();
         return of(null);
-      })
+      }),
     );
   }
 
@@ -131,7 +135,7 @@ export class AuthService {
           this._user.set(res.data.user);
         }
       }),
-      map((res) => res.data?.user)
+      map((res) => res.data?.user),
     );
   }
 
@@ -142,7 +146,7 @@ export class AuthService {
           this._user.set(res.data.user);
         }
       }),
-      map((res) => res.data?.user)
+      map((res) => res.data?.user),
     );
   }
 
@@ -159,7 +163,7 @@ export class AuthService {
         },
         error: () => this._loading.set(false),
       }),
-      map((res) => res.data)
+      map((res) => res.data),
     );
   }
 
@@ -209,15 +213,15 @@ export class AuthService {
       size: 'large',
       shape: 'rectangular',
       logo_alignment: 'left',
-      width: '100%',
+      width: 300,
     });
   }
 
   uploadAvatar(file: File) {
     const formData = new FormData();
     formData.append('avatar', file);
-    
-    return this.api.post<{ avatarUrl: string }>('/users/me/upload_avatar/', formData).pipe(
+
+    return this.api.post<{ avatarUrl: string }>('/users/me/avatar', formData).pipe(
       tap((res) => {
         if (res.data && this._user()) {
           const currentUser = this._user()!;
@@ -230,7 +234,7 @@ export class AuthService {
           });
         }
       }),
-      map((res) => res.data?.avatarUrl)
+      map((res) => res.data?.avatarUrl),
     );
   }
 
