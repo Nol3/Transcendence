@@ -136,7 +136,7 @@ export class AuthService {
   }
 
   updateProfile(updates: Partial<User>) {
-    return this.api.patch<{ user: User }>('/users/me', updates).pipe(
+    return this.api.patch<{ user: User }>('/users/me/update_profile/', updates).pipe(
       tap((res) => {
         if (res.data) {
           this._user.set(res.data.user);
@@ -217,7 +217,7 @@ export class AuthService {
     const formData = new FormData();
     formData.append('avatar', file);
     
-    return this.api.post<{ avatarUrl: string }>('/users/me/avatar', formData).pipe(
+    return this.api.post<{ avatarUrl: string }>('/users/me/upload_avatar/', formData).pipe(
       tap((res) => {
         if (res.data && this._user()) {
           this._user.set({ ...this._user()!, avatar: res.data.avatarUrl });

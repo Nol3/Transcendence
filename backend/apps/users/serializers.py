@@ -40,6 +40,19 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "email", "first_name", "last_name", "profile"]
 
 
+class UserUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for PATCH updates - allows partial updates."""
+    class Meta:
+        model = User
+        fields = ["username", "email", "first_name", "last_name"]
+        extra_kwargs = {
+            "username": {"required": False},
+            "email": {"required": False},
+            "first_name": {"required": False},
+            "last_name": {"required": False},
+        }
+
+
 class UserStatsSerializer(serializers.Serializer):
     wins = serializers.IntegerField()
     losses = serializers.IntegerField()

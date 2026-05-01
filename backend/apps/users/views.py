@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.contrib.auth.models import User
 from .models import UserProfile
-from .serializers import UserSerializer
+from .serializers import UserSerializer, UserUpdateSerializer
 from apps.games.models import Game
 
 
@@ -15,7 +15,13 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    @action(detail=False, methods=["get"])
+    def get_serializer_class(self):
+        """Return appropriate serializer based on action."""
+        if self.action == "update_profile":
+            return UserUpdateSerializer
+        return UserSerializer
+
+    @action(detail=False, methods=["get"], url_path="me")
     def me(self, request):
         """Get current logged-in user."""
         serializer = self.get_serializer(request.user)
@@ -69,12 +75,12 @@ class UserViewSet(viewsets.ModelViewSet):
             "longestStreak": max_streak,
         }
 
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["get"], url_path="me/stats")
     def stats(self, request):
         """Get current user's stats."""
         return Response({"data": self._build_stats(request.user), "error": None})
 
-    @action(detail=False, methods=["get"])
+    @action(detail=True, methods=["get"], url_path="stats")
     def user_stats(self, request, pk=None):
         """Get stats for a specific user by pk."""
         try:
@@ -124,7 +130,7 @@ class UserViewSet(viewsets.ModelViewSet):
             )
         return history, total
 
-    @action(detail=False, methods=["get"])
+    @action(detail=False, methods=["get"], url_path="me/history")
     def history(self, request):
         """Get current user's game history."""
         page = int(request.query_params.get("page", 1))
@@ -143,7 +149,7 @@ class UserViewSet(viewsets.ModelViewSet):
             }
         )
 
-    @action(detail=False, methods=["get"])
+    @action(detail=True, methods=["get"], url_path="history")
     def user_history(self, request, pk=None):
         """Get game history for a specific user by pk."""
         try:
@@ -166,42 +172,75 @@ class UserViewSet(viewsets.ModelViewSet):
             }
         )
 
-    @action(detail=False, methods=["patch"])
+    @action(detail=False, methods=["patch"], url_path="me/update_profile")
     def update_profile(self, request):
         """Update current user's profile."""
-        user = request.user
-        profile, _ = UserProfile.objects.get_or_create(user=user)
+        try:
+            user = request.user
+            if not user or user.is_anonymous:
+                return Response({
+                    "data": None,
+                    "error": "Authentication required"
+                }, status=status.HTTP_401_UNAUTHORIZED)
+            
+            profile, _ = UserProfile.objects.get_or_create(user=user)
 
-        username = request.data.get("username")
-        if username and username != user.username:
-            if User.objects.filter(username=username).exclude(id=user.id).exists():
-                return Response(
-                    {"error": "Username already taken"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            user.username = username
-            user.save()
+            username = request.data.get("username")
+            if username and username != user.username:
+                if User.objects.filter(username=username).exclude(id=user.id).exists():
+                    return Response({
+                        "data": None,
+                        "error": "Username already taken"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                user.username = username
+                user.save()
 
-        avatar = request.FILES.get("avatar")
-        if avatar:
+            avatar = request.FILES.get("avatar")
+            if avatar:
+                profile.avatar = avatar
+                profile.save()
+
+            # Refresh user from DB to get latest data
+            user.refresh_from_db()
+            serializer = UserSerializer(user, context={"request": request})
+            return Response({
+                "data": {"user": serializer.data},
+                "error": None
+            })
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return Response({
+                "data": None,
+                "error": str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @action(detail=False, methods=["post"], url_path="me/upload_avatar")
+    def upload_avatar(self, request):
+        """Upload avatar for current user."""
+        try:
+            profile, _ = UserProfile.objects.get_or_create(user=request.user)
+            avatar = request.FILES.get("avatar")
+
+            if not avatar:
+                return Response({
+                    "data": None,
+                    "error": "No avatar file provided"
+                }, status=status.HTTP_400_BAD_REQUEST)
+
             profile.avatar = avatar
             profile.save()
 
-        serializer = self.get_serializer(user)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=["post"], url_path="upload_avatar")
-    def upload_avatar(self, request):
-        """Upload avatar for current user."""
-        profile, _ = UserProfile.objects.get_or_create(user=request.user)
-        avatar = request.FILES.get("avatar")
-
-        if not avatar:
-            return Response(
-                {"error": "No avatar file provided"}, status=status.HTTP_400_BAD_REQUEST
-            )
-
-        profile.avatar = avatar
-        profile.save()
-
-        return Response({"avatar": request.build_absolute_uri(profile.avatar.url)})
+            avatar_url = request.build_absolute_uri(profile.avatar.url)
+            return Response({
+                "data": {"avatarUrl": avatar_url},
+                "error": None
+            })
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return Response({
+                "data": None,
+                "error": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
