@@ -25,8 +25,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
             try:
                 request = self.context.get("request")
                 if request:
-                    return request.build_absolute_uri(obj.avatar.url)
-                return f"/media/{obj.avatar.name}"
+                    # Build absolute URL - ensures host:port are included
+                    scheme = request.scheme
+                    host = request.get_host()  # Gets host with port
+                    path = obj.avatar.url
+                    return f"{scheme}://{host}{path}"
+                # Fallback if no request context
+                from django.conf import settings
+                backend_url = getattr(settings, 'BACKEND_URL', 'http://localhost:8000')
+                return f"{backend_url}{obj.avatar.url}"
             except Exception:
                 return None
         return None
@@ -38,6 +45,19 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "username", "email", "first_name", "last_name", "profile"]
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for PATCH updates - allows partial updates."""
+    class Meta:
+        model = User
+        fields = ["username", "email", "first_name", "last_name"]
+        extra_kwargs = {
+            "username": {"required": False},
+            "email": {"required": False},
+            "first_name": {"required": False},
+            "last_name": {"required": False},
+        }
 
 
 class UserStatsSerializer(serializers.Serializer):

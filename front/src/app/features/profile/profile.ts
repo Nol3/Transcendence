@@ -44,6 +44,7 @@ export class Profile implements OnInit {
   readonly avatarPreview = signal<string | null>(null);
   readonly statsLoading = signal(true);
   readonly historyLoading = signal(true);
+  private selectedAvatarFile: File | null = null;
 
   readonly stats = signal<UserStats | null>(null);
   readonly history = signal<GameHistoryEntry[]>([]);
@@ -109,6 +110,7 @@ export class Profile implements OnInit {
     this.isEditing.set(false);
     this.profileForm.reset({ username: this.user()?.username ?? '' });
     this.avatarPreview.set(null);
+    this.selectedAvatarFile = null;
   }
 
   onAvatarChange(event: Event) {
@@ -119,6 +121,7 @@ export class Profile implements OnInit {
         return;
       }
 
+      this.selectedAvatarFile = file;
       const reader = new FileReader();
       reader.onload = () => {
         this.avatarPreview.set(reader.result as string);
@@ -134,7 +137,7 @@ export class Profile implements OnInit {
     }
 
     const newUsername = this.profileForm.get('username')?.value as string;
-    const avatarFile = (document.querySelector('input[type="file"]') as HTMLInputElement)?.files?.[0];
+    const avatarFile = this.selectedAvatarFile;
 
     this.isSaving.set(true);
 
@@ -171,6 +174,7 @@ export class Profile implements OnInit {
     this.isSaving.set(false);
     this.isEditing.set(false);
     this.avatarPreview.set(null);
+    this.selectedAvatarFile = null;
   }
 
   getError(field: string): string {

@@ -1,4 +1,4 @@
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -16,16 +16,6 @@ export class Header {
   readonly auth = inject(AuthService);
   readonly notif = inject(NotificationService);
   readonly menuOpen = signal(false);
-
-  constructor() {
-    effect(() => {
-      if (this.auth.isAuthenticated()) {
-        this.notif.connect();
-      } else {
-        this.notif.disconnect();
-      }
-    });
-  }
 
   toggleMenu() {
     this.menuOpen.update((v) => !v);

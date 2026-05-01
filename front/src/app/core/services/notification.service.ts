@@ -36,7 +36,6 @@ export class NotificationService implements OnDestroy {
 
   private readonly _notifications = signal<Notification[]>([]);
   private readonly _realTimeNotifications = signal<RealTimeNotification[]>([]);
-  private eventSource: EventSource | null = null;
 
   readonly notifications = this._notifications.asReadonly();
   readonly realTimeNotifications = this._realTimeNotifications.asReadonly();
@@ -45,7 +44,6 @@ export class NotificationService implements OnDestroy {
     () => this._realTimeNotifications().filter((n) => !n.read).length,
   );
 
-  readonly isConnected = signal(false);
   readonly showPanel = signal(false);
 
   private getToken(): string | null {
@@ -57,52 +55,6 @@ export class NotificationService implements OnDestroy {
 
   private isAuthenticated(): boolean {
     return !!this.getToken();
-  }
-
-  connect(): void {
-    if (this.eventSource) return;
-
-    const token = this.getToken();
-    if (!token) return;
-
-    const url = `${environment.apiUrl}/notifications/sse?token=${token}`;
-    this.eventSource = new EventSource(url);
-
-    this.eventSource.onopen = () => {
-      this.isConnected.set(true);
-    };
-
-    this.eventSource.onmessage = (event) => {
-      try {
-        const notification: RealTimeNotification = JSON.parse(event.data);
-        notification.timestamp = new Date(notification.timestamp);
-        this.addRealTimeNotification(notification);
-        this.showToast(notification);
-      } catch {
-        console.warn('Failed to parse notification');
-      }
-    };
-
-    this.eventSource.onerror = () => {
-      this.isConnected.set(false);
-      this.reconnect();
-    };
-  }
-
-  disconnect(): void {
-    if (this.eventSource) {
-      this.eventSource.close();
-      this.eventSource = null;
-      this.isConnected.set(false);
-    }
-  }
-
-  private reconnect(): void {
-    setTimeout(() => {
-      if (this.isAuthenticated() && !this.eventSource) {
-        this.connect();
-      }
-    }, 5000);
   }
 
   private addRealTimeNotification(notification: RealTimeNotification): void {
@@ -174,6 +126,6 @@ export class NotificationService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.disconnect();
+    // No cleanup needed after removing SSE
   }
 }

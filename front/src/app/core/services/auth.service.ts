@@ -140,7 +140,7 @@ export class AuthService {
   }
 
   updateProfile(updates: Partial<User>) {
-    return this.api.patch<{ user: User }>('/users/me', updates).pipe(
+    return this.api.patch<{ user: User }>('/users/me/update_profile/', updates).pipe(
       tap((res) => {
         if (res.data) {
           this._user.set(res.data.user);
@@ -224,7 +224,14 @@ export class AuthService {
     return this.api.post<{ avatarUrl: string }>('/users/me/avatar', formData).pipe(
       tap((res) => {
         if (res.data && this._user()) {
-          this._user.set({ ...this._user()!, avatar: res.data.avatarUrl });
+          const currentUser = this._user()!;
+          this._user.set({ 
+            ...currentUser, 
+            profile: { 
+              ...currentUser.profile, 
+              avatar: res.data.avatarUrl 
+            } 
+          });
         }
       }),
       map((res) => res.data?.avatarUrl),

@@ -2,23 +2,19 @@
 URL Configuration for ft_transcendence project.
 """
 
-import json
-import time
 from pathlib import Path
 from django.contrib import admin
 from django.urls import path, re_path, include
 from django.views.generic import RedirectView
 from django.views.static import serve as static_serve
 from django.views.decorators.clickjacking import xframe_options_exempt
-from django.http import StreamingHttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework_simplejwt.exceptions import TokenError
 from drf_spectacular.views import SpectacularSwaggerView, SpectacularAPIView
 from apps.users.auth_views import (
     LoginView,
@@ -67,27 +63,6 @@ def game_asset_view(request, path):
     return _apply_immutable_cache(response, path)
 
 
-def notifications_sse(request):
-    """Server-Sent Events endpoint for realtime notifications.
-    Auth via `?token=<JWT>` since EventSource cannot set headers."""
-    token_str = request.GET.get("token", "")
-    try:
-        token = AccessToken(token_str)
-        user_id = token["user_id"]
-    except (TokenError, KeyError):
-        return JsonResponse({"error": "invalid token"}, status=401)
-
-    def event_stream():
-        yield "retry: 5000\n\n"
-        yield f"event: connected\ndata: {json.dumps({'user_id': user_id})}\n\n"
-        while True:
-            time.sleep(15)
-            yield ": heartbeat\n\n"
-
-    response = StreamingHttpResponse(event_stream(), content_type="text/event-stream")
-    response["Cache-Control"] = "no-cache"
-    response["X-Accel-Buffering"] = "no"
-    return response
 
 
 class HealthCheckView(APIView):
@@ -152,9 +127,6 @@ urlpatterns = [
     path("game/<path:path>", game_view),
     # Raw game assets (tapete, cards, audio) for HTML/CSS use
     path("game-assets/<path:path>", game_asset_view),
-    # Realtime notifications (Server-Sent Events)
-    path("api/notifications/sse", notifications_sse, name="notifications-sse"),
-    path("api/notifications/sse/", notifications_sse, name="notifications-sse-slash"),
     # Redirect root to game embedding MVP
     path("", RedirectView.as_view(url="/game/", permanent=False)),
     # Public API (API key authenticated)

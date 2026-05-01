@@ -11,7 +11,7 @@
                     <img [src]="avatarPreview()!" alt="Avatar preview" class="avatar-preview">
                   } @else {
                     <app-avatar 
-                      [src]="currentUser.avatar" 
+                      [src]="currentUser.profile?.avatar" 
                       [username]="currentUser.username"
                       [size]="'xl'">
                     </app-avatar>
