@@ -154,7 +154,7 @@ Dokploy
 - `GET /api/users/{id}/` — detalles usuario
 - `GET /api/users/me/` — perfil actual
 - `PATCH /api/users/me/` — actualizar perfil
-- `POST /api/users/me/avatar/` — subir avatar
+- `POST /api/users/me/upload_avatar/` — subir avatar
 - `GET /api/users/me/stats/` — estadísticas
 - `GET /api/users/me/history/` — historial partidas
 

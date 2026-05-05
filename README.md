@@ -77,7 +77,7 @@ Transcendence/
 - `GET /api/users/me/` — Perfil actual
 - `PATCH /api/users/me/` — Actualizar perfil
 - `GET /api/users/me/stats/` — Estadísticas (wins/losses/elo)
-- `POST /api/users/me/avatar/` — Subir avatar
+- `POST /api/users/me/upload_avatar/` — Subir avatar
 
 ### Juegos
 - `GET /api/games/` — Listar partidas

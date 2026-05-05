@@ -1,13 +1,18 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, switchMap, throwError } from 'rxjs';
+import { catchError, switchMap, throwError, finalize } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { ApiService } from '../services/api.service';
+
+let isRefreshing = false;
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
-  const api = inject(ApiService);
   const token = auth.getToken();
+
+  // No agregar header si es refresh o logout
+  if (req.url.includes('/auth/refresh') || req.url.includes('/auth/logout')) {
+    return next(req);
+  }
 
   const authReq = token
     ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
@@ -15,21 +20,26 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && !req.url.includes('/auth/refresh')) {
+      // Solo hacer refresh una vez
+      if (error.status === 401 && !isRefreshing && token) {
+        isRefreshing = true;
         return auth.refreshToken().pipe(
           switchMap((tokens) => {
+            isRefreshing = false;
             if (tokens) {
               const retryReq = req.clone({
                 setHeaders: { Authorization: `Bearer ${tokens.accessToken}` },
               });
               return next(retryReq);
             }
-            auth.logout();
+            // Si el refresh falló silenciosamente, no hacer nada
             return throwError(() => error);
           }),
-          catchError(() => {
+          catchError((err) => {
+            isRefreshing = false;
+            // Al fallar refresh, logout y rechazar la petición
             auth.logout();
-            return throwError(() => error);
+            return throwError(() => err);
           })
         );
       }

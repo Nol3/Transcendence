@@ -94,18 +94,26 @@ export class AuthService {
   }
 
   logout(): void {
-    this.api.post('/auth/logout', {}).subscribe({
-      complete: () => {
-        this._user.set(null);
-        this.clearTokens();
-        this.router.navigate(['/login']);
-      },
-      error: () => {
-        this._user.set(null);
-        this.clearTokens();
-        this.router.navigate(['/login']);
-      },
-    });
+    // Prevenir logout múltiple
+    if (!this._user()) return;
+    
+    this._user.set(null);
+    this.clearTokens();
+    this.router.navigate(['/login']).catch(() => {});
+    
+    // No enviar logout al backend en bucle
+    // this.api.post('/auth/logout', {}).subscribe({
+    //   complete: () => {
+    //     this._user.set(null);
+    //     this.clearTokens();
+    //     this.router.navigate(['/login']);
+    //   },
+    //   error: () => {
+    //     this._user.set(null);
+    //     this.clearTokens();
+    //     this.router.navigate(['/login']);
+    //   },
+    // });
   }
 
   refreshToken() {
@@ -221,7 +229,7 @@ export class AuthService {
     const formData = new FormData();
     formData.append('avatar', file);
 
-    return this.api.post<{ avatarUrl: string }>('/users/me/avatar', formData).pipe(
+    return this.api.post<{ avatarUrl: string }>('/users/me/upload_avatar/', formData).pipe(
       tap((res) => {
         if (res.data && this._user()) {
           const currentUser = this._user()!;

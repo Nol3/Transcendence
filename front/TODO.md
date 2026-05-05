@@ -210,7 +210,7 @@ El frontend está preparado para conectarse a estos endpoints:
 - `GET /api/users/me/stats` → `{ stats }`
 - `GET /api/users/me/history` → paginated
 - `PATCH /api/users/me` → `{ user }`
-- `POST /api/users/me/avatar` → `{ avatarUrl }`
+- `POST /api/users/me/upload_avatar` → `{ avatarUrl }`
 
 **Rooms:**
 - `GET /api/rooms` → paginated
