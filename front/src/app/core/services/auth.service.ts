@@ -24,6 +24,7 @@ declare const google: {
 
 const ACCESS_TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
+const CACHED_USER_KEY = 'current_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -44,9 +45,28 @@ export class AuthService {
 
   private initAuth(): void {
     const token = this.getToken();
+    const cachedUser = this.getCachedUser();
+
+    // Restaurar usuario desde caché si tenemos token
+    if (token && cachedUser) {
+      this._user.set(cachedUser);
+    }
+
+    // Validar con el servidor en background
     if (token) {
       this.fetchCurrentUser().subscribe({
-        error: () => this.clearTokens(),
+        next: (user) => {
+          // Usuario validado en servidor
+          if (user) {
+            this.setCachedUser(user);
+          }
+        },
+        error: () => {
+          // Si falla la validación pero tenemos usuario en caché, mantener sesión
+          if (!cachedUser) {
+            this.clearTokens();
+          }
+        },
       });
     }
   }
@@ -61,6 +81,7 @@ export class AuthService {
             if (res.data) {
               this._user.set(res.data.user);
               this.setTokens(res.data.tokens);
+              this.setCachedUser(res.data.user);
             }
             this._loading.set(false);
           },
@@ -82,6 +103,7 @@ export class AuthService {
             if (res.data) {
               this._user.set(res.data.user);
               this.setTokens(res.data.tokens);
+              this.setCachedUser(res.data.user);
             }
             this._loading.set(false);
           },
@@ -166,6 +188,7 @@ export class AuthService {
           if (res.data) {
             this._user.set(res.data.user);
             this.setTokens(res.data.tokens);
+            this.setCachedUser(res.data.user);
           }
           this._loading.set(false);
         },
@@ -264,6 +287,27 @@ export class AuthService {
     if (typeof window !== 'undefined') {
       localStorage.removeItem(ACCESS_TOKEN_KEY);
       localStorage.removeItem(REFRESH_TOKEN_KEY);
+      localStorage.removeItem(CACHED_USER_KEY);
+    }
+  }
+
+  private getCachedUser(): User | null {
+    if (typeof window === 'undefined') return null;
+    try {
+      const cached = localStorage.getItem(CACHED_USER_KEY);
+      return cached ? JSON.parse(cached) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private setCachedUser(user: User): void {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(CACHED_USER_KEY, JSON.stringify(user));
+      } catch {
+        console.warn('Failed to cache user in localStorage');
+      }
     }
   }
 }

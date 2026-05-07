@@ -123,9 +123,14 @@ class RegisterView(APIView):
 
 
 class MeView(APIView):
-    """Get current user."""
+    """Get current user. Requires authentication."""
 
     def get(self, request):
+        if not request.user or not request.user.is_authenticated:
+            return Response(
+                {"error": "User not authenticated"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
         user_data = UserSerializer(request.user).data
         return Response({"data": {"user": user_data}})
 
