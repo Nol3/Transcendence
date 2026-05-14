@@ -14,7 +14,36 @@
   <div class="lobby__body container">
     <div class="lobby__grid">
 
-      <!-- ── Left: game area ──────────────────────────────── -->
+      <!-- ── Left: sidebar ───────────────────────────────– -->
+      <div class="lobby__sidebar">
+
+        <!-- Game rules -->
+        <app-card title="GAME RULES">
+          <ul class="rules">
+            @for (rule of rules; track rule) {
+              <li class="rules__item">
+                <span class="neon-text-cyan font-mono">›</span>
+                <span class="text-secondary text-sm">{{ rule }}</span>
+              </li>
+            }
+          </ul>
+        </app-card>
+
+        <!-- Your stats -->
+        <app-card title="YOUR STATS">
+          <div class="my-stats">
+            @for (stat of stats(); track stat.label) {
+              <div class="my-stats__row">
+                <span class="text-muted font-mono text-sm">{{ stat.label }}</span>
+                <span [class]="'font-pixel ' + stat.color">{{ stat.value }}</span>
+              </div>
+            }
+          </div>
+        </app-card>
+
+      </div>
+
+      <!-- ── Right: game area ──────────────────────────────── -->
       <div class="game-area">
 
         <!-- Arcade cabinet frame -->
@@ -53,34 +82,6 @@
 
       </div>
 
-      <!-- ── Right: sidebar ───────────────────────────────── -->
-      <div class="lobby__sidebar">
-
-        <!-- Game rules -->
-        <app-card title="GAME RULES">
-          <ul class="rules">
-            @for (rule of rules; track rule) {
-              <li class="rules__item">
-                <span class="neon-text-cyan font-mono">›</span>
-                <span class="text-secondary text-sm">{{ rule }}</span>
-              </li>
-            }
-          </ul>
-        </app-card>
-
-        <!-- Your stats -->
-        <app-card title="YOUR STATS">
-          <div class="my-stats">
-            @for (stat of stats(); track stat.label) {
-              <div class="my-stats__row">
-                <span class="text-muted font-mono text-sm">{{ stat.label }}</span>
-                <span [class]="'font-pixel ' + stat.color">{{ stat.value }}</span>
-              </div>
-            }
-          </div>
-        </app-card>
-
-      </div>
     </div>
   </div>
 </div>
