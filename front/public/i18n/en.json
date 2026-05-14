@@ -36,12 +36,34 @@
   },
   "tournament": {
     "title": "Tournament",
-    "bracket": "Bracket"
+    "bracket": "Bracket",
+    "active": "Active Tournaments",
+    "upcoming": "Upcoming Tournaments",
+    "finished": "Finished Tournaments",
+    "noTournaments": "No tournaments available",
+    "checkBack": "Come back soon for more tournaments!",
+    "create": "Create Tournament",
+    "createDescription": "Organize your own tournament and challenge other players",
+    "name": "Tournament Name",
+    "description": "Tournament Description",
+    "players": "Players",
+    "maxPlayers": "Max Players"
   },
   "profile": {
     "title": "Player Profile",
     "wins": "Wins",
-    "losses": "Losses"
+    "losses": "Losses",
+    "rank": "Rank",
+    "winRate": "Win Rate",
+    "achievements": "Achievements",
+    "editProfile": "Edit Profile",
+    "currentStreak": "Current Streak",
+    "bestStreak": "Best Streak",
+    "firstVictory": "First Victory",
+    "winStreak": "Win Streak",
+    "speedPlayer": "Speed Player",
+    "gameHistory": "Game History",
+    "noGames": "You haven't played any games yet."
   },
   "common": {
     "loading": "Loading...",

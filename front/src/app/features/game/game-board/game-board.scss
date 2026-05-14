@@ -223,6 +223,13 @@
   }
 }
 
+.container{
+  display: flex;
+  justify-content: center;
+  
+}
+
+
 // ── Cabinet screen states ───────────────────────────────────
 .cabinet__idle,
 .cabinet__searching,

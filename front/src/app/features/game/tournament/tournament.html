@@ -31,7 +31,7 @@
       <div class="tournament-header">
         <h1 class="font-pixel neon-text-magenta">TOURNAMENTS</h1>
         <app-button variant="accent" (clicked)="openCreateModal()">
-          + Create Tournament
+          + {{ 'tournament.create' | translate }}
         </app-button>
       </div>
 
@@ -40,21 +40,21 @@
           class="tab"
           [class.tab--active]="selectedTab() === 'active'"
           (click)="selectTab('active')">
-          Active
+          {{ 'tournament.active' | translate }}
           <span class="tab__count">{{ activeCount() }}</span>
         </button>
         <button
           class="tab"
           [class.tab--active]="selectedTab() === 'upcoming'"
           (click)="selectTab('upcoming')">
-          Upcoming
+          {{ 'tournament.upcoming' | translate }}
           <span class="tab__count">{{ upcomingCount() }}</span>
         </button>
         <button
           class="tab"
           [class.tab--active]="selectedTab() === 'finished'"
           (click)="selectTab('finished')">
-          Finished
+          {{ 'tournament.finished' | translate }}
           <span class="tab__count">{{ finishedCount() }}</span>
         </button>
       </div>
@@ -122,8 +122,8 @@
             </app-card>
           } @empty {
             <div class="empty-state arcade-panel">
-              <p class="font-pixel neon-text-cyan">NO TOURNAMENTS</p>
-              <p class="text-secondary text-sm">Check back later for upcoming events</p>
+              <p class="font-pixel neon-text-cyan">{{ 'tournament.noTournaments' | translate }}</p>
+              <p class="text-secondary text-sm">{{ 'tournament.checkBack' | translate }}</p>
             </div>
           }
         }
@@ -133,33 +133,33 @@
 
   @if (showCreateModal()) {
     <div class="modal-overlay" (click)="closeCreateModal()">
-      <app-card [title]="'CREATE TOURNAMENT'" class="register-modal" (click)="$event.stopPropagation()">
+      <app-card [title]="'tournament.create' | translate" class="register-modal" (click)="$event.stopPropagation()">
         <form class="register-form" [formGroup]="createForm" (ngSubmit)="createTournament()">
-          <p class="text-secondary">Create your own tournament and invite friends to compete!</p>
+          <p class="text-secondary">{{ 'tournament.createDescription' | translate }}</p>
 
           <div class="form-field">
-            <label class="text-sm text-secondary">Tournament Name</label>
-            <input type="text" formControlName="name" placeholder="Enter tournament name" class="form-input">
+            <label class="text-sm text-secondary">{{ 'tournament.name' | translate }}</label>
+            <input type="text" formControlName="name"  class="form-input">
           </div>
 
           <div class="form-field">
-            <label class="text-sm text-secondary">Max Players</label>
+            <label class="text-sm text-secondary">{{ 'tournament.maxPlayers' | translate }}</label>
             <select formControlName="maxPlayers" class="form-input">
-              <option [ngValue]="4">4 Players</option>
-              <option [ngValue]="8">8 Players</option>
-              <option [ngValue]="16">16 Players</option>
+              <option [ngValue]="4">4 {{ 'tournament.players' | translate }}</option>
+              <option [ngValue]="8">8 {{ 'tournament.players' | translate }}</option>
+              <option [ngValue]="16">16 {{ 'tournament.players' | translate }}</option>
             </select>
           </div>
 
           <div class="form-field">
-            <label class="text-sm text-secondary">Description (optional)</label>
-            <input type="text" formControlName="description" placeholder="A short description" class="form-input">
+            <label class="text-sm text-secondary">{{ 'tournament.description' | translate }}</label>
+            <input type="text" formControlName="description" class="form-input">
           </div>
 
           <div class="form-actions">
-            <app-button variant="ghost" type="button" (clicked)="closeCreateModal()">Cancel</app-button>
+            <app-button variant="ghost" type="button" (clicked)="closeCreateModal()">{{ 'common.cancel' | translate }}</app-button>
             <app-button variant="primary" type="submit" [loading]="isCreating()">
-              Create Tournament
+              {{ 'tournament.create' | translate }}
             </app-button>
           </div>
         </form>

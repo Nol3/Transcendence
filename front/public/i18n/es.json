@@ -10,8 +10,8 @@
   },
   "home": {
     "subtitle": "Inserta moneda para jugar",
-    "play": "Jugar ahora",
-    "tournament": "Torneo"
+    "play": "Jugar ahasdasdasdora",
+    "tournament": "pene"
   },
   "auth": {
     "login": {
@@ -36,12 +36,34 @@
   },
   "tournament": {
     "title": "Torneo",
-    "bracket": "Cuadro"
+    "bracket": "Cuadro",
+    "active": "Torneos activos",
+    "upcoming": "Próximos torneos",
+    "finished": "Torneos finalizados",
+    "noTournaments": "No hay torneos disponibles",
+    "checkBack": "¡Vuelve pronto para más torneos!",
+    "create": "Crear torneo",
+    "createDescription": "Organiza tu propio torneo y desafía a otros jugadores",
+    "name": "Nombre del torneo",
+    "description": "Descripción del torneo",
+    "players": "Jugadores"
   },
   "profile": {
     "title": "Perfil del jugador",
     "wins": "Victorias",
-    "losses": "Derrotas"
+    "losses": "Derrotas",
+    "rank": "Rango",
+    "winRate": "Tasa de victorias",
+    "achievements": "Logros",
+    "editProfile": "Editar perfil",
+    "currentStreak": "Racha actual",
+    "bestStreak": "Mejor racha",
+    "firstVictory": "Primera victoria",
+    "winStreak": "Racha de victorias",
+    "speedPlayer": "Jugador rápido",
+    "gameHistory": "Historial de partidas",
+    "noGames": "No has jugado ninguna partida aún."
+
   },
   "common": {
     "loading": "Cargando...",

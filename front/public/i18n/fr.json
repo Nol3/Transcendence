@@ -36,12 +36,34 @@
   },
   "tournament": {
     "title": "Tournoi",
-    "bracket": "Tableau"
+    "bracket": "Tableau",
+    "active": "Tournois Actifs",
+    "upcoming": "Tournois à Venir",
+    "finished": "Tournois Terminés",
+    "noTournaments": "Aucun tournoi disponible",
+    "checkBack": "Reviens bientôt pour plus de tournois!",
+    "create": "Créer un Tournoi",
+    "createDescription": "Organise ton propre tournoi et défie d'autres joueurs",
+    "name": "Nom du Tournoi",
+    "description": "Description du Tournoi",
+    "players": "Joueurs",
+    "maxPlayers": "Nombre Maximum de Joueurs"
   },
   "profile": {
     "title": "Profil du joueur",
     "wins": "Victoires",
-    "losses": "Défaites"
+    "losses": "Défaites",
+    "rank": "Classement",
+    "winRate": "Taux de Victoires",
+    "achievements": "Accomplissements",
+    "editProfile": "Modifier le Profil",
+    "currentStreak": "Série Actuelle",
+    "bestStreak": "Meilleure Série",
+    "firstVictory": "Première Victoire",
+    "winStreak": "Série de Victoires",
+    "speedPlayer": "Joueur Rapide",
+    "gameHistory": "Historique des Parties",
+    "noGames": "Tu n'as pas encore joué."
   },
   "common": {
     "loading": "Chargement...",
