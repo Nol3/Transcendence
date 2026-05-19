@@ -8,118 +8,62 @@
     "register": "S'inscrire",
     "logout": "Déconnexion"
   },
-  "footer": {
-    "tagline": "L'expérience ultime de combat de cartes",
-    "game": "Jeu",
-    "account": "Compte",
-    "legal": "Mentions légales",
-    "privacy": "Politique de Confidentialité",
-    "terms": "Conditions d'Utilisation",
-    "rights": "Tous droits réservés."
-  },
   "home": {
-    "title": "Transcendence",
     "subtitle": "Insérez une pièce pour jouer",
-    "tagline": "L'expérience ultime de combat de cartes",
     "play": "Jouer maintenant",
-    "tournament": "Tournoi",
-    "leaderboard": "Classement",
-    "stats": "Statistiques",
-    "totalPlayers": "Joueurs totaux",
-    "gamesPlayed": "Parties jouées",
-    "howToPlay": "Comment jouer",
-    "howToPlayDesc": "Défiez vos adversaires dans des combats de cartes épiques. Construisez votre deck, dépassez votre rival et grimpez dans le classement pour devenir le champion ultime.",
-    "rankings": "Classement",
-    "player": "Joueur",
-    "wins": "Victoires",
-    "winRate": "Taux de victoire"
+    "tournament": "Tournoi"
   },
   "auth": {
     "login": {
       "title": "Connexion",
       "email": "E-mail",
-      "emailPlaceholder": "Entrez votre e-mail",
       "password": "Mot de passe",
-      "passwordPlaceholder": "Entrez votre mot de passe",
       "submit": "Se connecter",
-      "noAccount": "Pas de compte ? S'inscrire",
-      "forgotPassword": "Mot de passe oublié ?",
-      "invalidCredentials": "E-mail ou mot de passe invalide",
-      "required": "Ce champ est obligatoire",
-      "invalidEmail": "Veuillez entrer un e-mail valide"
+      "noAccount": "Pas de compte ? S'inscrire"
     },
     "register": {
       "title": "Inscription",
       "username": "Nom d'utilisateur",
-      "usernamePlaceholder": "Choisissez un nom d'utilisateur",
       "email": "E-mail",
-      "emailPlaceholder": "Entrez votre e-mail",
       "password": "Mot de passe",
-      "passwordPlaceholder": "Créez un mot de passe",
-      "confirmPassword": "Confirmer le mot de passe",
-      "confirmPasswordPlaceholder": "Confirmez votre mot de passe",
       "submit": "Créer un compte",
-      "hasAccount": "Déjà inscrit ? Se connecter",
-      "passwordMismatch": "Les mots de passe ne correspondent pas",
-      "usernameTaken": "Le nom d'utilisateur est déjà pris",
-      "emailTaken": "L'e-mail est déjà enregistré"
+      "hasAccount": "Déjà inscrit ? Se connecter"
     }
   },
   "game": {
     "title": "Jeu de cartes",
-    "insertCoin": "Insérer une pièce",
-    "findingMatch": "Recherche d'un adversaire...",
-    "matchFound": "Adversaire trouvé !",
-    "yourTurn": "Votre tour",
-    "opponentTurn": "Tour de l'adversaire",
-    "victory": "Victoire !",
-    "defeat": "Défaite",
-    "draw": "Égalité",
-    "playAgain": "Rejouer",
-    "exitGame": "Quitter le jeu",
-    "rules": "Règles",
-    "rulesText": "Associez les cartes par rang. La carte la plus haute gagne le tour. Le premier à gagner 3 tours gagne la partie !"
+    "insertCoin": "Insérer une pièce"
   },
   "tournament": {
     "title": "Tournoi",
     "bracket": "Tableau",
-    "register": "S'inscrire",
-    "joinTournament": "Rejoindre le tournoi",
-    "active": "Actif",
-    "upcoming": "À venir",
-    "finished": "Terminé",
-    "participants": "Participants",
-    "round": "Tour",
-    "finals": "Finale",
-    "semiFinals": "Demi-finales",
-    "quarterFinals": "Quarts de finale",
+    "active": "Tournois Actifs",
+    "upcoming": "Tournois à Venir",
+    "finished": "Tournois Terminés",
     "noTournaments": "Aucun tournoi disponible",
-    "createTournament": "Créer un tournoi",
-    "tournamentName": "Nom du tournoi",
-    "maxPlayers": "Joueurs max",
-    "startDate": "Date de début"
+    "checkBack": "Reviens bientôt pour plus de tournois!",
+    "create": "Créer un Tournoi",
+    "createDescription": "Organise ton propre tournoi et défie d'autres joueurs",
+    "name": "Nom du Tournoi",
+    "description": "Description du Tournoi",
+    "players": "Joueurs",
+    "maxPlayers": "Nombre Maximum de Joueurs"
   },
   "profile": {
     "title": "Profil du joueur",
-    "editProfile": "Modifier le profil",
     "wins": "Victoires",
     "losses": "Défaites",
-    "rank": "Rang",
-    "winRate": "Taux de victoire",
-    "gameHistory": "Historique des parties",
-    "achievements": "Succès",
-    "noGames": "Aucune partie jouée",
-    "saveChanges": "Enregistrer les modifications",
-    "cancelEdit": "Annuler",
-    "username": "Nom d'utilisateur",
-    "avatar": "Avatar",
-    "uploadAvatar": "Télécharger un nouvel avatar",
-    "achievementUnlocked": "Succès débloqué !",
-    "firstVictory": "Première victoire",
-    "winStreak": "Série de victoires x5",
-    "speedPlayer": "Joueur rapide",
-    "champion": "Champion",
-    "hundredWins": "100 victoires"
+    "rank": "Classement",
+    "winRate": "Taux de Victoires",
+    "achievements": "Accomplissements",
+    "editProfile": "Modifier le Profil",
+    "currentStreak": "Série Actuelle",
+    "bestStreak": "Meilleure Série",
+    "firstVictory": "Première Victoire",
+    "winStreak": "Série de Victoires",
+    "speedPlayer": "Joueur Rapide",
+    "gameHistory": "Historique des Parties",
+    "noGames": "Tu n'as pas encore joué."
   },
   "common": {
     "loading": "Chargement...",
@@ -129,105 +73,98 @@
     "save": "Enregistrer",
     "cancel": "Annuler",
     "confirm": "Confirmer",
-    "close": "Fermer",
-    "search": "Rechercher",
-    "filter": "Filtrer",
-    "sort": "Trier",
-    "ascending": "Croissant",
-    "descending": "Décroissant",
-    "noResults": "Aucun résultat trouvé",
-    "vs": "vs",
-    "ready": "Prêt"
-  },
-  "notifications": {
-    "title": "Notifications",
-    "noNotifications": "Aucune notification",
-    "matchInvite": "Invitation de partie",
-    "tournamentStart": "Début du tournoi",
-    "opponentFound": "Adversaire trouvé",
-    "gameResult": "Résultat de la partie",
-    "youWin": "Vous avez gagné !",
-    "youLose": "Vous avez perdu"
+    "status": "Statut",
+    "ready": "PRÊT",
+    "noResults": "Aucun résultat trouvé"
   },
   "privacy": {
     "title": "Politique de Confidentialité",
-    "lastUpdated": "Dernière mise à jour : 14 avril 2026",
+    "lastUpdated": "Dernière mise à jour : Avril 2026",
     "section1": {
       "title": "Informations que Nous Collectons",
-      "p1": "Nous collectons les informations que vous nous fournissez directement, notamment :",
-      "li1": "Informations de compte (nom d'utilisateur, email, mot de passe) lors de l'inscription",
-      "li2": "Données de jeu incluant les parties, scores et participation aux tournois",
-      "li3": "Communications et messages envoyés via notre plateforme",
-      "li4": "Informations de profil incluant avatar et paramètres"
+      "p1": "Nous collectons des informations que vous nous fournissez directement, telles que:",
+      "li1": "Identifiants de compte (email, nom d'utilisateur, mot de passe)",
+      "li2": "Informations de profil (avatar, nom affiché)",
+      "li3": "Statistiques de jeu et historique des matchs",
+      "li4": "Données de communication (si vous utilisez les fonctions de messagerie)"
     },
     "section2": {
       "title": "Comment Nous Utilisons Vos Informations",
-      "p1": "Nous utilisons les informations collectées pour :",
-      "li1": "Fournir, maintenir et améliorer nos services",
-      "li2": "Traiter les transactions et envoyer des informations associées",
-      "li3": "Vous envoyer des avis techniques et des messages de support"
+      "p1": "Nous utilisons les informations collectées pour:",
+      "li1": "Gestion et authentification de compte",
+      "li2": "Fonctionnalités du jeu et appairage",
+      "li3": "Génération du classement",
+      "li4": "Améliorer l'expérience utilisateur"
     },
     "section3": {
-      "title": "Partage des Informations",
-      "p1": "Nous ne vendons, n'échangeons ni ne transférons vos informations personnelles à des tiers sans votre consentement, sauf comme décrit dans cette politique. Nous pouvons partager des informations avec :",
-      "li1": "Les prestataires de services qui nous aident dans nos opérations",
-      "li2": "Autres utilisateurs (dans le cadre des fonctions publiques de jeu)",
-      "li3": "Autorités légales lorsque requis par la loi"
+      "title": "Protection des Données",
+      "p1": "Vos données sont protégées par:",
+      "li1": "Authentification chiffrée (jetons JWT)",
+      "li2": "Connexions sécurisées HTTPS",
+      "li3": "Hachage de mot de passe avec sel",
+      "li4": "Audits de sécurité réguliers"
     },
     "section4": {
-      "title": "Sécurité des Données",
-      "p1": "Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos informations personnelles contre tout accès non autorisé, altération, divulgation ou destruction.",
-      "p2": "Cependant, aucune méthode de transmission sur Internet n'est 100% sécurisée, et nous ne pouvons garantir une sécurité absolue."
-    },
-    "section5": {
-      "title": "Vos Droits",
-      "p1": "Vous avez le droit d'accéder, de corriger ou de supprimer vos données personnelles. Vous pouvez également refuser certaines communications. Pour exercer ces droits, contactez-nous via la plateforme.",
-      "p2": "Vous pouvez supprimer votre compte à tout moment, ce qui supprimera vos informations personnelles de nos serveurs."
-    },
-    "section6": {
-      "title": "Contactez-nous",
-      "p1": "Si vous avez des questions concernant cette Politique de Confidentialité, contactez-nous :",
-      "contact": "Email : privacy@transcendence.game | Adresse : 42 School, Paris, France"
+      "title": "Nous Contacter",
+      "p1": "Si vous avez des questions sur cette Politique de Confidentialité, veuillez nous contacter.",
+      "p2": "Nous respectons les réglementations de protection des données et les droits de confidentialité des utilisateurs."
     }
   },
   "terms": {
     "title": "Conditions d'Utilisation",
-    "lastUpdated": "Dernière mise à jour : 14 avril 2026",
+    "lastUpdated": "Dernière mise à jour : Avril 2026",
     "section1": {
       "title": "Acceptation des Conditions",
-      "p1": "En accédant ou en utilisant Transcendence, vous acceptez d'être lié par ces Conditions d'Utilisation et toutes les lois et réglementations applicables.",
-      "p2": "Si vous n'êtes pas d'accord avec une partie de ces conditions, vous ne pouvez pas utiliser nos services."
+      "p1": "En accédant et en utilisant cette plateforme, vous acceptez et acceptez les termes et dispositions de cet accord."
     },
     "section2": {
-      "title": "Conduite de l'Utilisateur",
-      "p1": "Vous acceptez d'utiliser Transcendence uniquement à des fins légales et conformément à ces Conditions. Vous êtes responsable de :",
-      "li1": "Maintenir la confidentialité de votre compte",
-      "li2": "Toutes les activités effectuées sous votre compte",
-      "li3": "Ne pas tricher, pirater ou exploiter",
-      "li4": "Traiter les autres joueurs avec respect",
-      "li5": "Ne pas transmettre de contenu nuisible ou inapproprié"
+      "title": "Responsabilités de l'Utilisateur",
+      "p1": "Vous êtes responsable de:",
+      "li1": "Maintenir la confidentialité de vos identifiants de compte",
+      "li2": "Toutes les activités qui se déroulent sous votre compte",
+      "li3": "Respecter toutes les lois et réglementations applicables",
+      "li4": "Ne pas utiliser la plateforme pour tricher ou jouer déloyalement"
     },
     "section3": {
-      "title": "Règles du Jeu",
-      "p1": "Tous les jeux joués sur Transcendence doivent suivre les principes de jeu équitable. Toute forme de tricherie, d'exploitation de bugs ou de modifications non autorisées est strictement interdite.",
-      "p2": "Les joueurs trouvés en violation des règles du jeu peuvent être soumis à des avertissements, suspensions temporaires ou suspension permanente du compte."
+      "title": "Activités Interdites",
+      "p1": "Les utilisateurs ne doivent pas:",
+      "li1": "S'engager dans la triche, le piratage ou l'exploitation de bugs",
+      "li2": "Harceler, abuser ou discriminer les autres joueurs",
+      "li3": "Partager des comptes ou des identifiants",
+      "li4": "Tenter d'obtenir un accès non autorisé aux systèmes"
     },
     "section4": {
-      "title": "Propriété Intellectuelle",
-      "p1": "Tout le contenu, les fonctionnalités et la fonctionnalité de Transcendence nous appartiennent et sont protégés par les lois sur le droit d'auteur, les marques commerciales et autres lois sur la propriété intellectuelle. Vous conservez la propriété du contenu que vous créez.",
-      "li1": "Vous ne pouvez pas reproduire, distribuer ou créer des œuvres dérivées",
-      "li2": "Le contenu généré par les utilisateurs ne doit pas enfreindre les droits d'autrui",
-      "li3": "Signalez toute violation de propriété intellectuelle à notre équipe"
+      "title": "Limitation de Responsabilité",
+      "p1": "La plateforme est fournie 'telle quelle' sans garanties.",
+      "p2": "Nous ne sommes pas responsables des dommages indirects ou consécutifs découlant de votre utilisation de ce service."
     },
     "section5": {
-      "title": "Limitation de Responsabilité",
-      "p1": "Transcendence est fourni 'tel quel' sans garantie d'aucune sorte. Nous ne sommes pas responsables de tout dommage indirect, accessoire ou consécutif découlant de votre utilisation du service.",
-      "p2": "Nous ne garantissons pas un service ininterrompu ou sans erreur."
-    },
-    "section6": {
-      "title": "Modifications des Conditions",
-      "p1": "Nous nous réservons le droit de modifier ces Conditions à tout moment. L'utilisation continue du service après les modifications constitue l'acceptation des nouvelles conditions.",
-      "contact": "Pour toute question concernant ces Conditions, contactez-nous à : legal@transcendence.game"
+      "title": "Résiliation",
+      "p1": "Nous nous réservons le droit de suspendre ou de résilier les comptes qui violent ces conditions."
     }
+  },
+  "home": {
+    "subtitle": "Insérez une pièce pour jouer",
+    "title": "TRANSCENDANCE",
+    "play": "Jouer maintenant",
+    "tournament": "Tournoi",
+    "leaderboard": "Classement",
+    "howToPlay": "Comment jouer",
+    "howToPlayDesc": "Prêt à défier d'autres joueurs? Rejoignez une partie et prouvez vos compétences!",
+    "rankings": "Voir le Classement Complet",
+    "totalPlayers": "JOUEURS",
+    "gamesPlayed": "MATCHS",
+    "yourStatus": "VOTRE STATUT",
+    "rank": "CLASSEMENT",
+    "streak": "SÉRIE"
+  },
+  "footer": {
+    "tagline": "L'Expérience Ultime du Jeu de Cartes",
+    "game": "Jeu",
+    "account": "Compte",
+    "legal": "Légal",
+    "privacy": "Politique de Confidentialité",
+    "terms": "Conditions d'Utilisation",
+    "rights": "Tous droits réservés"
   }
 }
