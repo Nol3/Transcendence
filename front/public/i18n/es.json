@@ -32,7 +32,10 @@
     "rankings": "Clasificación",
     "player": "Jugador",
     "wins": "Victorias",
-    "winRate": "Ratio de victoria"
+    "winRate": "Ratio de victoria",
+    "yourStatus": "Tu estado",
+    "rank": "Rango",
+    "winStreak": "Racha de victorias"
   },
   "auth": {
     "login": {

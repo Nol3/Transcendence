@@ -8,7 +8,6 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.backend
-    container_name: ft_transcendence_backend
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     environment:
@@ -26,8 +25,6 @@ services:
              python manage.py runserver 0.0.0.0:8000"
     networks:
       - transcendence-network
-    depends_on:
-      - nginx
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/admin/"]
       interval: 30s
@@ -40,18 +37,13 @@ services:
   # ==========================================
   frontend:
     build:
-      context: ./front
-      dockerfile: ../docker/Dockerfile.frontend
-    container_name: ft_transcendence_frontend
+      context: .
+      dockerfile: docker/Dockerfile.frontend
     ports:
       - "${FRONTEND_PORT:-4200}:4200"
     environment:
       - NG_ENV=${NG_ENV:-development}
       - BACKEND_URL=${BACKEND_URL:-http://localhost:8000}
-    volumes:
-      - ./front:/app
-      - /app/node_modules
-    command: npm start
     networks:
       - transcendence-network
     depends_on:
@@ -68,7 +60,6 @@ services:
   # ==========================================
   nginx:
     image: nginx:alpine
-    container_name: ft_transcendence_nginx
     ports:
       - "443:443"
       - "80:80"
