@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <time.h>
 
 const char* GetSuitSymbol(int suit) {
     switch (suit) {
@@ -57,8 +56,8 @@ void DeckInit(Deck* deck) {
 }
 
 void DeckShuffle(Deck* deck) {
-    // Fisher-Yates shuffle
-    srand((unsigned int)time(NULL));
+    // Fisher-Yates. El RNG se siembra una sola vez en GameInit; aquí solo se
+    // consume el stream, evitando barajas idénticas entre rondas seguidas.
     for (int i = deck->count - 1; i > 0; i--) {
         int j = rand() % (i + 1);
         Card temp = deck->cards[i];
