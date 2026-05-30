@@ -34,6 +34,9 @@ backend/htmlcov/
 backend/db.sqlite3
 backend/db.sqlite3-journal
 
+**/__pycache__/
+*.pyc
+
 # Docker
 docker/volumes/
 

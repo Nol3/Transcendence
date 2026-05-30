@@ -620,68 +620,6 @@ void DrawStateRoundEnd(Game* game) {
     DrawCenteredText("Calculando ganador...", GetScreenHeight() / 2, 30, WHITE);
 }
 
-void DrawStateShop(Game* game) {
-    int screenW = GetScreenWidth();
-    int screenH = GetScreenHeight();
-    int centerX = screenW / 2;
-
-    DrawCenteredText("TIENDA DE COMODINES", 40, 40, GOLD);
-
-    char moneyBuf[32];
-    snprintf(moneyBuf, sizeof(moneyBuf), "Dinero: %d", game->jokerSystem.money);
-    int cardW = 160;
-    int cardH = 180;
-    int totalW = SHOP_JOKER_COUNT * cardW + (SHOP_JOKER_COUNT - 1) * 20;
-    int startX = centerX - totalW / 2;
-
-    for (int i = 0; i < SHOP_JOKER_COUNT; i++) {
-        Joker* joker = &game->jokerSystem.shopJokers[i];
-        int x = startX + i * (cardW + 20);
-        int y = screenH / 2 - cardH / 2;
-
-        Color bgColor = (Color){30, 30, 50, 255};
-        if (joker->purchased) {
-            bgColor = (Color){0, 60, 0, 255};
-        } else if (game->jokerSystem.money < joker->price) {
-            bgColor = (Color){60, 20, 20, 255};
-        }
-
-        DrawRectangleRounded((Rectangle){(float)x, (float)y, cardW, cardH}, 0.15f, 10, bgColor);
-        DrawRectangleRoundedLines((Rectangle){(float)x, (float)y, cardW, cardH}, 0.15f, 10, GOLD);
-
-        Color nameColor = joker->purchased ? GREEN : WHITE;
-        int nameW = MeasureText(joker->name, 22);
-        DrawText(joker->name, x + cardW / 2 - nameW / 2, y + 15, 22, nameColor);
-
-        char priceBuf[16];
-        snprintf(priceBuf, sizeof(priceBuf), "$%d", joker->price);
-        Color priceColor = joker->purchased ? GREEN : (game->jokerSystem.money >= joker->price ? GOLD : (Color){200, 50, 50, 255});
-        int priceW = MeasureText(priceBuf, 20);
-        DrawText(priceBuf, x + cardW / 2 - priceW / 2, y + 45, 20, priceColor);
-
-        DrawText(joker->description, x + 10, y + 80, 16, LIGHTGRAY);
-
-        if (!joker->purchased && game->jokerSystem.money >= joker->price) {
-            DrawButton("COMPRAR", x, y + cardH - 50, cardW, 42, (Color){0, 150, 60, 255}, WHITE);
-        }
-    }
-
-    if (game->jokerSystem.money >= 1) {
-        DrawButton("REROLL", centerX + 250, screenH / 2 - 80, 100, 50, (Color){80, 60, 120, 255}, WHITE);
-    }
-
-    if (game->jokerSystem.ownedCount > 0) {
-        DrawCenteredText("Tus Comodines:", screenH / 2 + 120, 20, GOLD);
-        for (int i = 0; i < game->jokerSystem.ownedCount; i++) {
-            char buf[64];
-            snprintf(buf, sizeof(buf), "%s", game->jokerSystem.ownedJokers[i].name);
-            DrawText(buf, 50 + i * 150, screenH / 2 + 150, 16, GREEN);
-        }
-    }
-
-        DrawButton("CONTINUAR", centerX - 100, screenH - 100, 200, 55, (Color){0, 100, 40, 255}, WHITE);
-}
-
 void DrawStateGameOver(Game* game) {
     int screenW = GetScreenWidth();
     int screenH = GetScreenHeight();
@@ -841,7 +779,7 @@ void DrawHighScoresScreen(HighScoreEntry* entries, int count) {
         int y = startY + 50 + i * lineHeight;
         Color color = (i == 0) ? GOLD : (i == 1) ? (Color){192, 192, 192, 255} : (i == 2) ? (Color){205, 127, 50, 255} : WHITE;
         
-        char rankStr[4];
+        char rankStr[16];
         snprintf(rankStr, sizeof(rankStr), "%d.", i + 1);
         DrawText(rankStr, nameX - 40, y, 20, color);
         

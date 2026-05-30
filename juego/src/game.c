@@ -1,7 +1,6 @@
 #include "game.h"
 #include "renderer.h"
 #include "audio.h"
-#include "joker.h"
 #include "cJSON.h"
 #include <string.h>
 #include <stdio.h>
@@ -61,14 +60,16 @@ void GameInit(Game* game) {
     game->maxRounds = 5;
     game->targetScore = 300;
     game->winnerId = -1;
-    JokerSystemInit(&game->jokerSystem);
-    
+
+    // Sembrar el RNG una sola vez por partida. DeckShuffle reutiliza este
+    // stream, evitando barajas idénticas en rondas dentro del mismo segundo.
+    srand((unsigned int)time(NULL));
+
     // Inicializar jugadores con nombres por defecto
     for (int i = 0; i < MAX_PLAYERS; i++) {
         game->players[i].id = i;
         if (i == 0) {
-            strncpy(game->players[i].name, g_player_name, sizeof(game->players[i].name) - 1);
-            game->players[i].name[sizeof(game->players[i].name) - 1] = '\0';
+            snprintf(game->players[i].name, sizeof(game->players[i].name), "%.31s", g_player_name);
         } else {
             snprintf(game->players[i].name, sizeof(game->players[i].name), "Jugador %d", i + 1);
         }
@@ -122,9 +123,6 @@ void GameUpdate(Game* game) {
         case STATE_ROUND_END:
             UpdateStateRoundEnd(game);
             break;
-        case STATE_SHOP:
-            UpdateStateShop(game);
-            break;
         case STATE_GAME_OVER:
             UpdateStateGameOver(game);
             break;
@@ -167,14 +165,11 @@ void GameDraw(Game* game) {
         case STATE_ROUND_END:
             DrawStateRoundEnd(game);
             break;
-        case STATE_SHOP:
-            DrawStateShop(game);
-            break;
         case STATE_GAME_OVER:
             DrawStateGameOver(game);
             break;
     }
-    
+
     EndDrawing();
 }
 
@@ -250,7 +245,6 @@ void UpdateStateConfig(Game* game) {
 }
 
 void UpdateStateSetupPlayers(Game* game) {
-    static int selectedPlayers = 2;
     static int currentOption = 0;  // 0=jugadores, 1=rondas, 2=puntuacion
     int screenW = GetScreenWidth();
     int screenH = GetScreenHeight();
@@ -270,8 +264,8 @@ void UpdateStateSetupPlayers(Game* game) {
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_RIGHT)) {
         switch (currentOption) {
             case 0: // Jugadores
-                selectedPlayers++;
-                if (selectedPlayers > MAX_PLAYERS) selectedPlayers = MAX_PLAYERS;
+                game->playerCount++;
+                if (game->playerCount > MAX_PLAYERS) game->playerCount = MAX_PLAYERS;
                 break;
             case 1: // Rondas
                 game->maxRounds++;
@@ -286,8 +280,8 @@ void UpdateStateSetupPlayers(Game* game) {
     if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_LEFT)) {
         switch (currentOption) {
             case 0: // Jugadores
-                selectedPlayers--;
-                if (selectedPlayers < 2) selectedPlayers = 2;
+                game->playerCount--;
+                if (game->playerCount < 2) game->playerCount = 2;
                 break;
             case 1: // Rondas
                 game->maxRounds--;
@@ -300,8 +294,6 @@ void UpdateStateSetupPlayers(Game* game) {
         }
     }
     
-    game->playerCount = selectedPlayers;
-    
     // Botones de ajuste con ratón - coordenadas deben coincidir con renderer.c
     int startY = 140;
     int spacing = 100;
@@ -311,12 +303,12 @@ void UpdateStateSetupPlayers(Game* game) {
     
     // Jugadores - botones +/-
     if (IsButtonClicked("+", centerX + labelW/2 + 10, startY - 8, btnW, btnH)) {
-        selectedPlayers++;
-        if (selectedPlayers > MAX_PLAYERS) selectedPlayers = MAX_PLAYERS;
+        game->playerCount++;
+        if (game->playerCount > MAX_PLAYERS) game->playerCount = MAX_PLAYERS;
     }
     if (IsButtonClicked("-", centerX - labelW/2 - btnW - 10, startY - 8, btnW, btnH)) {
-        selectedPlayers--;
-        if (selectedPlayers < 2) selectedPlayers = 2;
+        game->playerCount--;
+        if (game->playerCount < 2) game->playerCount = 2;
     }
     
     // Rondas - botones +/-
@@ -478,10 +470,8 @@ void UpdateStatePlayerTurn(Game* game) {
     // Confirmar mano con ENTER o botón (requiere al menos 1 carta seleccionada)
     bool canPlay = current->selectedCount >= 1;
     if (canPlay && (IsKeyPressed(KEY_ENTER) || IsButtonClicked("CONFIRMAR", screenW/2 - 100, btnRowY, 200, 48))) {   
-        // Evaluar mano con bonus de comodines
-        int jokerBonus = CalculateJokerBonus(&game->jokerSystem, current->selectedCards, current->selectedCount);
+        // Evaluar la mano seleccionada y acumular su puntuación
         current->lastResult = EvaluateHand(current->selectedCards, current->selectedCount);
-        current->lastResult.score += jokerBonus;
         current->score += current->lastResult.score;
         
         // Resetear estado de descarte para el siguiente turno
@@ -523,50 +513,24 @@ void UpdateStateShowResults(Game* game) {
 }
 
 void UpdateStateRoundEnd(Game* game) {
-    int winner = CalculateRoundWinner(game);
-    if (winner >= 0) {
-        game->players[winner].totalRoundsWon++;
+    int roundWinner = CalculateRoundWinner(game);
+    if (roundWinner >= 0) {
+        game->players[roundWinner].totalRoundsWon++;
         AudioPlayRoundEnd();
     }
 
     if (CheckGameEnd(game)) {
+        // Fijar el ganador de la partida antes de la pantalla final.
+        // Sin esto, winnerId quedaba en -1 y los high scores no se guardaban.
+        game->winnerId = GetGameWinner(game);
         game->state = STATE_GAME_OVER;
-        NOTIFY_INT("score", game->players[GetGameWinner(game)].score);
+        NOTIFY_INT("score", game->players[game->winnerId].score);
         NOTIFY("gameover");
         AudioPlayWin();
     } else {
         NOTIFY_INT("round", game->currentRound);
         NOTIFY("round-end");
-        DeactivateAllJokers(&game->jokerSystem);
-        game->jokerSystem.money += 5;
-        GenerateShopJokers(&game->jokerSystem, (int)time(NULL) ^ game->currentRound);
-        game->state = STATE_SHOP;
-    }
-}
-
-void UpdateStateShop(Game* game) {
-    int screenW = GetScreenWidth();
-    int screenH = GetScreenHeight();
-    int centerX = screenW / 2;
-
-    for (int i = 0; i < SHOP_JOKER_COUNT; i++) {
-        int x = centerX - 220 + i * 220;
-        int y = screenH / 2 - 80;
-        if (IsButtonClicked("COMPRAR", x, y, 180, 50)) {
-            PurchaseJoker(&game->jokerSystem, i);
-            AudioPlayWin();
-        }
-    }
-
-    if (IsButtonClicked("CONTINUAR", centerX - 100, screenH - 100, 200, 55)) {
-        AudioPlayButtonClick();
-        game->currentRound++;
-        game->state = STATE_DEAL_CARDS;
-    }
-
-    if (IsButtonClicked("REROLL", centerX + 250, screenH / 2 - 80, 100, 50)) {
-        JokerSystemRerollShop(&game->jokerSystem, (int)time(NULL));
-        AudioPlayCardDiscard();
+        StartNewRound(game);  // Avanza de ronda y vuelve a repartir
     }
 }
 
@@ -604,6 +568,7 @@ void UpdateStateGameOver(Game* game) {
 void StartNewRound(Game* game) {
     game->currentRound++;
     game->currentPlayer = 0;
+    game->dealCardsInitialized = false;  // Fuerza el reparto en STATE_DEAL_CARDS
     game->state = STATE_DEAL_CARDS;
 }
 
@@ -706,10 +671,15 @@ int GetGameWinner(Game* game) {
 // ========== FUNCIONES DE ORDENAMIENTO ==========
 
 // Helper para comparar cartas por valor (mayor a menor)
+// El As se almacena como rank=1 pero vale 14 (igual que en poker_hand.c)
+static int RankSortValue(int rank) {
+    return (rank == 1) ? 14 : rank;
+}
+
 static int CompareCardsByRankDesc(const void* a, const void* b) {
     const Card* cardA = (const Card*)a;
     const Card* cardB = (const Card*)b;
-    return cardB->rank - cardA->rank;  // Mayor a menor
+    return RankSortValue(cardB->rank) - RankSortValue(cardA->rank);  // Mayor a menor
 }
 
 // Helper para contar cartas por palo
@@ -742,11 +712,19 @@ void SortHandBySuit(Player* player) {
             
             bool shouldSwap = false;
             if (suitCountJ1 > suitCountJ) {
+                // Palo con más cartas primero
                 shouldSwap = true;
             } else if (suitCountJ1 == suitCountJ) {
-                // Mismo palo, ordenar por valor
-                if (player->hand[j + 1].rank > player->hand[j].rank) {
+                int suitJ = player->hand[j].suit;
+                int suitJ1 = player->hand[j + 1].suit;
+                if (suitJ1 > suitJ) {
+                    // Mismo conteo pero distinto palo: agrupar por índice de palo
                     shouldSwap = true;
+                } else if (suitJ1 == suitJ) {
+                    // Mismo palo: ordenar por valor (As=14 arriba)
+                    if (RankSortValue(player->hand[j + 1].rank) > RankSortValue(player->hand[j].rank)) {
+                        shouldSwap = true;
+                    }
                 }
             }
             
@@ -765,36 +743,34 @@ void StartDealAnimation(Game* game) {
     // Posición inicial del mazo (centro superior de la pantalla)
     float deckX = GetScreenWidth() / 2.0f - CARD_WIDTH / 2;
     float deckY = 100;
-    
+
     // Posición central de las cartas en mano
     float handY = GetScreenHeight() / 2.0f;
-    
+    float handStartX = GetHandStartX(CARDS_PER_HAND, GetScreenWidth());
+
     game->animationCount = 0;
     game->dealingInProgress = true;
-    
-    // Crear animación para cada carta de cada jugador
-    for (int p = 0; p < game->playerCount; p++) {
-        float handStartX = GetHandStartX(CARDS_PER_HAND, GetScreenWidth());
-        
-        for (int i = 0; i < CARDS_PER_HAND; i++) {
-            if (game->animationCount >= MAX_CARD_ANIMATIONS) break;
-            
-            CardAnimation* anim = &game->cardAnimations[game->animationCount];
-            anim->active = true;
-            anim->cardIndex = i;
-            anim->playerIndex = p;
-            anim->startX = deckX;
-            anim->startY = deckY;
-            anim->currentX = deckX;
-            anim->currentY = deckY;
-            anim->targetX = handStartX + i * (CARD_WIDTH * 1.2f + CARD_SPACING);
-            anim->targetY = handY;
-            anim->progress = 0.0f;
-            anim->speed = 0.03f + (game->animationCount * 0.005f); // Velocidad escalonada
-            anim->card = game->players[p].hand[i];
-            
-            game->animationCount++;
-        }
+
+    // Solo se anima la mano del jugador actual: es la única que se mostrará
+    // tras el reparto. El reparto lógico ya entregó cartas a todos los
+    // jugadores en UpdateStateDealCards. Así nunca se exceden las
+    // MAX_CARD_ANIMATIONS ni se solapan manos de varios jugadores.
+    Player* player = &game->players[game->currentPlayer];
+    for (int i = 0; i < CARDS_PER_HAND && game->animationCount < MAX_CARD_ANIMATIONS; i++) {
+        CardAnimation* anim = &game->cardAnimations[game->animationCount];
+        anim->active = true;
+        anim->cardIndex = i;
+        anim->playerIndex = game->currentPlayer;
+        anim->startX = deckX;
+        anim->startY = deckY;
+        anim->currentX = deckX;
+        anim->currentY = deckY;
+        anim->targetX = handStartX + i * (CARD_WIDTH * 1.2f + CARD_SPACING);
+        anim->targetY = handY;
+        anim->progress = 0.0f;
+        anim->speed = 0.03f + (i * 0.005f);  // Velocidad escalonada por carta
+        anim->card = player->hand[i];
+        game->animationCount++;
     }
 }
 
@@ -851,9 +827,14 @@ void LoadHighScores(HighScoreEntry* entries, int* count) {
     *count = 0;
     FILE* file = fopen("highscores.dat", "rb");
     if (file) {
-        (void)fread(count, sizeof(int), 1, file);
+        if (fread(count, sizeof(int), 1, file) != 1) {
+            *count = 0;  // Archivo corrupto o vacío
+        }
+        if (*count < 0) *count = 0;
         if (*count > MAX_HIGH_SCORES) *count = MAX_HIGH_SCORES;
-        (void)fread(entries, sizeof(HighScoreEntry), *count, file);
+        if (fread(entries, sizeof(HighScoreEntry), *count, file) != (size_t)*count) {
+            *count = 0;  // Datos incompletos: descartar
+        }
         fclose(file);
     }
 }
@@ -904,8 +885,11 @@ bool AddHighScore(HighScoreEntry* entries, int* count, const char* name, int sco
     // Fecha actual
     time_t now = time(NULL);
     struct tm* tm = localtime(&now);
-    snprintf(entries[insertPos].date, sizeof(entries[insertPos].date), 
-             "%04d-%02d-%02d", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday);
+    if (tm) {
+        strftime(entries[insertPos].date, sizeof(entries[insertPos].date), "%Y-%m-%d", tm);
+    } else {
+        entries[insertPos].date[0] = '\0';
+    }
     
     if (*count < MAX_HIGH_SCORES) {
         (*count)++;

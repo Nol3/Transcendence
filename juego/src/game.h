@@ -3,7 +3,6 @@
 
 #include "card.h"
 #include "poker_hand.h"
-#include "joker.h"
 
 #define MAX_PLAYERS 4
 #define CARDS_PER_HAND 8
@@ -21,7 +20,6 @@ typedef enum {
     STATE_HIDE_SCREEN,
     STATE_SHOW_RESULTS,
     STATE_ROUND_END,
-    STATE_SHOP,
     STATE_GAME_OVER
 } GameState;
 
@@ -75,11 +73,10 @@ typedef struct {
     int winnerId;  // -1 si no hay ganador aún
     
     // Animaciones
-CardAnimation cardAnimations[MAX_CARD_ANIMATIONS];
+    CardAnimation cardAnimations[MAX_CARD_ANIMATIONS];
     int animationCount;
     bool dealingInProgress;
     bool dealCardsInitialized;
-    JokerSystem jokerSystem;
 } Game;
 
 // Funciones principales
@@ -97,7 +94,6 @@ void UpdateStatePlayerTurn(Game* game);
 void UpdateStateHideScreen(Game* game);
 void UpdateStateShowResults(Game* game);
 void UpdateStateRoundEnd(Game* game);
-void UpdateStateShop(Game* game);
 void UpdateStateGameOver(Game* game);
 
 // Utilidades del juego
