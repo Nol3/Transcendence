@@ -156,38 +156,14 @@
 
           <app-card [title]="'profile.achievements' | translate" [padding]="'md'">
             <div class="achievements-list">
-              <div class="achievement unlocked">
-                <span class="achievement-icon">🏆</span>
-                <span class="achievement-name">{{ 'profile.firstVictory' | translate }}</span>
-              </div>
-              <div class="achievement unlocked">
-                <span class="achievement-icon">🔥</span>
-                <span class="achievement-name">{{ 'profile.winStreak' | translate }}</span>
-              </div>
-              <div class="achievement unlocked">
-                <span class="achievement-icon">⚡</span>
-                <span class="achievement-name">{{ 'profile.speedPlayer' | translate }}</span>
-              </div>
-              @if (stats()?.wins && stats()!.wins >= 10) {
-                <div class="achievement unlocked">
-                  <span class="achievement-icon">🎯</span>
-                  <span class="achievement-name">10 Wins</span>
-                </div>
-              } @else {
-                <div class="achievement locked">
-                  <span class="achievement-icon">🎯</span>
-                  <span class="achievement-name">10 Wins ({{ stats()?.wins ?? 0 }}/10)</span>
-                </div>
-              }
-              @if (stats()?.wins && stats()!.wins >= 50) {
-                <div class="achievement unlocked">
-                  <span class="achievement-icon">💎</span>
-                  <span class="achievement-name">50 Wins</span>
-                </div>
-              } @else {
-                <div class="achievement locked">
-                  <span class="achievement-icon">💎</span>
-                  <span class="achievement-name">50 Wins ({{ stats()?.wins ?? 0 }}/50)</span>
+              @for (ach of achievements(); track ach.labelKey) {
+                <div class="achievement" [class.unlocked]="ach.unlocked" [class.locked]="!ach.unlocked">
+                  <span class="achievement-icon">{{ ach.icon }}</span>
+                  <span class="achievement-name">
+                    {{ ach.labelKey | translate }}@if (!ach.unlocked && ach.progress) {
+                      <span class="achievement-progress"> ({{ ach.progress }})</span>
+                    }
+                  </span>
                 </div>
               }
             </div>

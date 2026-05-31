@@ -13,6 +13,13 @@ import { DividerComponent } from '../../shared/components/divider/divider';
 import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 import { TranslatePipe } from '../../i18n/translate.pipe';
 
+interface Achievement {
+  icon: string;
+  labelKey: string;
+  unlocked: boolean;
+  progress?: string;
+}
+
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -50,7 +57,15 @@ export class Profile implements OnInit {
   readonly history = signal<GameHistoryEntry[]>([]);
 
   readonly profileForm: FormGroup = this.fb.group({
-    username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20), Validators.pattern(/^[a-zA-Z0-9_]+$/)]],
+    username: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(20),
+        Validators.pattern(/^[a-zA-Z0-9_]+$/),
+      ],
+    ],
   });
 
   readonly rankLabel = computed(() => {
@@ -60,6 +75,52 @@ export class Profile implements OnInit {
     if (rank <= 5) return 'EXPERT';
     if (rank <= 10) return 'SKILLED';
     return 'ROOKIE';
+  });
+
+  // Logros basados en estadísticas reales de partidas locales (sin online).
+  // Se desbloquean jugando: partidas, victorias y mejor racha acumuladas.
+  readonly achievements = computed<Achievement[]>(() => {
+    const s = this.stats();
+    const wins = s?.wins ?? 0;
+    const games = s?.gamesPlayed ?? 0;
+    const bestStreak = s?.longestStreak ?? 0;
+
+    return [
+      {
+        icon: '🎮',
+        labelKey: 'profile.firstGame',
+        unlocked: games >= 1,
+      },
+      {
+        icon: '🏆',
+        labelKey: 'profile.firstVictory',
+        unlocked: wins >= 1,
+      },
+      {
+        icon: '🔥',
+        labelKey: 'profile.winStreak',
+        unlocked: bestStreak >= 3,
+        progress: `${Math.min(bestStreak, 3)}/3`,
+      },
+      {
+        icon: '🎯',
+        labelKey: 'profile.tenWins',
+        unlocked: wins >= 10,
+        progress: `${Math.min(wins, 10)}/10`,
+      },
+      {
+        icon: '💎',
+        labelKey: 'profile.fiftyWins',
+        unlocked: wins >= 50,
+        progress: `${Math.min(wins, 50)}/50`,
+      },
+      {
+        icon: '👑',
+        labelKey: 'profile.veteran',
+        unlocked: games >= 50,
+        progress: `${Math.min(games, 50)}/50`,
+      },
+    ];
   });
 
   ngOnInit(): void {
@@ -182,8 +243,10 @@ export class Profile implements OnInit {
     if (!control?.errors || !control.touched) return '';
 
     if (control.errors['required']) return 'This field is required';
-    if (control.errors['minlength']) return `Minimum ${control.errors['minlength'].requiredLength} characters`;
-    if (control.errors['maxlength']) return `Maximum ${control.errors['maxlength'].requiredLength} characters`;
+    if (control.errors['minlength'])
+      return `Minimum ${control.errors['minlength'].requiredLength} characters`;
+    if (control.errors['maxlength'])
+      return `Maximum ${control.errors['maxlength'].requiredLength} characters`;
     if (control.errors['pattern']) return 'Only letters, numbers and underscores allowed';
 
     return 'Invalid value';

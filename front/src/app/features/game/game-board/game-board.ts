@@ -29,7 +29,9 @@ export class GameBoard implements OnInit {
   private readonly userService = inject(UserService);
 
   @ViewChild('gameFrame') private readonly gameFrame!: ElementRef<HTMLIFrameElement>;
-  private readonly gameOrigin = new URL(environment.gameUrl).origin;
+  // gameUrl is absolute in dev (http://localhost:8000/game/) and relative in
+  // prod (/game/). Resolve against the current origin so both yield a valid origin.
+  private readonly gameOrigin = new URL(environment.gameUrl, window.location.origin).origin;
 
   readonly gameSrc: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
     environment.gameUrl,

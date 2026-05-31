@@ -58,9 +58,12 @@
     "editProfile": "Editar perfil",
     "currentStreak": "Racha actual",
     "bestStreak": "Mejor racha",
+    "firstGame": "Primera partida",
     "firstVictory": "Primera victoria",
-    "winStreak": "Racha de victorias",
-    "speedPlayer": "Jugador rápido",
+    "winStreak": "Racha de 3 victorias",
+    "tenWins": "10 victorias",
+    "fiftyWins": "50 victorias",
+    "veteran": "Veterano (50 partidas)",
     "gameHistory": "Historial de partidas",
     "noGames": "No has jugado ninguna partida aún."
 
