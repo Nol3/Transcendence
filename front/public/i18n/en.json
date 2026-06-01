@@ -34,6 +34,23 @@
     "title": "Card Game",
     "insertCoin": "Insert Coin"
   },
+  "lobby": {
+    "title": "GAME LOBBY",
+    "online": "ONLINE",
+    "subtitle": "Card Wars — pick up where the deck left off.",
+    "rulesTitle": "GAME RULES",
+    "statsTitle": "YOUR STATS",
+    "cardBattle": "CARD BATTLE",
+    "rank": "RANK",
+    "wins": "WINS",
+    "losses": "LOSSES",
+    "winRate": "W-RATE",
+    "rule1": "Each player starts with 5 cards",
+    "rule2": "Draw 1 card per turn",
+    "rule3": "Play cards to attack or defend",
+    "rule4": "Reduce opponent HP to 0 to win",
+    "rule5": "Special cards have unique effects"
+  },
   "tournament": {
     "title": "Tournament",
     "bracket": "Bracket",
@@ -159,7 +176,8 @@
     "gamesPlayed": "GAMES",
     "yourStatus": "YOUR STATUS",
     "rank": "RANK",
-    "streak": "STREAK"
+    "streak": "STREAK",
+    "tagline": "🪙"
   },
   "footer": {
     "tagline": "The Ultimate Card Game Experience",

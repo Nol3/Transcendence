@@ -34,6 +34,23 @@
     "title": "Juego de cartas",
     "insertCoin": "Inserta moneda"
   },
+  "lobby": {
+    "title": "SALA DE JUEGO",
+    "online": "EN LÍNEA",
+    "subtitle": "Card Wars — retoma la partida donde la dejaste.",
+    "rulesTitle": "REGLAS DEL JUEGO",
+    "statsTitle": "TUS ESTADÍSTICAS",
+    "cardBattle": "BATALLA DE CARTAS",
+    "rank": "RANGO",
+    "wins": "VICTORIAS",
+    "losses": "DERROTAS",
+    "winRate": "% VICT.",
+    "rule1": "Cada jugador empieza con 5 cartas",
+    "rule2": "Roba 1 carta por turno",
+    "rule3": "Juega cartas para atacar o defender",
+    "rule4": "Reduce los PV del rival a 0 para ganar",
+    "rule5": "Las cartas especiales tienen efectos únicos"
+  },
   "tournament": {
     "title": "Torneo",
     "bracket": "Cuadro",
@@ -159,7 +176,8 @@
     "gamesPlayed": "PARTIDAS",
     "yourStatus": "TU ESTADO",
     "rank": "RANGO",
-    "streak": "RACHA"
+    "streak": "RACHA",
+    "tagline": "🪙"
   },
   "footer": {
     "tagline": "La Experiencia Definitiva del Juego de Cartas",
