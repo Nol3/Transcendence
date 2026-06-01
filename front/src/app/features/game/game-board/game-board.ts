@@ -15,11 +15,12 @@ import { BadgeComponent } from '../../../shared/components/badge/badge';
 import { CardComponent } from '../../../shared/components/card/card';
 import { PixelTitleComponent } from '../../../shared/components/pixel-title/pixel-title';
 import { environment } from '../../../../environments/environment';
+import { TranslatePipe } from '../../../i18n';
 
 @Component({
   selector: 'app-game-board',
   standalone: true,
-  imports: [BadgeComponent, CardComponent, PixelTitleComponent],
+  imports: [BadgeComponent, CardComponent, PixelTitleComponent, TranslatePipe],
   templateUrl: './game-board.html',
   styleUrl: './game-board.scss',
 })
@@ -29,7 +30,9 @@ export class GameBoard implements OnInit {
   private readonly userService = inject(UserService);
 
   @ViewChild('gameFrame') private readonly gameFrame!: ElementRef<HTMLIFrameElement>;
-  private readonly gameOrigin = new URL(environment.gameUrl).origin;
+  // gameUrl is absolute in dev (http://localhost:8000/game/) and relative in
+  // prod (/game/). Resolve against the current origin so both yield a valid origin.
+  private readonly gameOrigin = new URL(environment.gameUrl, window.location.origin).origin;
 
   readonly gameSrc: SafeResourceUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
     environment.gameUrl,
@@ -48,17 +51,17 @@ export class GameBoard implements OnInit {
     const stats = this.userStats();
     if (!stats) {
       return [
-        { label: 'RANK', value: '—', color: 'neon-text-yellow' },
-        { label: 'WINS', value: '—', color: 'neon-text-green' },
-        { label: 'LOSSES', value: '—', color: 'text-secondary' },
-        { label: 'W-RATE', value: '—', color: 'neon-text-cyan' },
+        { label: 'lobby.rank', value: '—', color: 'neon-text-yellow' },
+        { label: 'lobby.wins', value: '—', color: 'neon-text-green' },
+        { label: 'lobby.losses', value: '—', color: 'text-secondary' },
+        { label: 'lobby.winRate', value: '—', color: 'neon-text-cyan' },
       ];
     }
     return [
-      { label: 'RANK', value: `#${stats.rank}`, color: 'neon-text-yellow' },
-      { label: 'WINS', value: String(stats.wins), color: 'neon-text-green' },
-      { label: 'LOSSES', value: String(stats.losses), color: 'text-secondary' },
-      { label: 'W-RATE', value: `${stats.winRate}%`, color: 'neon-text-cyan' },
+      { label: 'lobby.rank', value: `#${stats.rank}`, color: 'neon-text-yellow' },
+      { label: 'lobby.wins', value: String(stats.wins), color: 'neon-text-green' },
+      { label: 'lobby.losses', value: String(stats.losses), color: 'text-secondary' },
+      { label: 'lobby.winRate', value: `${stats.winRate}%`, color: 'neon-text-cyan' },
     ];
   });
 
@@ -71,13 +74,7 @@ export class GameBoard implements OnInit {
     }
   }
 
-  readonly rules = [
-    'Each player starts with 5 cards',
-    'Draw 1 card per turn',
-    'Play cards to attack or defend',
-    'Reduce opponent HP to 0 to win',
-    'Special cards have unique effects',
-  ];
+  readonly rules = ['lobby.rule1', 'lobby.rule2', 'lobby.rule3', 'lobby.rule4', 'lobby.rule5'];
 
   onGameFrameLoad(): void {
     const user = this.auth.user();

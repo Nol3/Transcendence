@@ -92,8 +92,6 @@ Juego de cartas/
 │   ├── cards/              # Sprites de cartas (BASIC/, DEFAULT/, 1.cards/)
 │   └── audio/              # 8 archivos WAV generadas proceduralmente
 ├── fonts/                  # Fuentes personalizadas
-├── poker_api_post.js       # API de embedding para Emscripten
-├── emscripten_api.js       # Glue code para comunicación postMessage
 ├── DEPLOY.md               # Guía de deployment y embedding
 ├── build/                  # Ejecutable desktop
 ├── web/                    # Archivos web (subir a hosting)

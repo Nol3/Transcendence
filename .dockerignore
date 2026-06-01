@@ -9,17 +9,27 @@
 LICENSE
 !docker/
 
-# Node modules (will be installed in container)
+# Node modules (will be installed in container) — match at any depth
 node_modules/
+**/node_modules/
 npm-debug.log
 yarn-error.log
 
-# Python cache and venv (will be installed in container)
+# Python cache and venv (will be installed in container) — match at any depth.
+# Plain "venv/" only matches the context root; backend/venv needs **/venv/.
 __pycache__/
+**/__pycache__/
 *.py[cod]
 *$py.class
 .venv/
+**/.venv/
 venv/
+**/venv/
+
+# Game build artifacts not needed in the backend image context
+juego/raylib-6.0/
+juego/build/
+RayLib/
 
 # IDE and editor files
 .vscode/

@@ -283,6 +283,11 @@ app-avatar {
   font-weight: 500;
 }
 
+.achievement-progress {
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
 .profile-placeholder {
   display: flex;
   flex-direction: column;

@@ -30,14 +30,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = BASE_DIR.parent
 GAME_WEB_DIR = PROJECT_ROOT / "juego" / "web"
 GAME_ASSETS_DIR = PROJECT_ROOT / "juego" / "assets"
-IMMUTABLE_GAME_EXTS = (".wasm", ".js", ".data", ".png", ".otf", ".ttf", ".wav", ".mp3", ".ogg")
+GAME_ARTIFACT_EXTS = (".wasm", ".js", ".data", ".png", ".otf", ".ttf", ".wav", ".mp3", ".ogg")
 GAME_FRAME_ANCESTORS = "frame-ancestors 'self' http://localhost:4200 http://127.0.0.1:4200"
 
 
-def _apply_immutable_cache(response, path):
-    """Attach long-lived cache headers when serving WASM build artifacts."""
-    if path.lower().endswith(IMMUTABLE_GAME_EXTS):
-        response["Cache-Control"] = "public, max-age=31536000, immutable"
+def _apply_game_cache(response, path):
+    """Cache WASM build artifacts but force revalidation.
+
+    Filenames are unversioned (index.wasm/.js/.data), so an "immutable"
+    policy would pin a stale game in the browser forever after a rebuild.
+    static_serve sends Last-Modified, so "no-cache" makes the browser
+    revalidate via If-Modified-Since: 304 (cheap) when unchanged, fresh
+    bytes after a rebuild.
+    """
+    if path.lower().endswith(GAME_ARTIFACT_EXTS):
+        response["Cache-Control"] = "public, no-cache"
     return response
 
 
@@ -51,7 +58,7 @@ def game_view(request, path=""):
     response["Cross-Origin-Embedder-Policy"] = "require-corp"
     response["Cross-Origin-Resource-Policy"] = "cross-origin"
     response["Content-Security-Policy"] = GAME_FRAME_ANCESTORS
-    return _apply_immutable_cache(response, path)
+    return _apply_game_cache(response, path)
 
 
 def game_asset_view(request, path):
@@ -60,7 +67,7 @@ def game_asset_view(request, path):
     response["Cross-Origin-Resource-Policy"] = "cross-origin"
     response["Access-Control-Allow-Origin"] = "*"
     response["Content-Security-Policy"] = GAME_FRAME_ANCESTORS
-    return _apply_immutable_cache(response, path)
+    return _apply_game_cache(response, path)
 
 
 

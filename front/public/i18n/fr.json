@@ -34,6 +34,23 @@
     "title": "Jeu de cartes",
     "insertCoin": "Insérer une pièce"
   },
+  "lobby": {
+    "title": "SALON DE JEU",
+    "online": "EN LIGNE",
+    "subtitle": "Card Wars — reprends là où le paquet s'est arrêté.",
+    "rulesTitle": "RÈGLES DU JEU",
+    "statsTitle": "TES STATISTIQUES",
+    "cardBattle": "BATAILLE DE CARTES",
+    "rank": "RANG",
+    "wins": "VICTOIRES",
+    "losses": "DÉFAITES",
+    "winRate": "% VICT.",
+    "rule1": "Chaque joueur commence avec 5 cartes",
+    "rule2": "Pioche 1 carte par tour",
+    "rule3": "Joue des cartes pour attaquer ou défendre",
+    "rule4": "Réduis les PV de l'adversaire à 0 pour gagner",
+    "rule5": "Les cartes spéciales ont des effets uniques"
+  },
   "tournament": {
     "title": "Tournoi",
     "bracket": "Tableau",
@@ -59,9 +76,12 @@
     "editProfile": "Modifier le Profil",
     "currentStreak": "Série Actuelle",
     "bestStreak": "Meilleure Série",
+    "firstGame": "Première Partie",
     "firstVictory": "Première Victoire",
-    "winStreak": "Série de Victoires",
-    "speedPlayer": "Joueur Rapide",
+    "winStreak": "Série de 3 Victoires",
+    "tenWins": "10 Victoires",
+    "fiftyWins": "50 Victoires",
+    "veteran": "Vétéran (50 parties)",
     "gameHistory": "Historique des Parties",
     "noGames": "Tu n'as pas encore joué."
   },
@@ -156,7 +176,8 @@
     "gamesPlayed": "MATCHS",
     "yourStatus": "VOTRE STATUT",
     "rank": "CLASSEMENT",
-    "streak": "SÉRIE"
+    "streak": "SÉRIE",
+    "tagline": "🪙"
   },
   "footer": {
     "tagline": "L'Expérience Ultime du Jeu de Cartes",

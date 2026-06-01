@@ -74,8 +74,6 @@ EM_LDFLAGS := -L. -Lraylib-6.0/src \
     --shell-file minshell.html \
     --preload-file assets@/assets \
     --preload-file fonts@/fonts \
-    --pre-js emscripten_wrapper.js \
-    --post-js poker_api_post.js \
     -DPLATFORM_WEB \
     raylib-6.0/src/libraylib.web.a
 WEB_TARGET := $(WEB_DIR)/index.html
