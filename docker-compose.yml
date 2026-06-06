@@ -78,7 +78,10 @@ services:
       #instead, we leave the default conf as it is and then we OVERRIDE with custom configuration, not the other way around, thats why I create the waf.conf file
       #- ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./docker/waf.conf:/etc/nginx/templates/conf.d/default.conf.template:ro
+      - ./docker/modsecurity-override.conf:/etc/nginx/templates/modsecurity.d/modsecurity-override.conf.template:ro
       - ./docker/ssl:/etc/nginx/ssl:ro
+    environment:
+      - MODSEC_AUDIT_ENGINE=On
     networks:
       - transcendence-network
     depends_on:
