@@ -41,11 +41,15 @@ if ! command -v docker &> /dev/null; then
 fi
 print_success "Docker instalado: $(docker --version)"
 
-if ! command -v docker-compose &> /dev/null; then
+if command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE="docker-compose"
+elif docker compose version &> /dev/null; then
+    DOCKER_COMPOSE="docker compose"
+else
     print_error "Docker Compose no está instalado"
     exit 1
 fi
-print_success "Docker Compose instalado: $(docker-compose --version)"
+print_success "Docker Compose instalado: $($DOCKER_COMPOSE version)"
 
 if ! command -v curl &> /dev/null; then
     print_warning "curl no instalado, se usará wget para verificaciones"
@@ -89,9 +93,9 @@ print_success "Docker daemon activo"
 # Stop existing containers (if any)
 print_header "4. Limpiando contenedores anteriores"
 
-if docker-compose ps | grep -q "Up"; then
+if $DOCKER_COMPOSE ps | grep -q "Up"; then
     print_info "Deteniendo contenedores existentes..."
-    docker-compose down --remove-orphans
+    $DOCKER_COMPOSE down --remove-orphans
     sleep 2
     print_success "Contenedores detenidos"
 else
@@ -102,18 +106,18 @@ fi
 print_header "5. Compilando imágenes Docker"
 
 print_info "Backend..."
-docker-compose build backend
+$DOCKER_COMPOSE build backend
 print_success "Backend compilado"
 
 print_info "Frontend..."
-docker-compose build frontend
+$DOCKER_COMPOSE build frontend
 print_success "Frontend compilado"
 
 # Start services
 print_header "6. Iniciando servicios"
 
-print_info "Lanzando contenedores con docker-compose up..."
-docker-compose up -d
+print_info "Lanzando contenedores con $DOCKER_COMPOSE up..."
+$DOCKER_COMPOSE up -d
 
 print_info "Esperando a que servicios estén healthy..."
 sleep 5
@@ -127,7 +131,7 @@ check_service_health() {
     local attempt=0
 
     while [ $attempt -lt $max_attempts ]; do
-        health=$(docker-compose ps $service | grep -o "healthy\|unhealthy\|exited" | tail -1)
+        health=$($DOCKER_COMPOSE ps $service | grep -o "healthy\|unhealthy\|exited" | tail -1)
 
         if [ "$health" = "healthy" ]; then
             print_success "$service está healthy"
@@ -136,7 +140,7 @@ check_service_health() {
 
         if [ "$health" = "exited" ]; then
             print_error "$service exited"
-            docker-compose logs $service | tail -20
+            $DOCKER_COMPOSE logs $service | tail -20
             return 1
         fi
 
@@ -154,9 +158,9 @@ check_service_health "frontend"
 check_service_health "nginx"
 
 # Create test users if backend is up
-if docker-compose ps backend | grep -q "Up"; then
+if $DOCKER_COMPOSE ps backend | grep -q "Up"; then
     print_info "Creando usuarios de prueba..."
-    docker-compose exec -T backend python manage.py shell << 'EOF'
+    $DOCKER_COMPOSE exec -T backend python manage.py shell << 'EOF'
 from django.contrib.auth.models import User
 from apps.users.models import UserProfile
 
@@ -221,7 +225,7 @@ fi
 # Show container status
 print_header "9. Estado de contenedores"
 
-docker-compose ps
+$DOCKER_COMPOSE ps
 
 # Display useful information
 print_header "10. URLs de acceso"
@@ -241,31 +245,31 @@ echo -e "  - player1 / password123 (hasta player5)"
 print_header "Próximos pasos"
 
 echo -e "${BLUE}Ver logs en tiempo real:${NC}"
-echo "  docker-compose logs -f backend"
-echo "  docker-compose logs -f frontend"
-echo "  docker-compose logs -f nginx"
+echo "  $DOCKER_COMPOSE logs -f backend"
+echo "  $DOCKER_COMPOSE logs -f frontend"
+echo "  $DOCKER_COMPOSE logs -f nginx"
 
 echo ""
 echo -e "${BLUE}Detener servicios:${NC}"
-echo "  docker-compose down"
+echo "  $DOCKER_COMPOSE down"
 
 echo ""
 echo -e "${BLUE}Reconstruir servicios:${NC}"
-echo "  docker-compose up -d --build"
+echo "  $DOCKER_COMPOSE up -d --build"
 
 # Final status
 print_header "Estado final"
 
 # Count healthy services
-healthy=$(docker-compose ps | grep healthy | wc -l)
-total=$(docker-compose ps | grep -c "")
+healthy=$($DOCKER_COMPOSE ps | grep healthy | wc -l)
+total=$($DOCKER_COMPOSE ps | grep -c "")
 
 if [ $healthy -ge 2 ]; then
     print_success "Setup completado exitosamente"
     print_info "Todos los servicios están en funcionamiento"
 else
     print_warning "Algunos servicios pueden estar inicializándose"
-    print_info "Espera unos segundos y verifica de nuevo con: docker-compose ps"
+    print_info "Espera unos segundos y verifica de nuevo con: $DOCKER_COMPOSE ps"
 fi
 
 echo ""
