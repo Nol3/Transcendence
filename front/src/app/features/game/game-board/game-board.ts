@@ -16,6 +16,7 @@ import { CardComponent } from '../../../shared/components/card/card';
 import { PixelTitleComponent } from '../../../shared/components/pixel-title/pixel-title';
 import { environment } from '../../../../environments/environment';
 import { TranslatePipe } from '../../../i18n';
+import { I18nService } from '../../../i18n';
 
 @Component({
   selector: 'app-game-board',
@@ -28,6 +29,7 @@ export class GameBoard implements OnInit {
   readonly auth = inject(AuthService);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly userService = inject(UserService);
+  private readonly i18n = inject(I18nService);
 
   @ViewChild('gameFrame') private readonly gameFrame!: ElementRef<HTMLIFrameElement>;
   // gameUrl is absolute in dev (http://localhost:8000/game/) and relative in
@@ -44,6 +46,10 @@ export class GameBoard implements OnInit {
     effect(() => {
       const user = this.auth.user();
       if (user?.username) this.sendUsernameToGame(user.username);
+    });
+    effect(() => {
+      const lang = this.i18n.currentLang();
+      this.sendLangToGame(lang);
     });
   }
 
@@ -79,11 +85,18 @@ export class GameBoard implements OnInit {
   onGameFrameLoad(): void {
     const user = this.auth.user();
     if (user?.username) this.sendUsernameToGame(user.username);
+    this.sendLangToGame(this.i18n.currentLang());
   }
 
   private sendUsernameToGame(username: string): void {
     const iframe = this.gameFrame?.nativeElement;
     if (!iframe?.contentWindow) return;
     iframe.contentWindow.postMessage({ type: 'set-username', username }, this.gameOrigin);
+  }
+
+  private sendLangToGame(lang: string): void {
+    const iframe = this.gameFrame?.nativeElement;
+    if (!iframe?.contentWindow) return;
+    iframe.contentWindow.postMessage({ type: 'set-language', lang }, this.gameOrigin);
   }
 }

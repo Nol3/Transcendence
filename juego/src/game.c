@@ -2,6 +2,7 @@
 #include "renderer.h"
 #include "audio.h"
 #include "cJSON.h"
+#include "lang.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,6 +21,11 @@
 #endif
 
 static char g_player_name[128] = "Jugador 1";
+
+EMSCRIPTEN_KEEPALIVE
+void set_language(const char* lang_code) {
+    LangSet(lang_code);
+}
 
 extern Game game;
 

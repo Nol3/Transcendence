@@ -64,11 +64,9 @@
     
     <script>
         var _pendingUsername = null;
+        var _pendingLang = null;
 
-        // ccall is only safe AFTER the wasm runtime is initialized: before that
-        // Module.ccall already exists but the wasm exports it relies on (stack
-        // functions) do not, so calling it throws. Gate every ccall on this flag
-        // and flush any queued username in onRuntimeInitialized.
+        // ccall is only safe AFTER the wasm runtime is initialized.
         var _runtimeReady = false;
 
         function _applyUsername(username) {
@@ -76,15 +74,24 @@
                 [JSON.stringify({ username: username })]);
         }
 
-        // Recibir username desde Angular (parent frame) via postMessage
+        function _applyLang(lang) {
+            if (Module._set_language) {
+                Module.ccall('set_language', null, ['string'], [lang]);
+            }
+        }
+
         window.addEventListener('message', function(event) {
-            if (!event.data || event.data.type !== 'set-username') return;
-            var username = event.data.username;
-            if (!username) return;
-            if (_runtimeReady) {
-                _applyUsername(username);
-            } else {
-                _pendingUsername = username;
+            if (!event.data) return;
+            if (event.data.type === 'set-username') {
+                var username = event.data.username;
+                if (!username) return;
+                if (_runtimeReady) _applyUsername(username);
+                else _pendingUsername = username;
+            } else if (event.data.type === 'set-language') {
+                var lang = event.data.lang;
+                if (!lang) return;
+                if (_runtimeReady) _applyLang(lang);
+                else _pendingLang = lang;
             }
         });
 
@@ -96,6 +103,10 @@
                 if (_pendingUsername) {
                     _applyUsername(_pendingUsername);
                     _pendingUsername = null;
+                }
+                if (_pendingLang) {
+                    _applyLang(_pendingLang);
+                    _pendingLang = null;
                 }
             }
         };
