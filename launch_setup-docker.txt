@@ -1,0 +1,11 @@
+Bash (si tienes sudo)
+sudo apt update && sudo apt install dos2unix
+Convierte el archivo:
+
+Bash
+dos2unix setup-docker.sh
+Intenta ejecutarlo de nuevo:
+
+Bash
+chmod +x setup-docker.sh
+./setup-docker.sh
