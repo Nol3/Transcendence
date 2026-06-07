@@ -95,6 +95,24 @@ services:
       timeout: 10s
       retries: 3
 
+  vault:
+    image: hashicorp/vault:1.15
+    container_name: ft_transcendence_vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200"
+    # apparently it is acceptable to present it in dev mode
+    command: >
+      vault server -dev -dev-root-token-id=root
+    cap_add:
+    #IPC_LOCK prevents secrets from being swapped to disk (RAM → swap),
+      - IPC_LOCK
+    networks:
+      - transcendence-network
+    volumes:
+      - vault_data:/vault/file
+
 # ==========================================
 # Networks
 # ==========================================
@@ -110,3 +128,4 @@ volumes:
     driver: local
   frontend_data:
     driver: local
+  vault_data:
