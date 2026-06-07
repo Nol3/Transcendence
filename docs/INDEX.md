@@ -44,7 +44,7 @@ Welcome to FT Transcendence! This is your complete documentation guide for the p
   - Testing
 
 ### DevOps / Infrastructure
-- **[docker-compose.yml](docker-compose.yml)** — Service orchestration
+- **[compose.yaml](compose.yaml)** — Service orchestration
 - **[docker/](docker/)** — Container configs
   - Dockerfile.backend
   - Dockerfile.frontend
@@ -65,7 +65,7 @@ ft_transcendence/
 ├── 📖 README.md                    # Main project README
 ├── 📖 CONTRIBUTING.md              # Contribution guidelines
 ├── 📖 QUICKREF.md                  # Quick command reference
-├── 🐳 docker-compose.yml           # Docker orchestration
+├── 🐳 compose.yaml           # Docker orchestration
 ├── .env.example                   # Environment variables template
 │
 ├── frontend/                       # Angular 18 application
@@ -130,7 +130,7 @@ ft_transcendence/
 ### 🚀 DevOps / Full Stack
 - [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) — Full architecture
 - Docker files in [docker/](docker/)
-- [docker-compose.yml](docker-compose.yml) — Service config
+- [compose.yaml](compose.yaml) — Service config
 
 ## 🎓 Learning Path
 
@@ -141,7 +141,7 @@ ft_transcendence/
 
 ### Understanding the Architecture
 1. Read [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)
-2. Review [docker-compose.yml](docker-compose.yml)
+2. Review [compose.yaml](compose.yaml)
 3. Check service-specific README files
 
 ### Starting Development

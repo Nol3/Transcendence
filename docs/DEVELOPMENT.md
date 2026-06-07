@@ -30,7 +30,7 @@ ft_transcendence/
 │   ├── nginx-app.conf     # Nginx app config
 │   ├── generate-ssl.sh    # SSL certificate generation
 │   └── ssl/              # SSL certificates (generated)
-├── docker-compose.yml     # Docker orchestration
+├── compose.yaml           # Docker orchestration
 ├── .env.example          # Environment variables template
 └── README.md             # Main documentation
 ```
@@ -258,7 +258,7 @@ npm test
 ## 🚨 Troubleshooting
 
 ### Docker Issues
-- **Port already in use:** Change port in `docker-compose.yml`
+- **Port already in use:** Change port in `compose.yaml`
 - **Permission denied (SSL):** `chmod +x docker/generate-ssl.sh`
 - **Database locked:** Run `docker compose down -v && docker compose up --build`
 

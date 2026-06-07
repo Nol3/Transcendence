@@ -10,7 +10,7 @@ Vault is already declared in the docker-compose file, so using the docker setup 
 
 This setup uses **dev mode** which is far enough to meet the requirements of the evaluation. In this mode, we do not need authentication from the services, as it is not required in the subject. Prod mode would need authentication, which is overkill for the purposes of the project.
 
-The only and fixed token to access vault is defined in the docker-compose.yml file, so no authentication system is used. 
+The only and fixed token to access vault is defined in the compose.yaml file, so no authentication system is used.
 
 Our guess is that Vault should be initialized and filled with secrets (from vault-init.sh) before the rest of the services that need credentials, so they can retrieve them once they are initialized
 
