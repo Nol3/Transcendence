@@ -153,6 +153,38 @@ check_service_health "backend"
 check_service_health "frontend"
 check_service_health "nginx"
 
+# Create test users if backend is up
+if docker-compose ps backend | grep -q "Up"; then
+    print_info "Creando usuarios de prueba..."
+    docker-compose exec -T backend python manage.py shell << 'EOF'
+from django.contrib.auth.models import User
+from apps.users.models import UserProfile
+
+if not User.objects.filter(username='admin').exists():
+    admin = User.objects.create_superuser(username='admin', email='admin@transcendence.local', password='admin123')
+    UserProfile.objects.create(user=admin)
+    print('Created: admin / admin123')
+else:
+    admin = User.objects.get(username='admin')
+    admin.set_password('admin123')
+    admin.save()
+    print('admin password updated to admin123')
+
+if not User.objects.filter(username='testuser').exists():
+    user = User.objects.create_user(username='testuser', email='test@transcendence.local', password='test123')
+    UserProfile.objects.create(user=user)
+    print('Created: testuser / test123')
+
+for i in range(1, 6):
+    username = f'player{i}'
+    if not User.objects.filter(username=username).exists():
+        user = User.objects.create_user(username=username, email=f'{username}@test.com', password='password123')
+        UserProfile.objects.create(user=user)
+        print(f'Created: {username} / password123')
+EOF
+    print_success "Usuarios de prueba creados"
+fi
+
 echo ""
 
 # Verify endpoints
@@ -199,6 +231,11 @@ print_success "Backend API: http://localhost:8000"
 print_success "Backend Admin: http://localhost:8000/admin/"
 print_success "Nginx (HTTPS): https://localhost"
 print_success "Nginx (HTTP): http://localhost"
+
+echo -e "\n${BLUE}Credenciales de prueba:${NC}"
+echo -e "  - admin / admin123"
+echo -e "  - testuser / test123"
+echo -e "  - player1 / password123 (hasta player5)"
 
 # Show logs tip
 print_header "Próximos pasos"
