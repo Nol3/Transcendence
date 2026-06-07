@@ -103,8 +103,12 @@ services:
     environment:
       VAULT_ADDR: "http://0.0.0.0:8200"
     # apparently it is acceptable to present it in dev mode
-    command: >
-      vault server -dev -dev-root-token-id=root
+    command:
+      - vault
+      - server
+      - -dev
+      - -dev-root-token-id=root
+      - -dev-listen-address=0.0.0.0:8200
     cap_add:
     #IPC_LOCK prevents secrets from being swapped to disk (RAM → swap),
       - IPC_LOCK
@@ -112,6 +116,20 @@ services:
       - transcendence-network
     volumes:
       - vault_data:/vault/file
+
+  vault-init:
+    image: hashicorp/vault:1.15
+    container_name: ft_transcendence_vault_init
+    depends_on:
+      - vault
+    networks:
+      - transcendence-network
+    volumes: 
+      - ./scripts/vault-init.sh:/vault-init.sh:ro
+    entrypoint:
+      - sh
+      - /vault-init.sh
+    restart: "no"
 
 # ==========================================
 # Networks
