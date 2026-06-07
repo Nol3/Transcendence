@@ -70,7 +70,7 @@ echo_step "Checking requirements..."
 # Check Python
 if ! command -v python3 &> /dev/null; then
     if ! command -v python &> /dev/null; then
-        echo_error "Python is not installed. Please install Python 3.10+"
+        echo_error "Python is not installed. Please install Python 3.12+"
         exit 1
     fi
     PYTHON_CMD="python"

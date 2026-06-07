@@ -100,22 +100,22 @@ if docker info 2>/dev/null | grep -q "rootless"; then
     print_warning "Detectado: Rootless Docker (sin privilegios sudo)"
     print_info "Se ajustarán puertos para evitar conflictos con puertos privilegiados..."
     
-    # Check if docker-compose.yml exists and adjust ports
-    if [ -f "docker-compose.yml" ]; then
+    # Check if compose.yaml exists and adjust ports
+    if [ -f "compose.yaml" ]; then
         # Create backup
-        cp docker-compose.yml docker-compose.yml.backup
-        print_info "✓ Backup creado: docker-compose.yml.backup"
-        
+        cp compose.yaml compose.yaml.backup
+        print_info "✓ Backup creado: compose.yaml.backup"
+
         # Replace privileged ports with non-privileged equivalents
-        sed -i 's/"443:443"/"8443:443"/g; s/'\''443:443'\''/'\''8443:443'\''/g' docker-compose.yml 2>/dev/null || true
-        sed -i 's/"80:80"/"8080:80"/g; s/'\''80:80'\''/'\''8080:80'\''/g' docker-compose.yml 2>/dev/null || true
-        
+        sed -i 's/"443:443"/"8443:443"/g; s/'\''443:443'\''/'\''8443:443'\''/g' compose.yaml 2>/dev/null || true
+        sed -i 's/"80:80"/"8080:80"/g; s/'\''80:80'\''/'\''8080:80'\''/g' compose.yaml 2>/dev/null || true
+
         print_info "Puerto HTTPS: 443 → 8443"
         print_info "Puerto HTTP: 80 → 8080"
         NGINX_PORT="8443"
         HTTP_PORT="8080"
     else
-        print_warning "docker-compose.yml no encontrado, asegúrate de ajustar los puertos manualmente"
+        print_warning "compose.yaml no encontrado, asegúrate de ajustar los puertos manualmente"
     fi
     print_success "Puertos ajustados para Rootless Docker"
 else

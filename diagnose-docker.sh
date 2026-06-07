@@ -29,7 +29,7 @@ if echo "$DOCKER_INFO" | grep -q "rootless"; then
     echo ""
     echo "   SOLUCIONES:"
     echo ""
-    echo "   1. Cambiar puertos en docker-compose.yml:"
+    echo "   1. Cambiar puertos en compose.yaml:"
     echo "      443:443  →  8443:443"
     echo "      80:80    →  8080:80"
     echo ""
@@ -67,10 +67,10 @@ echo "  Usuario: $(whoami)"
 echo "  Docker socket: $DOCKER_HOST"
 echo ""
 
-# Verificar docker-compose.yml
-if [ -f "docker-compose.yml" ]; then
-    echo "Puertos en docker-compose.yml actual:"
-    grep -E "^[[:space:]]*-[[:space:]]*\"?[0-9]+:" docker-compose.yml | sed 's/^/  /' || echo "  (no encontrados)"
+# Verificar compose.yaml
+if [ -f "compose.yaml" ]; then
+    echo "Puertos en compose.yaml actual:"
+    grep -E "^[[:space:]]*-[[:space:]]*\"?[0-9]+:" compose.yaml | sed 's/^/  /' || echo "  (no encontrados)"
     echo ""
 fi
 
@@ -82,7 +82,7 @@ echo ""
 if echo "$DOCKER_INFO" | grep -q "rootless"; then
     echo "➜ Ejecuta: ./setup-docker.sh (versión mejorada)"
     echo ""
-    echo "  O modifica docker-compose.yml manualmente:"
+    echo "  O modifica compose.yaml manualmente:"
     echo "  - Cambiar puerto 443 a 8443"
     echo "  - Cambiar puerto 80 a 8080"
     echo ""

@@ -210,7 +210,7 @@ docker compose exec backend sqlite3 db.sqlite3
 
 ```bash
 # Port already in use
-# Edit docker-compose.yml: change port mapping
+# Edit compose.yaml: change port mapping
 # Or kill process: lsof -i :8000 | kill -9 <PID>
 
 # Database locked
