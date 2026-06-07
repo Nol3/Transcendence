@@ -1,4 +1,5 @@
 #include "poker_hand.h"
+#include "lang.h"
 #include <string.h>
 #include <stdlib.h>
 
@@ -11,16 +12,16 @@ static int RankValue(int rank) {
 
 const char* GetHandTypeName(HandType type) {
     switch (type) {
-        case HAND_HIGH_CARD:       return "Carta Alta";
-        case HAND_ONE_PAIR:        return "Pareja";
-        case HAND_TWO_PAIR:        return "Doble Pareja";
-        case HAND_THREE_OF_A_KIND: return "Trio";
-        case HAND_STRAIGHT:        return "Escalera";
-        case HAND_FLUSH:           return "Color";
-        case HAND_FULL_HOUSE:      return "Full House";
-        case HAND_FOUR_OF_A_KIND:  return "Poker";
-        case HAND_STRAIGHT_FLUSH:  return "Escalera de Color";
-        default:                   return "Desconocido";
+        case HAND_HIGH_CARD:       return T(STR_HAND_HIGH_CARD);
+        case HAND_ONE_PAIR:        return T(STR_HAND_ONE_PAIR);
+        case HAND_TWO_PAIR:        return T(STR_HAND_TWO_PAIR);
+        case HAND_THREE_OF_A_KIND: return T(STR_HAND_THREE_KIND);
+        case HAND_STRAIGHT:        return T(STR_HAND_STRAIGHT);
+        case HAND_FLUSH:           return T(STR_HAND_FLUSH);
+        case HAND_FULL_HOUSE:      return T(STR_HAND_FULL_HOUSE);
+        case HAND_FOUR_OF_A_KIND:  return T(STR_HAND_FOUR_KIND);
+        case HAND_STRAIGHT_FLUSH:  return T(STR_HAND_STRAIGHT_FLUSH);
+        default:                   return T(STR_HAND_UNKNOWN);
     }
 }
 
