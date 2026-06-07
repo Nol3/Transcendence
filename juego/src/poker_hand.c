@@ -1,20 +1,27 @@
 #include "poker_hand.h"
+#include "lang.h"
 #include <string.h>
-#include <stdio.h>
 #include <stdlib.h>
+
+// El As (rank 1 en la baraja) se evalúa como la carta más alta (valor 14),
+// salvo en la escalera baja A-2-3-4-5. Toda comparación y puntuación usa este
+// valor, de modo que A-J-Q-K-A se detecta como escalera y el As gana al Rey.
+static int RankValue(int rank) {
+    return (rank == 1) ? 14 : rank;
+}
 
 const char* GetHandTypeName(HandType type) {
     switch (type) {
-        case HAND_HIGH_CARD:       return "Carta Alta";
-        case HAND_ONE_PAIR:        return "Pareja";
-        case HAND_TWO_PAIR:        return "Doble Pareja";
-        case HAND_THREE_OF_A_KIND: return "Trio";
-        case HAND_STRAIGHT:        return "Escalera";
-        case HAND_FLUSH:           return "Color";
-        case HAND_FULL_HOUSE:      return "Full House";
-        case HAND_FOUR_OF_A_KIND:  return "Poker";
-        case HAND_STRAIGHT_FLUSH:  return "Escalera de Color";
-        default: return "Desconocido";
+        case HAND_HIGH_CARD:       return T(STR_HAND_HIGH_CARD);
+        case HAND_ONE_PAIR:        return T(STR_HAND_ONE_PAIR);
+        case HAND_TWO_PAIR:        return T(STR_HAND_TWO_PAIR);
+        case HAND_THREE_OF_A_KIND: return T(STR_HAND_THREE_KIND);
+        case HAND_STRAIGHT:        return T(STR_HAND_STRAIGHT);
+        case HAND_FLUSH:           return T(STR_HAND_FLUSH);
+        case HAND_FULL_HOUSE:      return T(STR_HAND_FULL_HOUSE);
+        case HAND_FOUR_OF_A_KIND:  return T(STR_HAND_FOUR_KIND);
+        case HAND_STRAIGHT_FLUSH:  return T(STR_HAND_STRAIGHT_FLUSH);
+        default:                   return T(STR_HAND_UNKNOWN);
     }
 }
 
@@ -29,42 +36,47 @@ int GetHandBaseScore(HandType type) {
         case HAND_FULL_HOUSE:      return 60;
         case HAND_FOUR_OF_A_KIND:  return 80;
         case HAND_STRAIGHT_FLUSH:  return 100;
-        default: return 0;
+        default:                   return 0;
     }
 }
 
+// Orden descendente por valor de carta (el As queda primero).
 int CompareCards(const void* a, const void* b) {
-    Card* cardA = (Card*)a;
-    Card* cardB = (Card*)b;
-    return cardB->rank - cardA->rank; // Orden descendente
+    const Card* cardA = (const Card*)a;
+    const Card* cardB = (const Card*)b;
+    return RankValue(cardB->rank) - RankValue(cardA->rank);
 }
 
 void SortCardsByRank(Card* cards, int count) {
     qsort(cards, count, sizeof(Card), CompareCards);
 }
 
-// Contar ocurrencias de cada rango
-void CountRanks(Card* cards, int count, int* rankCounts) {
-    memset(rankCounts, 0, sizeof(int) * 14); // 1-13
+// ========== CONTEO ==========
+
+// Cuenta ocurrencias por valor de carta. counts debe tener 15 enteros; los
+// índices útiles son 2..14 (el As ocupa el 14).
+static void CountRanks(Card* cards, int count, int* counts) {
+    memset(counts, 0, sizeof(int) * 15);
     for (int i = 0; i < count; i++) {
-        rankCounts[cards[i].rank]++;
+        counts[RankValue(cards[i].rank)]++;
     }
 }
 
-// Contar ocurrencias de cada palo
-void CountSuits(Card* cards, int count, int* suitCounts) {
-    memset(suitCounts, 0, sizeof(int) * 4);
+// Cuenta ocurrencias por palo. counts debe tener 4 enteros.
+static void CountSuits(Card* cards, int count, int* counts) {
+    memset(counts, 0, sizeof(int) * 4);
     for (int i = 0; i < count; i++) {
-        suitCounts[cards[i].suit]++;
+        counts[cards[i].suit]++;
     }
 }
+
+// ========== DETECCIÓN DE COMBINACIONES ==========
 
 bool HasPair(Card* cards, int count, int* pairRank) {
-    int rankCounts[14] = {0};
-    CountRanks(cards, count, rankCounts);
-    
-    for (int r = 13; r >= 1; r--) {
-        if (rankCounts[r] >= 2) {
+    int counts[15];
+    CountRanks(cards, count, counts);
+    for (int r = 14; r >= 2; r--) {
+        if (counts[r] >= 2) {
             *pairRank = r;
             return true;
         }
@@ -73,17 +85,16 @@ bool HasPair(Card* cards, int count, int* pairRank) {
 }
 
 bool HasTwoPair(Card* cards, int count, int* highPair, int* lowPair) {
-    int rankCounts[14] = {0};
-    CountRanks(cards, count, rankCounts);
-    
+    int counts[15];
+    CountRanks(cards, count, counts);
+
     *highPair = 0;
     *lowPair = 0;
-    
-    for (int r = 13; r >= 1; r--) {
-        if (rankCounts[r] >= 2) {
+    for (int r = 14; r >= 2; r--) {
+        if (counts[r] >= 2) {
             if (*highPair == 0) {
                 *highPair = r;
-            } else if (*lowPair == 0) {
+            } else {
                 *lowPair = r;
                 return true;
             }
@@ -93,11 +104,10 @@ bool HasTwoPair(Card* cards, int count, int* highPair, int* lowPair) {
 }
 
 bool HasThreeOfAKind(Card* cards, int count, int* trioRank) {
-    int rankCounts[14] = {0};
-    CountRanks(cards, count, rankCounts);
-    
-    for (int r = 13; r >= 1; r--) {
-        if (rankCounts[r] >= 3) {
+    int counts[15];
+    CountRanks(cards, count, counts);
+    for (int r = 14; r >= 2; r--) {
+        if (counts[r] >= 3) {
             *trioRank = r;
             return true;
         }
@@ -107,75 +117,39 @@ bool HasThreeOfAKind(Card* cards, int count, int* trioRank) {
 
 bool HasStraight(Card* cards, int count, int* highCard) {
     if (count < 5) return false;
-    
-    // Crear array de rangos únicos ordenados
-    int uniqueRanks[14] = {0};
-    int uniqueCount = 0;
-    
-    for (int i = 0; i < count && uniqueCount < 14; i++) {
-        bool alreadyAdded = false;
-        for (int j = 0; j < uniqueCount; j++) {
-            if (uniqueRanks[j] == cards[i].rank) {
-                alreadyAdded = true;
-                break;
-            }
-        }
-        if (!alreadyAdded) {
-            uniqueRanks[uniqueCount++] = cards[i].rank;
-        }
+
+    bool present[15] = {0};
+    for (int i = 0; i < count; i++) {
+        present[RankValue(cards[i].rank)] = true;
     }
-    
-    // Ordenar únicos
-    for (int i = 0; i < uniqueCount - 1; i++) {
-        for (int j = i + 1; j < uniqueCount; j++) {
-            if (uniqueRanks[j] > uniqueRanks[i]) {
-                int temp = uniqueRanks[i];
-                uniqueRanks[i] = uniqueRanks[j];
-                uniqueRanks[j] = temp;
-            }
+
+    // Escaleras normales: cinco valores consecutivos, de la más alta a la más
+    // baja (high = 6 cubre 2-3-4-5-6).
+    for (int high = 14; high >= 6; high--) {
+        bool run = true;
+        for (int k = 0; k < 5; k++) {
+            if (!present[high - k]) { run = false; break; }
         }
-    }
-    
-    // Buscar escalera (5 consecutivos)
-    for (int i = 0; i <= uniqueCount - 5; i++) {
-        bool isStraight = true;
-        for (int j = 0; j < 4; j++) {
-            if (uniqueRanks[i + j] - 1 != uniqueRanks[i + j + 1]) {
-                isStraight = false;
-                break;
-            }
-        }
-        if (isStraight) {
-            *highCard = uniqueRanks[i];
+        if (run) {
+            *highCard = high;
             return true;
         }
     }
-    
-    // Escalera baja (A-2-3-4-5)
-    if (uniqueCount >= 5) {
-        bool hasAce = false, has2 = false, has3 = false, has4 = false, has5 = false;
-        for (int i = 0; i < uniqueCount; i++) {
-            if (uniqueRanks[i] == 1) hasAce = true;
-            if (uniqueRanks[i] == 2) has2 = true;
-            if (uniqueRanks[i] == 3) has3 = true;
-            if (uniqueRanks[i] == 4) has4 = true;
-            if (uniqueRanks[i] == 5) has5 = true;
-        }
-        if (hasAce && has2 && has3 && has4 && has5) {
-            *highCard = 5; // La escalera baja termina en 5
-            return true;
-        }
+
+    // Escalera baja (rueda): A-2-3-4-5, donde el As cuenta como 1.
+    if (present[14] && present[2] && present[3] && present[4] && present[5]) {
+        *highCard = 5;
+        return true;
     }
-    
+
     return false;
 }
 
 bool HasFlush(Card* cards, int count, int* suit) {
-    int suitCounts[4] = {0};
-    CountSuits(cards, count, suitCounts);
-    
+    int counts[4];
+    CountSuits(cards, count, counts);
     for (int s = 0; s < 4; s++) {
-        if (suitCounts[s] >= 5) {
+        if (counts[s] >= 5) {
             *suit = s;
             return true;
         }
@@ -184,39 +158,31 @@ bool HasFlush(Card* cards, int count, int* suit) {
 }
 
 bool HasFullHouse(Card* cards, int count, int* trioRank, int* pairRank) {
-    int rankCounts[14] = {0};
-    CountRanks(cards, count, rankCounts);
-    
+    int counts[15];
+    CountRanks(cards, count, counts);
+
     *trioRank = 0;
     *pairRank = 0;
-    
-    // Buscar trío
-    for (int r = 13; r >= 1; r--) {
-        if (rankCounts[r] >= 3) {
-            *trioRank = r;
-            break;
-        }
+
+    for (int r = 14; r >= 2; r--) {
+        if (counts[r] >= 3) { *trioRank = r; break; }
     }
-    
     if (*trioRank == 0) return false;
-    
-    // Buscar pareja (diferente del trío)
-    for (int r = 13; r >= 1; r--) {
-        if (r != *trioRank && rankCounts[r] >= 2) {
+
+    for (int r = 14; r >= 2; r--) {
+        if (r != *trioRank && counts[r] >= 2) {
             *pairRank = r;
             return true;
         }
     }
-    
     return false;
 }
 
 bool HasFourOfAKind(Card* cards, int count, int* fourRank) {
-    int rankCounts[14] = {0};
-    CountRanks(cards, count, rankCounts);
-    
-    for (int r = 13; r >= 1; r--) {
-        if (rankCounts[r] >= 4) {
+    int counts[15];
+    CountRanks(cards, count, counts);
+    for (int r = 14; r >= 2; r--) {
+        if (counts[r] >= 4) {
             *fourRank = r;
             return true;
         }
@@ -225,108 +191,77 @@ bool HasFourOfAKind(Card* cards, int count, int* fourRank) {
 }
 
 bool HasStraightFlush(Card* cards, int count, int* highCard) {
-    // Verificar cada palo
     for (int suit = 0; suit < 4; suit++) {
-        // Extraer cartas de este palo
-        Card suitedCards[7];
+        Card suited[7];
         int suitedCount = 0;
-        
         for (int i = 0; i < count && suitedCount < 7; i++) {
             if (cards[i].suit == suit) {
-                suitedCards[suitedCount++] = cards[i];
+                suited[suitedCount++] = cards[i];
             }
         }
-        
-        if (suitedCount >= 5) {
-            if (HasStraight(suitedCards, suitedCount, highCard)) {
-                return true;
-            }
+        if (suitedCount >= 5 && HasStraight(suited, suitedCount, highCard)) {
+            return true;
         }
     }
     return false;
 }
 
+// ========== EVALUACIÓN ==========
+
 HandResult EvaluateHand(Card* cards, int count) {
     HandResult result = {0};
     result.type = HAND_HIGH_CARD;
-    result.score = 0;
-    strcpy(result.name, "Carta Alta");
-    
+    strcpy(result.name, GetHandTypeName(HAND_HIGH_CARD));
+
     if (count == 0) return result;
-    
-    // Copiar y ordenar cartas
+
+    // Copiar y ordenar (descendente por valor) sin tocar la mano original.
     Card sorted[7];
-    memcpy(sorted, cards, sizeof(Card) * count);
-    SortCardsByRank(sorted, count);
-    memcpy(result.cards, sorted, sizeof(Card) * (count > 5 ? 5 : count));
-    
-    int tempRank1, tempRank2;
-    
-    // Verificar de mejor a peor
-    if (HasStraightFlush(sorted, count, &tempRank1)) {
+    int n = (count > 7) ? 7 : count;
+    memcpy(sorted, cards, sizeof(Card) * n);
+    SortCardsByRank(sorted, n);
+    memcpy(result.cards, sorted, sizeof(Card) * (n > 5 ? 5 : n));
+
+    int rank1, rank2;
+
+    // Se comprueba de la mejor mano a la peor; la primera que encaja gana.
+    if (HasStraightFlush(sorted, n, &rank1)) {
         result.type = HAND_STRAIGHT_FLUSH;
-        result.score = GetHandBaseScore(result.type) + tempRank1;
-        strcpy(result.name, GetHandTypeName(result.type));
-        return result;
-    }
-    
-    if (HasFourOfAKind(sorted, count, &tempRank1)) {
+        result.score = GetHandBaseScore(result.type) + rank1;
+    } else if (HasFourOfAKind(sorted, n, &rank1)) {
         result.type = HAND_FOUR_OF_A_KIND;
-        result.score = GetHandBaseScore(result.type) + tempRank1;
-        strcpy(result.name, GetHandTypeName(result.type));
-        return result;
-    }
-    
-    if (HasFullHouse(sorted, count, &tempRank1, &tempRank2)) {
+        result.score = GetHandBaseScore(result.type) + rank1;
+    } else if (HasFullHouse(sorted, n, &rank1, &rank2)) {
         result.type = HAND_FULL_HOUSE;
-        result.score = GetHandBaseScore(result.type) + tempRank1 * 10 + tempRank2;
-        strcpy(result.name, GetHandTypeName(result.type));
-        return result;
-    }
-    
-    if (HasFlush(sorted, count, &tempRank1)) {
+        result.score = GetHandBaseScore(result.type) + rank1 * 10 + rank2;
+    } else if (HasFlush(sorted, n, &rank1)) {
         result.type = HAND_FLUSH;
         result.score = GetHandBaseScore(result.type);
-        // Sumar valor de cartas altas
-        for (int i = 0; i < count && i < 5; i++) {
-            if (sorted[i].suit == tempRank1) {
-                result.score += sorted[i].rank;
+        // Sumar el valor de hasta 5 cartas del palo del color.
+        int added = 0;
+        for (int i = 0; i < n && added < 5; i++) {
+            if (sorted[i].suit == rank1) {
+                result.score += RankValue(sorted[i].rank);
+                added++;
             }
         }
-        strcpy(result.name, GetHandTypeName(result.type));
-        return result;
-    }
-    
-    if (HasStraight(sorted, count, &tempRank1)) {
+    } else if (HasStraight(sorted, n, &rank1)) {
         result.type = HAND_STRAIGHT;
-        result.score = GetHandBaseScore(result.type) + tempRank1;
-        strcpy(result.name, GetHandTypeName(result.type));
-        return result;
-    }
-    
-    if (HasThreeOfAKind(sorted, count, &tempRank1)) {
+        result.score = GetHandBaseScore(result.type) + rank1;
+    } else if (HasThreeOfAKind(sorted, n, &rank1)) {
         result.type = HAND_THREE_OF_A_KIND;
-        result.score = GetHandBaseScore(result.type) + tempRank1;
-        strcpy(result.name, GetHandTypeName(result.type));
-        return result;
-    }
-    
-    if (HasTwoPair(sorted, count, &tempRank1, &tempRank2)) {
+        result.score = GetHandBaseScore(result.type) + rank1;
+    } else if (HasTwoPair(sorted, n, &rank1, &rank2)) {
         result.type = HAND_TWO_PAIR;
-        result.score = GetHandBaseScore(result.type) + tempRank1 + tempRank2;
-        strcpy(result.name, GetHandTypeName(result.type));
-        return result;
-    }
-    
-    if (HasPair(sorted, count, &tempRank1)) {
+        result.score = GetHandBaseScore(result.type) + rank1 + rank2;
+    } else if (HasPair(sorted, n, &rank1)) {
         result.type = HAND_ONE_PAIR;
-        result.score = GetHandBaseScore(result.type) + tempRank1;
-        strcpy(result.name, GetHandTypeName(result.type));
-        return result;
+        result.score = GetHandBaseScore(result.type) + rank1;
+    } else {
+        result.type = HAND_HIGH_CARD;
+        result.score = GetHandBaseScore(HAND_HIGH_CARD) + RankValue(sorted[0].rank);
     }
-    
-    // Carta alta - sumar valor de la carta más alta
-    result.score = GetHandBaseScore(HAND_HIGH_CARD) + sorted[0].rank;
-    
+
+    strcpy(result.name, GetHandTypeName(result.type));
     return result;
 }

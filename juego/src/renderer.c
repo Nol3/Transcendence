@@ -1,6 +1,7 @@
 #include "renderer.h"
 #include "audio.h"
 #include "poker_hand.h"
+#include "lang.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -263,76 +264,76 @@ void DrawStateMenu(Game* game) {
     int screenH = GetScreenHeight();
     
     DrawCenteredText("POKER RACE", 80, 60, GOLD);
-    DrawCenteredText("Juego de Cartas Multiplayer", 150, 30, WHITE);
-    
+    DrawCenteredText(T(STR_SUBTITLE), 150, 30, WHITE);
+
     // Botón JUGAR
     float btnX = screenW / 2 - 100;
     float btnY = 300;
-    DrawButton("JUGAR", btnX, btnY, 200, 60, (Color){0, 100, 40, 255}, WHITE);
-    
+    DrawButton(T(STR_BTN_PLAY), btnX, btnY, 200, 60, (Color){0, 100, 40, 255}, WHITE);
+
     // Botón INSTRUCCIONES
-    DrawButton("INSTRUCCIONES", btnX, btnY + 80, 200, 50, (Color){0, 80, 120, 255}, WHITE);
-    
+    DrawButton(T(STR_BTN_INSTRUCTIONS), btnX, btnY + 80, 200, 50, (Color){0, 80, 120, 255}, WHITE);
+
     // Botón CONFIGURACIÓN
-    DrawButton("CONFIGURACION", btnX, btnY + 140, 200, 50, (Color){80, 80, 80, 255}, WHITE);
-    
-    DrawCenteredText("Presiona ENTER para comenzar", screenH - 100, 20, LIGHTGRAY);
-    
+    DrawButton(T(STR_BTN_SETTINGS), btnX, btnY + 140, 200, 50, (Color){80, 80, 80, 255}, WHITE);
+
+    DrawCenteredText(T(STR_HINT_ENTER_START), screenH - 100, 20, LIGHTGRAY);
+
     // Instrucciones
-    DrawCenteredText("Forma la mejor mano de 5 cartas con 8 cartas repartidas", screenH - 50, 16, LIGHTGRAY);
+    DrawCenteredText(T(STR_HINT_BEST_HAND), screenH - 50, 16, LIGHTGRAY);
 }
 
 void DrawStateInstructions(Game* game) {
     int screenW = GetScreenWidth();
     int screenH = GetScreenHeight();
     
-    DrawCenteredText("COMO JUGAR", 40, 40, GOLD);
-    
+    DrawCenteredText(T(STR_HOW_TO_PLAY_TITLE), 40, 40, GOLD);
+
     // Panel de instrucciones
     int panelY = 100;
     int lineHeight = 35;
     int startX = screenW / 2 - 350;
-    
+
     // Sección: Objetivo
-    DrawText("obj:", startX, panelY, 24, WHITE);
+    DrawText(T(STR_OBJ_LABEL), startX, panelY, 24, WHITE);
     panelY += lineHeight;
-    DrawText("Forma la mejor mano de poker con las cartas que tienes.", startX + 20, panelY, 20, LIGHTGRAY);
+    DrawText(T(STR_OBJ_TEXT), startX + 20, panelY, 20, LIGHTGRAY);
     panelY += lineHeight + 10;
-    
+
     // Sección: Como jugar
-    DrawText("COMO JUGAR:", startX, panelY, 24, WHITE);
+    DrawText(T(STR_HOW_TO_PLAY_SECTION), startX, panelY, 24, WHITE);
     panelY += lineHeight;
-    DrawText("1. Recibes 8 cartas", startX + 20, panelY, 20, LIGHTGRAY);
+    DrawText(T(STR_INSTR_1), startX + 20, panelY, 20, LIGHTGRAY);
     panelY += lineHeight;
-    DrawText("2. Selecciona 1-5 cartas para formar tu mano", startX + 20, panelY, 20, LIGHTGRAY);
+    DrawText(T(STR_INSTR_2), startX + 20, panelY, 20, LIGHTGRAY);
     panelY += lineHeight;
-    DrawText("3. Puedes DESCARTAR hasta 5 cartas UNA vez", startX + 20, panelY, 20, LIGHTGRAY);
+    DrawText(T(STR_INSTR_3), startX + 20, panelY, 20, LIGHTGRAY);
     panelY += lineHeight;
-    DrawText("4. Presiona CONFIRMAR para jugar tu mano", startX + 20, panelY, 20, LIGHTGRAY);
+    DrawText(T(STR_INSTR_4), startX + 20, panelY, 20, LIGHTGRAY);
     panelY += lineHeight + 10;
-    
+
     // Sección: Manos y puntuación
-    DrawText("MANOS Y PUNTOS:", startX, panelY, 24, WHITE);
+    DrawText(T(STR_HANDS_SECTION), startX, panelY, 24, WHITE);
     panelY += lineHeight;
-    DrawText("Pareja: 10 pts    Doble Pareja: 20 pts    Trio: 30 pts", startX + 20, panelY, 18, LIGHTGRAY);
+    DrawText(T(STR_HANDS_LINE1), startX + 20, panelY, 18, LIGHTGRAY);
     panelY += lineHeight;
-    DrawText("Escalera: 40 pts  Color: 50 pts           Full House: 60 pts", startX + 20, panelY, 18, LIGHTGRAY);
+    DrawText(T(STR_HANDS_LINE2), startX + 20, panelY, 18, LIGHTGRAY);
     panelY += lineHeight + 10;
-    
+
     // Sección: Controles
-    DrawText("CONTROLES:", startX, panelY, 24, WHITE);
+    DrawText(T(STR_CONTROLS_SECTION), startX, panelY, 24, WHITE);
     panelY += lineHeight;
-    DrawText("Raton: Click en cartas para seleccionar", startX + 20, panelY, 20, LIGHTGRAY);
+    DrawText(T(STR_CTRL_MOUSE), startX + 20, panelY, 20, LIGHTGRAY);
     panelY += lineHeight;
-    DrawText("Botones: Usa los botones verdes para continuar", startX + 20, panelY, 20, LIGHTGRAY);
+    DrawText(T(STR_CTRL_BUTTONS), startX + 20, panelY, 20, LIGHTGRAY);
     panelY += lineHeight;
-    DrawText("Enter: Tambien puedes presionar ENTER", startX + 20, panelY, 20, LIGHTGRAY);
-    
+    DrawText(T(STR_CTRL_ENTER), startX + 20, panelY, 20, LIGHTGRAY);
+
     // Botón ATRAS (esquina superior derecha)
-    DrawButton("ATRAS", screenW - 140, 20, 120, 40, (Color){60, 60, 60, 220}, WHITE);
+    DrawButton(T(STR_BTN_BACK), screenW - 140, 20, 120, 40, (Color){60, 60, 60, 220}, WHITE);
 
     // Botón VOLVER
-    DrawButton("VOLVER", screenW/2 - 100, screenH - 80, 200, 50, (Color){0, 100, 40, 255}, WHITE);
+    DrawButton(T(STR_BTN_RETURN), screenW/2 - 100, screenH - 80, 200, 50, (Color){0, 100, 40, 255}, WHITE);
 }
 
 void DrawStateConfig(Game* game) {
@@ -340,7 +341,7 @@ void DrawStateConfig(Game* game) {
     int screenH = GetScreenHeight();
     int centerX = screenW / 2;
     
-    DrawCenteredText("CONFIGURACION DE AUDIO", 50, 42, GOLD);
+    DrawCenteredText(T(STR_AUDIO_SETTINGS), 50, 42, GOLD);
     
     // Obtener volúmenes actuales
     int masterVol = 100, musicVol = 50, sfxVol = 80;
@@ -360,7 +361,7 @@ void DrawStateConfig(Game* game) {
     DrawText(buf, centerX + 260, baseY + 5, 20, BLACK);
     
     // Music Volume
-    DrawText("Musica:", centerX - 180, baseY + gapY, 28, BLACK);
+    DrawText(T(STR_LABEL_MUSIC), centerX - 180, baseY + gapY, 28, BLACK);
     DrawButton("-", centerX - 60, baseY + gapY - 5, 40, 40, (Color){220, 220, 220, 255}, BLACK);
     DrawRectangle(centerX, baseY + gapY, 200, 30, (Color){30, 30, 30, 255});
     DrawRectangle(centerX, baseY + gapY, (int)(musicVol * 2.0f), 30, GOLD);
@@ -377,13 +378,13 @@ void DrawStateConfig(Game* game) {
     snprintf(buf, sizeof(buf), "%d%%", sfxVol);
     DrawText(buf, centerX + 260, baseY + gapY * 2 + 5, 20, BLACK);
     
-    DrawCenteredText("Usa las flechas o botones + y - para ajustar", screenH - 120, 20, BLACK);
-    
+    DrawCenteredText(T(STR_HINT_ADJUST), screenH - 120, 20, BLACK);
+
     // Botón ATRAS (esquina superior derecha)
-    DrawButton("ATRAS", screenW - 140, 20, 120, 40, (Color){60, 60, 60, 220}, WHITE);
+    DrawButton(T(STR_BTN_BACK), screenW - 140, 20, 120, 40, (Color){60, 60, 60, 220}, WHITE);
 
     // Botón VOLVER
-    DrawButton("VOLVER", centerX - 100, screenH - 80, 200, 50, GOLD, BLACK);
+    DrawButton(T(STR_BTN_RETURN), centerX - 100, screenH - 80, 200, 50, GOLD, BLACK);
 }
 
 void DrawStateSetupPlayers(Game* game) {
@@ -393,46 +394,46 @@ void DrawStateSetupPlayers(Game* game) {
     int spacing = 100;
     
     // Título
-    DrawCenteredText("CONFIGURACION", 50, 42, WHITE);
-    
+    DrawCenteredText(T(STR_SETUP_TITLE), 50, 42, WHITE);
+
     char buffer[64];
     int btnW = 50, btnH = 45;
     int labelW = 220;
     int centerX = screenW / 2;
-    
+
     // Jugadores
-    snprintf(buffer, sizeof(buffer), "Jugadores: %d", game->playerCount);
+    snprintf(buffer, sizeof(buffer), T(STR_FMT_PLAYERS), game->playerCount);
     DrawCenteredText(buffer, startY, 32, GOLD);
     DrawButton("-", centerX - labelW/2 - btnW - 10, startY - 8, btnW, btnH, (Color){60, 60, 60, 255}, WHITE);
     DrawButton("+", centerX + labelW/2 + 10, startY - 8, btnW, btnH, (Color){60, 60, 60, 255}, WHITE);
-    
+
     // Rondas
-    snprintf(buffer, sizeof(buffer), "Rondas: %d", game->maxRounds);
+    snprintf(buffer, sizeof(buffer), T(STR_FMT_ROUNDS), game->maxRounds);
     DrawCenteredText(buffer, startY + spacing, 32, GOLD);
     DrawButton("-", centerX - labelW/2 - btnW - 10, startY + spacing - 8, btnW, btnH, (Color){60, 60, 60, 255}, WHITE);
     DrawButton("+", centerX + labelW/2 + 10, startY + spacing - 8, btnW, btnH, (Color){60, 60, 60, 255}, WHITE);
-    
+
     // Puntuación objetivo
-    snprintf(buffer, sizeof(buffer), "obj: %d pts", game->targetScore);
+    snprintf(buffer, sizeof(buffer), T(STR_FMT_TARGET), game->targetScore);
     DrawCenteredText(buffer, startY + spacing*2, 32, GOLD);
     DrawButton("-", centerX - labelW/2 - btnW - 10, startY + spacing*2 - 8, btnW, btnH, (Color){60, 60, 60, 255}, WHITE);
     DrawButton("+", centerX + labelW/2 + 10, startY + spacing*2 - 8, btnW, btnH, (Color){60, 60, 60, 255}, WHITE);
-    
+
     // Instrucciones
-    DrawCenteredText("Usa TAB para cambiar opcion, FLECHAS para ajustar", screenH - 140, 18, LIGHTGRAY);
+    DrawCenteredText(T(STR_HINT_TAB_ARROWS), screenH - 140, 18, LIGHTGRAY);
 
     // Botón ATRAS (esquina superior derecha)
-    DrawButton("ATRAS", screenW - 140, 20, 120, 40, (Color){60, 60, 60, 220}, WHITE);
+    DrawButton(T(STR_BTN_BACK), screenW - 140, 20, 120, 40, (Color){60, 60, 60, 220}, WHITE);
 
     // Botón CONTINUAR
-    DrawButton("CONTINUAR", screenW/2 - 100, screenH - 90, 200, 55, (Color){0, 100, 40, 255}, WHITE);
+    DrawButton(T(STR_BTN_CONTINUE), screenW/2 - 100, screenH - 90, 200, 55, (Color){0, 100, 40, 255}, WHITE);
 }
 
 void DrawStateDealCards(Game* game) {
-    DrawCenteredText("Repartiendo cartas...", GetScreenHeight() / 2, 30, WHITE);
-    
+    DrawCenteredText(T(STR_DEALING), GetScreenHeight() / 2, 30, WHITE);
+
     char buffer[64];
-    snprintf(buffer, sizeof(buffer), "Ronda %d de %d", game->currentRound, game->maxRounds);
+    snprintf(buffer, sizeof(buffer), T(STR_FMT_ROUND_OF), game->currentRound, game->maxRounds);
     DrawCenteredText(buffer, 50, 25, GOLD);
 }
 
@@ -448,7 +449,7 @@ void DrawStatePlayerTurn(Game* game) {
     char buffer[256];
     
     // ========== HEADER ==========
-    snprintf(buffer, sizeof(buffer), "Turno de: %s", current->name);
+    snprintf(buffer, sizeof(buffer), T(STR_FMT_TURN), current->name);
     if (g_fontsLoaded) {
         float textW = MeasureTextEx(g_fontTitle, buffer, 38, 1).x;
         DrawTextEx(g_fontTitle, buffer, (Vector2){(screenW - textW)/2, marginTop}, 38, 1, GOLD);
@@ -467,7 +468,7 @@ void DrawStatePlayerTurn(Game* game) {
         if (points > 0) {
             snprintf(buffer, sizeof(buffer), "%s: %d pts", handName, points);
         } else {
-            snprintf(buffer, sizeof(buffer), "%s (sin puntos)", handName);
+            snprintf(buffer, sizeof(buffer), T(STR_FMT_HAND_NO_POINTS), handName);
         }
         
         if (g_fontsLoaded) {
@@ -482,7 +483,7 @@ void DrawStatePlayerTurn(Game* game) {
     DrawScoreboard(game, 20, marginTop);
     
     // ========== CONTADOR (esquina superior derecha) ==========
-    snprintf(buffer, sizeof(buffer), "Seleccionadas: %d/5", current->selectedCount);
+    snprintf(buffer, sizeof(buffer), T(STR_FMT_SELECTED), current->selectedCount);
     if (g_fontsLoaded) {
         float textW = MeasureTextEx(g_fontText, buffer, 20, 1).x;
         DrawTextEx(g_fontText, buffer, (Vector2){screenW - textW - 20, marginTop + 10}, 20, 1, WHITE);
@@ -494,31 +495,31 @@ void DrawStatePlayerTurn(Game* game) {
     // ========== BOTONES PRINCIPALES (fila inferior) ==========
     // CONFIRMAR (centro)
     if (current->selectedCount >= 1) {
-        DrawButton("CONFIRMAR", screenW/2 - 100, btnRowY, 200, 48, (Color){0, 150, 60, 255}, WHITE);
+        DrawButton(T(STR_BTN_CONFIRM), screenW/2 - 100, btnRowY, 200, 48, (Color){0, 150, 60, 255}, WHITE);
     }
-    
+
     // DESCARTAR (derecha)
     if (!current->hasDiscarded && current->selectedCount >= 1 && current->selectedCount <= 5) {
-        DrawButton("DESCARTAR", screenW - 155, btnRowY, 135, 48, (Color){180, 40, 40, 255}, WHITE);
+        DrawButton(T(STR_BTN_DISCARD), screenW - 155, btnRowY, 135, 48, (Color){180, 40, 40, 255}, WHITE);
     }
-    
+
     // ========== BOTONES DE ORDENAMIENTO (izquierda, más pequeños) ==========
-    DrawButton("VALOR", 20, sortBtnY + 5, 75, 38, (Color){60, 80, 120, 255}, WHITE);
-    DrawButton("PALO", 105, sortBtnY + 5, 75, 38, (Color){80, 60, 120, 255}, WHITE);
-    
+    DrawButton(T(STR_BTN_SORT_VALUE), 20, sortBtnY + 5, 75, 38, (Color){60, 80, 120, 255}, WHITE);
+    DrawButton(T(STR_BTN_SORT_SUIT), 105, sortBtnY + 5, 75, 38, (Color){80, 60, 120, 255}, WHITE);
+
     // ========== INSTRUCCIONES (debajo de todo) ==========
     int infoY = screenH - 45;
     if (g_fontsLoaded) {
-        DrawTextEx(g_fontText, "Selecciona 1-5 cartas para formar tu mano", 
+        DrawTextEx(g_fontText, T(STR_HINT_SELECT_CARDS),
                    (Vector2){20, infoY}, 16, 1, LIGHTGRAY);
         if (!current->hasDiscarded) {
-            DrawTextEx(g_fontText, "Puedes descartar hasta 5 cartas", 
+            DrawTextEx(g_fontText, T(STR_HINT_CAN_DISCARD),
                        (Vector2){20, infoY + 20}, 14, 1, (Color){200, 200, 150, 255});
         }
     } else {
-        DrawText("Selecciona 1-5 cartas para formar tu mano", 20, infoY, 16, LIGHTGRAY);
+        DrawText(T(STR_HINT_SELECT_CARDS), 20, infoY, 16, LIGHTGRAY);
         if (!current->hasDiscarded) {
-            DrawText("Puedes descartar hasta 5 cartas", 20, infoY + 20, 14, (Color){200, 200, 150, 255});
+            DrawText(T(STR_HINT_CAN_DISCARD), 20, infoY + 20, 14, (Color){200, 200, 150, 255});
         }
     }
     
@@ -565,11 +566,11 @@ void DrawStateHideScreen(Game* game) {
     Player* next = &game->players[game->currentPlayer];
     
     char buffer[128];
-    snprintf(buffer, sizeof(buffer), "Pasa el dispositivo a %s", next->name);
+    snprintf(buffer, sizeof(buffer), T(STR_FMT_PASS_DEVICE), next->name);
     DrawCenteredText(buffer, screenH / 2 - 50, 35, GOLD);
-    
+
     // Botón ESTOY LISTO
-    DrawButton("ESTOY LISTO", screenW/2 - 100, screenH/2 + 80, 200, 50, (Color){0, 120, 50, 255}, WHITE);
+    DrawButton(T(STR_BTN_READY), screenW/2 - 100, screenH/2 + 80, 200, 50, (Color){0, 120, 50, 255}, WHITE);
     
     // Indicador visual
     DrawRectangle(screenW/2 - 150, screenH/2 + 150, 300, 4, GOLD);
@@ -579,13 +580,13 @@ void DrawStateShowResults(Game* game) {
     int screenW = GetScreenWidth();
     int screenH = GetScreenHeight();
     
-    DrawCenteredText("RESULTADOS DE LA RONDA", 30, 35, GOLD);
-    
+    DrawCenteredText(T(STR_ROUND_RESULTS), 30, 35, GOLD);
+
     // Botón SIGUIENTE
-    DrawButton("SIGUIENTE", screenW/2 - 100, screenH - 80, 200, 50, (Color){0, 100, 40, 255}, WHITE);
-    
+    DrawButton(T(STR_BTN_NEXT), screenW/2 - 100, screenH - 80, 200, 50, (Color){0, 100, 40, 255}, WHITE);
+
     char buffer[128];
-    snprintf(buffer, sizeof(buffer), "Ronda %d", game->currentRound);
+    snprintf(buffer, sizeof(buffer), T(STR_FMT_ROUND), game->currentRound);
     DrawCenteredText(buffer, 70, 25, WHITE);
     
     // Dibujar cada jugador y su mano
@@ -596,7 +597,7 @@ void DrawStateShowResults(Game* game) {
         Player* player = &game->players[p];
         
         // Nombre y puntuación
-        snprintf(buffer, sizeof(buffer), "%s - Puntos: +%d (Total: %d)", 
+        snprintf(buffer, sizeof(buffer), T(STR_FMT_PLAYER_RESULT),
                  player->name, player->lastResult.score, player->score);
         DrawText(buffer, 50, (int)yOffset, 22, WHITE);
         
@@ -613,73 +614,11 @@ void DrawStateShowResults(Game* game) {
         yOffset += playerHeight;
     }
     
-    DrawCenteredText("Presiona ENTER para continuar", screenH - 40, 20, LIGHTGRAY);
+    DrawCenteredText(T(STR_HINT_ENTER_CONTINUE), screenH - 40, 20, LIGHTGRAY);
 }
 
 void DrawStateRoundEnd(Game* game) {
     DrawCenteredText("Calculando ganador...", GetScreenHeight() / 2, 30, WHITE);
-}
-
-void DrawStateShop(Game* game) {
-    int screenW = GetScreenWidth();
-    int screenH = GetScreenHeight();
-    int centerX = screenW / 2;
-
-    DrawCenteredText("TIENDA DE COMODINES", 40, 40, GOLD);
-
-    char moneyBuf[32];
-    snprintf(moneyBuf, sizeof(moneyBuf), "Dinero: %d", game->jokerSystem.money);
-    int cardW = 160;
-    int cardH = 180;
-    int totalW = SHOP_JOKER_COUNT * cardW + (SHOP_JOKER_COUNT - 1) * 20;
-    int startX = centerX - totalW / 2;
-
-    for (int i = 0; i < SHOP_JOKER_COUNT; i++) {
-        Joker* joker = &game->jokerSystem.shopJokers[i];
-        int x = startX + i * (cardW + 20);
-        int y = screenH / 2 - cardH / 2;
-
-        Color bgColor = (Color){30, 30, 50, 255};
-        if (joker->purchased) {
-            bgColor = (Color){0, 60, 0, 255};
-        } else if (game->jokerSystem.money < joker->price) {
-            bgColor = (Color){60, 20, 20, 255};
-        }
-
-        DrawRectangleRounded((Rectangle){(float)x, (float)y, cardW, cardH}, 0.15f, 10, bgColor);
-        DrawRectangleRoundedLines((Rectangle){(float)x, (float)y, cardW, cardH}, 0.15f, 10, GOLD);
-
-        Color nameColor = joker->purchased ? GREEN : WHITE;
-        int nameW = MeasureText(joker->name, 22);
-        DrawText(joker->name, x + cardW / 2 - nameW / 2, y + 15, 22, nameColor);
-
-        char priceBuf[16];
-        snprintf(priceBuf, sizeof(priceBuf), "$%d", joker->price);
-        Color priceColor = joker->purchased ? GREEN : (game->jokerSystem.money >= joker->price ? GOLD : (Color){200, 50, 50, 255});
-        int priceW = MeasureText(priceBuf, 20);
-        DrawText(priceBuf, x + cardW / 2 - priceW / 2, y + 45, 20, priceColor);
-
-        DrawText(joker->description, x + 10, y + 80, 16, LIGHTGRAY);
-
-        if (!joker->purchased && game->jokerSystem.money >= joker->price) {
-            DrawButton("COMPRAR", x, y + cardH - 50, cardW, 42, (Color){0, 150, 60, 255}, WHITE);
-        }
-    }
-
-    if (game->jokerSystem.money >= 1) {
-        DrawButton("REROLL", centerX + 250, screenH / 2 - 80, 100, 50, (Color){80, 60, 120, 255}, WHITE);
-    }
-
-    if (game->jokerSystem.ownedCount > 0) {
-        DrawCenteredText("Tus Comodines:", screenH / 2 + 120, 20, GOLD);
-        for (int i = 0; i < game->jokerSystem.ownedCount; i++) {
-            char buf[64];
-            snprintf(buf, sizeof(buf), "%s", game->jokerSystem.ownedJokers[i].name);
-            DrawText(buf, 50 + i * 150, screenH / 2 + 150, 16, GREEN);
-        }
-    }
-
-        DrawButton("CONTINUAR", centerX - 100, screenH - 100, 200, 55, (Color){0, 100, 40, 255}, WHITE);
 }
 
 void DrawStateGameOver(Game* game) {
@@ -691,7 +630,7 @@ void DrawStateGameOver(Game* game) {
     DrawRectangle(0, 0, screenW, screenH, (Color){0, 0, 0, 230});
     
     // Título FIN DEL JUEGO
-    DrawCenteredText("FIN DEL JUEGO", marginTop, 48, GOLD);
+    DrawCenteredText(T(STR_GAME_OVER), marginTop, 48, GOLD);
     
     // Encontrar ganador
     int winner = -1;
@@ -705,7 +644,7 @@ void DrawStateGameOver(Game* game) {
     
     if (winner >= 0) {
         char buffer[128];
-        snprintf(buffer, sizeof(buffer), "Ganador: %s con %d puntos!", 
+        snprintf(buffer, sizeof(buffer), T(STR_FMT_WINNER),
                  game->players[winner].name, maxScore);
         DrawCenteredText(buffer, marginTop + 70, 32, GREEN);
     }
@@ -715,18 +654,18 @@ void DrawStateGameOver(Game* game) {
     for (int i = 0; i < game->playerCount; i++) {
         char buffer[64];
         Color color = (i == winner) ? GOLD : WHITE;
-        snprintf(buffer, sizeof(buffer), "%s: %d puntos (%d rondas ganadas)", 
-                 game->players[i].name, game->players[i].score, 
+        snprintf(buffer, sizeof(buffer), T(STR_FMT_FINAL_SCORE),
+                 game->players[i].name, game->players[i].score,
                  game->players[i].totalRoundsWon);
         DrawCenteredText(buffer, y, 24, color);
         y += 32;
     }
     
     // Instrucción
-    DrawCenteredText("Presiona ENTER o R para reiniciar", screenH - marginBottom + 20, 20, LIGHTGRAY);
-    
+    DrawCenteredText(T(STR_HINT_RESTART), screenH - marginBottom + 20, 20, LIGHTGRAY);
+
     // Botón JUGAR DE NUEVO
-    DrawButton("JUGAR DE NUEVO", screenW/2 - 120, screenH - marginBottom - 65, 240, 55, (Color){0, 120, 50, 255}, WHITE);
+    DrawButton(T(STR_BTN_PLAY_AGAIN), screenW/2 - 120, screenH - marginBottom - 65, 240, 55, (Color){0, 120, 50, 255}, WHITE);
 }
 
 // ========== UTILIDADES DE UI ==========
@@ -784,7 +723,7 @@ void DrawScoreboard(Game* game, float x, float y) {
     DrawRectangleRoundedLines((Rectangle){x, y, width, height}, 0.1f, 8, GOLD);
     
     // Título
-    DrawText("PUNTUACION", (int)(x + 10), (int)(y + 8), 18, GOLD);
+    DrawText(T(STR_SCOREBOARD), (int)(x + 10), (int)(y + 8), 18, GOLD);
     
     // Jugadores
     for (int i = 0; i < game->playerCount; i++) {
@@ -820,18 +759,18 @@ void DrawHighScoresScreen(HighScoreEntry* entries, int count) {
     DrawRectangle(0, 0, screenW, screenH, (Color){0, 0, 0, 200});
     
     // Título
-    DrawCenteredText("MEJORES PUNTUACIONES", 40, 40, GOLD);
-    
+    DrawCenteredText(T(STR_HIGH_SCORES), 40, 40, GOLD);
+
     // Encabezados
     int startY = 100;
     int lineHeight = 35;
     int nameX = screenW/2 - 200;
     int scoreX = screenW/2 + 50;
     int dateX = screenW/2 + 150;
-    
-    DrawText("Jugador", nameX, startY, 20, LIGHTGRAY);
-    DrawText("Puntos", scoreX, startY, 20, LIGHTGRAY);
-    DrawText("Fecha", dateX, startY, 20, LIGHTGRAY);
+
+    DrawText(T(STR_HS_PLAYER), nameX, startY, 20, LIGHTGRAY);
+    DrawText(T(STR_HS_POINTS), scoreX, startY, 20, LIGHTGRAY);
+    DrawText(T(STR_HS_DATE), dateX, startY, 20, LIGHTGRAY);
     
     // Línea separadora
     DrawRectangle(screenW/2 - 250, startY + 30, 500, 2, GOLD);
@@ -841,7 +780,7 @@ void DrawHighScoresScreen(HighScoreEntry* entries, int count) {
         int y = startY + 50 + i * lineHeight;
         Color color = (i == 0) ? GOLD : (i == 1) ? (Color){192, 192, 192, 255} : (i == 2) ? (Color){205, 127, 50, 255} : WHITE;
         
-        char rankStr[4];
+        char rankStr[16];
         snprintf(rankStr, sizeof(rankStr), "%d.", i + 1);
         DrawText(rankStr, nameX - 40, y, 20, color);
         
@@ -855,10 +794,10 @@ void DrawHighScoresScreen(HighScoreEntry* entries, int count) {
     }
     
     if (count == 0) {
-        DrawCenteredText("No hay puntuaciones registradas", startY + 100, 24, LIGHTGRAY);
+        DrawCenteredText(T(STR_HS_EMPTY), startY + 100, 24, LIGHTGRAY);
     }
-    
+
     // Botón VOLVER
-    DrawButton("VOLVER", screenW/2 - 75, screenH - 100, 150, 45, (Color){0, 100, 40, 255}, WHITE);
+    DrawButton(T(STR_BTN_RETURN), screenW/2 - 75, screenH - 100, 150, 45, (Color){0, 100, 40, 255}, WHITE);
 }
 

@@ -5,7 +5,6 @@
 #include "game.h"
 #include "poker_hand.h"
 #include "card_textures.h"
-#include "joker.h"
 
 // Dimensiones de cartas (basadas en los sprites extraídos: 71x95)
 #define CARD_WIDTH 71
@@ -45,7 +44,6 @@ void DrawStatePlayerTurn(Game* game);
 void DrawStateHideScreen(Game* game);
 void DrawStateShowResults(Game* game);
 void DrawStateRoundEnd(Game* game);
-void DrawStateShop(Game* game);
 void DrawStateGameOver(Game* game);
 
 // Utilidades de UI

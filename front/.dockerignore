@@ -1,0 +1,16 @@
+# Installed fresh inside the image; host binaries are platform-specific (win32)
+node_modules/
+dist/
+.angular/
+npm-debug.log
+
+# Env / local
+.env
+.env.local
+.env.*.local
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store

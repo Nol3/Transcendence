@@ -64,28 +64,49 @@
     
     <script>
         var _pendingUsername = null;
+        var _pendingLang = null;
 
-        // Recibir username desde Angular (parent frame) via postMessage
+        // ccall is only safe AFTER the wasm runtime is initialized.
+        var _runtimeReady = false;
+
+        function _applyUsername(username) {
+            Module.ccall('set_player_name_from_json', null, ['string'],
+                [JSON.stringify({ username: username })]);
+        }
+
+        function _applyLang(lang) {
+            if (Module._set_language) {
+                Module.ccall('set_language', null, ['string'], [lang]);
+            }
+        }
+
         window.addEventListener('message', function(event) {
-            if (!event.data || event.data.type !== 'set-username') return;
-            var username = event.data.username;
-            if (!username) return;
-            if (typeof Module !== 'undefined' && typeof Module.ccall === 'function') {
-                Module.ccall('set_player_name_from_json', null, ['string'],
-                    [JSON.stringify({ username: username })]);
-            } else {
-                _pendingUsername = username;
+            if (!event.data) return;
+            if (event.data.type === 'set-username') {
+                var username = event.data.username;
+                if (!username) return;
+                if (_runtimeReady) _applyUsername(username);
+                else _pendingUsername = username;
+            } else if (event.data.type === 'set-language') {
+                var lang = event.data.lang;
+                if (!lang) return;
+                if (_runtimeReady) _applyLang(lang);
+                else _pendingLang = lang;
             }
         });
 
-        Module = {
+        var Module = {
             canvas: document.getElementById('canvas'),
             onRuntimeInitialized: function() {
+                _runtimeReady = true;
                 document.getElementById('loading').classList.add('hidden');
                 if (_pendingUsername) {
-                    Module.ccall('set_player_name_from_json', null, ['string'],
-                        [JSON.stringify({ username: _pendingUsername })]);
+                    _applyUsername(_pendingUsername);
                     _pendingUsername = null;
+                }
+                if (_pendingLang) {
+                    _applyLang(_pendingLang);
+                    _pendingLang = null;
                 }
             }
         };

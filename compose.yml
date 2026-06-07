@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.backend
+    container_name: ft_transcendence_backend
+    user: root
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     environment:
@@ -17,7 +19,9 @@ services:
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
     volumes:
       - ./backend:/app
-      - ./backend/db.sqlite3:/app/db.sqlite3
+      # Raylib/WASM poker game build (served by Django at /game/).
+      # PROJECT_ROOT inside the container is "/", so juego maps to /juego.
+      - ./juego:/juego:ro
     command: >
       sh -c "python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
@@ -35,19 +39,25 @@ services:
   # ==========================================
   frontend:
     build:
-      context: .
-      dockerfile: docker/Dockerfile.frontend
+      context: ./front
+      dockerfile: ../docker/Dockerfile.frontend
+    container_name: ft_transcendence_frontend
     ports:
       - "${FRONTEND_PORT:-4200}:4200"
     environment:
-      - NG_ENV=${NG_ENV:-development}
+      - NG_ENV=${NG_ENV:-production}
       - BACKEND_URL=${BACKEND_URL:-http://localhost:8000}
+    volumes:
+      # Serve config mounted at runtime so the image build context (./front)
+      # doesn't need to reach ../docker. Static prod build comes from the image.
+      - ./docker/nginx-app.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       - transcendence-network
     depends_on:
       - backend
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4200"]
+      # 127.0.0.1, not localhost (→ ::1): the image's nginx binds IPv4 only.
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:4200/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -57,19 +67,31 @@ services:
   # Reverse Proxy (Nginx)
   # ==========================================
   nginx:
-    image: nginx:alpine
+    #image: nginx:alpine
+    image: owasp/modsecurity-crs:nginx
+    container_name: ft_transcendence_nginx
     ports:
-      - "443:443"
-      - "80:80"
+    #the image use those ports because they try to avoid "privileged ports"
+      - "443:8443"
+      - "80:8080"
     volumes:
-      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      # The OWASP modsecurity creates its own conf file and it cannot be copied from the outside;
+      #instead, we leave the default conf as it is and then we OVERRIDE with custom configuration, not the other way around, thats why I create the waf.conf file
+      #- ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/waf.conf:/etc/nginx/templates/conf.d/default.conf.template:ro
       - ./docker/ssl:/etc/nginx/ssl:ro
     networks:
       - transcendence-network
     depends_on:
       - backend
+      - frontend
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost"]
+      # Use 127.0.0.1 (not localhost → ::1, nginx binds IPv4 only) over HTTPS
+      # directly: port 80 only 301-redirects, and the cert is self-signed.
+      # I need to change this because it looks like this image does not have "wget", it appears like a good approach
+      # is to use this one:
+      test: ["CMD", "nginx", "-t"]
+      #test: ["CMD", "wget", "--no-verbose", "--tries=1", "--no-check-certificate", "--spider", "http://127.0.0.1:8080/healthz"]
       interval: 30s
       timeout: 10s
       retries: 3

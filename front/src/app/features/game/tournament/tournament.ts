@@ -11,6 +11,7 @@ import {
   TournamentStatus as ApiTournamentStatus,
 } from '../../../core/services/tournament.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { TranslatePipe } from "../../../i18n/translate.pipe";
 
 export type UiTournamentStatus = 'active' | 'upcoming' | 'finished';
 
@@ -42,7 +43,8 @@ const STATUS_API_TO_UI: Record<ApiTournamentStatus, UiTournamentStatus> = {
     ButtonComponent,
     SpinnerComponent,
     BracketComponent,
-  ],
+    TranslatePipe
+],
   templateUrl: './tournament.html',
   styleUrl: './tournament.scss',
 })

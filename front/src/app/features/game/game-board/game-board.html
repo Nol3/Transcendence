@@ -3,24 +3,53 @@
   <!-- ── Page header ──────────────────────────────────────── -->
   <div class="lobby__header container">
     <div class="lobby__title-row">
-      <app-pixel-title [level]="2" color="yellow">GAME LOBBY</app-pixel-title>
-      <app-badge variant="success">ONLINE</app-badge>
+      <app-pixel-title [level]="2" color="yellow">{{ 'lobby.title' | translate }}</app-pixel-title>
+      <app-badge variant="success">{{ 'lobby.online' | translate }}</app-badge>
     </div>
     <p class="text-secondary text-sm">
-      Card Wars — pick up where the deck left off.
+      {{ 'lobby.subtitle' | translate }}
     </p>
   </div>
 
   <div class="lobby__body container">
     <div class="lobby__grid">
 
-      <!-- ── Left: game area ──────────────────────────────── -->
+      <!-- ── Left: sidebar ───────────────────────────────– -->
+      <div class="lobby__sidebar">
+
+        <!-- Game rules -->
+        <app-card [title]="'lobby.rulesTitle' | translate">
+          <ul class="rules">
+            @for (rule of rules; track rule) {
+              <li class="rules__item">
+                <span class="neon-text-cyan font-mono">›</span>
+                <span class="text-secondary text-sm">{{ rule | translate }}</span>
+              </li>
+            }
+          </ul>
+        </app-card>
+
+        <!-- Your stats -->
+        <app-card [title]="'lobby.statsTitle' | translate">
+          <div class="my-stats">
+            @for (stat of stats(); track stat.label) {
+              <div class="my-stats__row">
+                <span class="text-muted font-mono text-sm">{{ stat.label | translate }}</span>
+                <span [class]="'font-pixel ' + stat.color">{{ stat.value }}</span>
+              </div>
+            }
+          </div>
+        </app-card>
+
+      </div>
+
+      <!-- ── Right: game area ──────────────────────────────── -->
       <div class="game-area">
 
         <!-- Arcade cabinet frame -->
         <div class="cabinet">
           <div class="cabinet__top">
-            <span class="font-pixel neon-text-yellow cabinet__label">CARD BATTLE</span>
+            <span class="font-pixel neon-text-yellow cabinet__label">{{ 'lobby.cardBattle' | translate }}</span>
             <div class="cabinet__lights" aria-hidden="true">
               <span class="cabinet__light cabinet__light--cyan  animate-pulse-glow"></span>
               <span class="cabinet__light cabinet__light--magenta animate-pulse-glow"></span>
@@ -35,8 +64,7 @@
               title="Card Wars - WASM Game"
               class="cabinet__game-frame"
               loading="lazy"
-              sandbox="allow-scripts allow-pointer-lock allow-popups"
-              allow="autoplay; clipboard-write; clipboard-read; fullscreen"
+              allow="fullscreen"
               (load)="onGameFrameLoad()"
             ></iframe>
           </div>
@@ -53,34 +81,6 @@
 
       </div>
 
-      <!-- ── Right: sidebar ───────────────────────────────── -->
-      <div class="lobby__sidebar">
-
-        <!-- Game rules -->
-        <app-card title="GAME RULES">
-          <ul class="rules">
-            @for (rule of rules; track rule) {
-              <li class="rules__item">
-                <span class="neon-text-cyan font-mono">›</span>
-                <span class="text-secondary text-sm">{{ rule }}</span>
-              </li>
-            }
-          </ul>
-        </app-card>
-
-        <!-- Your stats -->
-        <app-card title="YOUR STATS">
-          <div class="my-stats">
-            @for (stat of stats(); track stat.label) {
-              <div class="my-stats__row">
-                <span class="text-muted font-mono text-sm">{{ stat.label }}</span>
-                <span [class]="'font-pixel ' + stat.color">{{ stat.value }}</span>
-              </div>
-            }
-          </div>
-        </app-card>
-
-      </div>
     </div>
   </div>
 </div>
