@@ -6,11 +6,17 @@ import os
 from pathlib import Path
 from decouple import config, Csv
 
+from config.vault import load_vault_secrets
+
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Secrets from HashiCorp Vault (empty dict when Vault is disabled/unavailable,
+# in which case the `config(...)` env-var defaults below take over).
+_vault = load_vault_secrets()
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config(
+SECRET_KEY = _vault.get("DJANGO_SECRET_KEY") or config(
     "DJANGO_SECRET_KEY", default="django-insecure-dev-key-change-in-production"
 )
 
@@ -160,8 +166,10 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
-# JWT Configuration
-JWT_SECRET_KEY = config("JWT_SECRET_KEY", default="jwt-secret-key-change-in-production")
+# JWT Configuration — Vault stores this under the key "JWT_SECRET".
+JWT_SECRET_KEY = _vault.get("JWT_SECRET") or config(
+    "JWT_SECRET_KEY", default="jwt-secret-key-change-in-production"
+)
 JWT_ALGORITHM = config("JWT_ALGORITHM", default="HS256")
 JWT_EXPIRATION_HOURS = config("JWT_EXPIRATION_HOURS", default=24, cast=int)
 
@@ -203,8 +211,8 @@ EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
-# Google OAuth2
-GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID", default="")
+# Google OAuth2 — provisioned via env, but Vault may override it if stored there.
+GOOGLE_CLIENT_ID = _vault.get("GOOGLE_CLIENT_ID") or config("GOOGLE_CLIENT_ID", default="")
 
 # Swagger/OpenAPI Configuration
 SPECTACULAR_SETTINGS = {

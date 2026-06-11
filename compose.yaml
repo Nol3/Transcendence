@@ -17,6 +17,11 @@ services:
       - DB_ENGINE=${DB_ENGINE}
       - DB_NAME=${DB_NAME}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+      # Vault (dev mode). When USE_VAULT is on, settings.py pulls secrets from
+      # secret/transcendence; otherwise it falls back to the env vars above.
+      - USE_VAULT=${USE_VAULT:-true}
+      - VAULT_ADDR=${VAULT_ADDR:-http://vault:8200}
+      - VAULT_TOKEN=${VAULT_TOKEN:-root}
     volumes:
       - ./backend:/app
       # Raylib/WASM poker game build (served by Django at /game/).
@@ -27,6 +32,11 @@ services:
              python manage.py runserver 0.0.0.0:8000"
     networks:
       - transcendence-network
+    depends_on:
+      # Wait until vault-init has finished writing secrets to Vault so the first
+      # settings load can read them (the loader still falls back gracefully).
+      vault-init:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/admin/"]
       interval: 30s
