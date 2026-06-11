@@ -81,14 +81,11 @@ services:
     image: owasp/modsecurity-crs:nginx
     container_name: ft_transcendence_nginx
     ports:
-<<<<<<< HEAD
-    #the image use those ports because they try to avoid "privileged ports"
-=======
     # nginx inside the image listens on 8080/8443 (non-root, "avoid privileged
-    # ports"), so the host ports must map to those, not to 80/443.
->>>>>>> b98f0d2 (changes for docker launch)
-      - "8443:8443"
-      - "8080:8080"
+    # ports"), so the host side maps to those, never to 80/443 — no sudo needed.
+    # Override HTTPS_PORT/HTTP_PORT if 8443/8080 are already taken on the host.
+      - "${HTTPS_PORT:-8443}:8443"
+      - "${HTTP_PORT:-8080}:8080"
     volumes:
       # The OWASP modsecurity creates its own conf file and it cannot be copied from the outside;
       #instead, we leave the default conf as it is and then we OVERRIDE with custom configuration, not the other way around, thats why I create the waf.conf file
@@ -118,7 +115,8 @@ services:
     image: hashicorp/vault:1.15
     container_name: ft_transcendence_vault
     ports:
-      - "8200:8200"
+      # Override VAULT_PORT if 8200 is already taken on the host.
+      - "${VAULT_PORT:-8200}:8200"
     environment:
       VAULT_ADDR: "http://0.0.0.0:8200"
     # apparently it is acceptable to present it in dev mode
