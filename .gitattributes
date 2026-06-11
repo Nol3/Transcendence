@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 # Set default behavior to automatic text conversion.
 * text=auto
 
 # Force shell scripts to always have LF line endings on checkout.
+=======
+# Shell scripts must use LF endings: they run inside Linux containers (e.g.
+# scripts/vault-init.sh mounted into the Vault image). CRLF breaks `set -e`
+# with "illegal option" and the container exits non-zero.
+>>>>>>> b98f0d2 (changes for docker launch)
 *.sh text eol=lf

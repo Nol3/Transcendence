@@ -81,7 +81,12 @@ services:
     image: owasp/modsecurity-crs:nginx
     container_name: ft_transcendence_nginx
     ports:
+<<<<<<< HEAD
     #the image use those ports because they try to avoid "privileged ports"
+=======
+    # nginx inside the image listens on 8080/8443 (non-root, "avoid privileged
+    # ports"), so the host ports must map to those, not to 80/443.
+>>>>>>> b98f0d2 (changes for docker launch)
       - "8443:8443"
       - "8080:8080"
     volumes:

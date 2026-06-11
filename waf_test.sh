@@ -1,6 +1,11 @@
 #!/bin/bash
 
+<<<<<<< HEAD
 TARGET="${TARGET:-https://localhost:8443}"
+=======
+# nginx (ModSecurity reverse proxy) is exposed on host port 8443 (HTTPS).
+TARGET="https://localhost:8443"
+>>>>>>> b98f0d2 (changes for docker launch)
 
 echo "===== WAF FULL HARDENED TEST ====="
 echo ""
@@ -96,8 +101,13 @@ test_attack "Scanner blocked (nikto UA)" \
 test_attack "Method TRACE blocked" \
 "curl -k -A '$UA' -X TRACE -s -o /dev/null -w '%{http_code}' \"$TARGET/\""
 
+<<<<<<< HEAD
 test_attack "Method INVALID blocked" \
 "curl -k -A '$UA' -X INVALID -s -o /dev/null -w '%{http_code}' \"$TARGET/\""
+=======
+test_attack "Method PROPFIND blocked" \
+"curl -k -A '$UA' -X PROPFIND -s -o /dev/null -w '%{http_code}' \"$TARGET/\""
+>>>>>>> b98f0d2 (changes for docker launch)
 
 # =========================
 # 🔹 SUMMARY
