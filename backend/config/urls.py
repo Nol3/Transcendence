@@ -130,12 +130,13 @@ urlpatterns = [
     path("api/leaderboard/", include("apps.users.leaderboard_urls")),
     path("api/leaderboard", include("apps.users.leaderboard_urls")),
     # WASM card game — served directly from juego/web/
-    path("game/", game_view),
-    path("game/<path:path>", game_view),
+    # NOTE: Must not collide with Angular's /game route (SPA client-side route)
+    path("game-embed/", game_view),
+    path("game-embed/<path:path>", game_view),
     # Raw game assets (tapete, cards, audio) for HTML/CSS use
     path("game-assets/<path:path>", game_asset_view),
     # Redirect root to game embedding MVP
-    path("", RedirectView.as_view(url="/game/", permanent=False)),
+    path("", RedirectView.as_view(url="/game-embed/", permanent=False)),
     # Public API (API key authenticated)
     path("api/public/", include("apps.public_api.urls", namespace="public_api")),
     # Swagger/OpenAPI documentation
