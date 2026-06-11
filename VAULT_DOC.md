@@ -40,21 +40,23 @@ to get a single value:
 
 ## Using Vault in Backend
 
-The backend should retrieve secrets from Vault at runtime
+The backend retrieves secrets from Vault at runtime using **AppRole Authentication**.
 
-Required environment variables:
+### AppRole Authentication (Production / Docker mode)
+The `vault-init` container configures an AppRole named `django-role` with a read-only policy for `secret/data/transcendence`. It generates a **Role ID** and a **Secret ID** and writes them to a shared volume path `/vault_creds/credentials.env`.
 
-``` YAML
-    environment:
-        - VAULT_ADDR: http://vault:8200
-        - VAULT_token: root
-```
+The backend reads these credentials and logs into Vault at `/v1/auth/approle/login` to obtain a client token, which is then used to retrieve the secrets.
 
-to inject a secret in a service:
+No manual token setup is needed in Docker.
 
-``` bash
-    export DB_PASSWORD=$(vault kv get -field=DB_PASSWORD secret/transcendence)
-```
+### Development Fallback (Local mode outside Docker)
+When running Django locally without Docker (`USE_VAULT=false` or if credentials are not found), Django falls back gracefully to standard `.env` variables using `decouple`.
+
+For manual Vault testing in development, you can set `VAULT_TOKEN` or `VAULT_ROLE_ID` and `VAULT_SECRET_ID` in your local environment.
+
+### Secret Rotation
+1. Update the secret value in Vault using the CLI: `vault kv put secret/transcendence KEY=NEW_VALUE`
+2. Restart the Django container (e.g. `docker compose restart backend`) to pull the new secrets into memory. Since AppRole tokens have a limited TTL (1 hour), they will automatically expire, and restarting the backend re-authenticates and pulls fresh secrets.
 
 ## Recommended usage
 

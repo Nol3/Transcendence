@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TARGET="https://localhost"
+TARGET="${TARGET:-https://localhost:8443}"
 
 echo "===== WAF FULL HARDENED TEST ====="
 echo ""
@@ -96,8 +96,8 @@ test_attack "Scanner blocked (nikto UA)" \
 test_attack "Method TRACE blocked" \
 "curl -k -A '$UA' -X TRACE -s -o /dev/null -w '%{http_code}' \"$TARGET/\""
 
-test_attack "Method CONNECT blocked" \
-"curl -k -A '$UA' -X CONNECT -s -o /dev/null -w '%{http_code}' \"$TARGET/\""
+test_attack "Method INVALID blocked" \
+"curl -k -A '$UA' -X INVALID -s -o /dev/null -w '%{http_code}' \"$TARGET/\""
 
 # =========================
 # 🔹 SUMMARY

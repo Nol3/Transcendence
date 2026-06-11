@@ -21,12 +21,12 @@ services:
       # secret/transcendence; otherwise it falls back to the env vars above.
       - USE_VAULT=${USE_VAULT:-true}
       - VAULT_ADDR=${VAULT_ADDR:-http://vault:8200}
-      - VAULT_TOKEN=${VAULT_TOKEN:-root}
     volumes:
       - ./backend:/app
       # Raylib/WASM poker game build (served by Django at /game/).
       # PROJECT_ROOT inside the container is "/", so juego maps to /juego.
       - ./juego:/juego:ro
+      - vault_creds:/vault_creds:ro
     command: >
       sh -c "python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
@@ -82,8 +82,8 @@ services:
     container_name: ft_transcendence_nginx
     ports:
     #the image use those ports because they try to avoid "privileged ports"
-      - "8443:443"
-      - "8080:80"
+      - "8443:8443"
+      - "8080:8080"
     volumes:
       # The OWASP modsecurity creates its own conf file and it cannot be copied from the outside;
       #instead, we leave the default conf as it is and then we OVERRIDE with custom configuration, not the other way around, thats why I create the waf.conf file
@@ -140,6 +140,7 @@ services:
       - transcendence-network
     volumes: 
       - ./scripts/vault-init.sh:/vault-init.sh:ro
+      - vault_creds:/vault_creds
     entrypoint:
       - sh
       - /vault-init.sh
@@ -161,3 +162,4 @@ volumes:
   frontend_data:
     driver: local
   vault_data:
+  vault_creds:

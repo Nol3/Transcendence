@@ -32,6 +32,35 @@ vault kv put secret/transcendence \
 
 echo "[VAULT-INIT] Secrets stored successfully"
 
+# Enable AppRole auth method
+echo "[VAULT-INIT] Configuring AppRole..."
+vault auth enable approle || true
+
+# Write policy for django backend
+vault policy write django-policy - <<EOF
+path "secret/data/transcendence" {
+  capabilities = ["read"]
+}
+EOF
+
+# Create AppRole for django
+vault write auth/approle/role/django-role \
+    token_policies="django-policy" \
+    token_ttl=1h \
+    token_max_ttl=24h || true
+
+# Retrieve Role ID and Secret ID
+ROLE_ID=$(vault read -field=role_id auth/approle/role/django-role/role-id)
+SECRET_ID=$(vault write -f -field=secret_id auth/approle/role/django-role/secret-id)
+
+# Write credentials to the shared volume
+mkdir -p /vault_creds
+echo "VAULT_ROLE_ID=$ROLE_ID" > /vault_creds/credentials.env
+echo "VAULT_SECRET_ID=$SECRET_ID" >> /vault_creds/credentials.env
+
+echo "[VAULT-INIT] AppRole configured successfully. Credentials written to /vault_creds/credentials.env"
+
+
 #
 # Future candidates for Vault storage:
 #

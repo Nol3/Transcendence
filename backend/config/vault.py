@@ -50,11 +50,47 @@ def load_vault_secrets() -> dict[str, str]:
         return _cache
 
     addr = os.environ.get("VAULT_ADDR", "http://vault:8200").rstrip("/")
-    token = os.environ.get("VAULT_TOKEN", "")
+    
+    # Try to load AppRole credentials
+    role_id = os.environ.get("VAULT_ROLE_ID")
+    secret_id = os.environ.get("VAULT_SECRET_ID")
+    
+    creds_path = "/vault_creds/credentials.env"
+    if not (role_id and secret_id) and os.path.exists(creds_path):
+        try:
+            with open(creds_path, "r") as f:
+                for line in f:
+                    if "=" in line:
+                        k, v = line.strip().split("=", 1)
+                        if k == "VAULT_ROLE_ID":
+                            role_id = v
+                        elif k == "VAULT_SECRET_ID":
+                            secret_id = v
+        except Exception as exc:
+            logger.warning("Could not read Vault credentials file: %s", exc)
+
+    token = None
+    if role_id and secret_id:
+        # Authenticate using AppRole to get a client token
+        try:
+            login_url = f"{addr}/v1/auth/approle/login"
+            login_res = requests.post(
+                login_url,
+                json={"role_id": role_id, "secret_id": secret_id},
+                timeout=_TIMEOUT_SECONDS,
+            )
+            login_res.raise_for_status()
+            token = login_res.json()["auth"]["client_token"]
+        except Exception as exc:
+            logger.warning("Could not authenticate with Vault AppRole (%s); trying env vars.", exc)
+
     if not token:
-        logger.warning("USE_VAULT is on but VAULT_TOKEN is empty; using env vars.")
-        _cache = {}
-        return _cache
+        # Fallback to direct token authentication (dev mode token / manual testing)
+        token = os.environ.get("VAULT_TOKEN", "")
+        if not token:
+            logger.warning("USE_VAULT is on but AppRole credentials and VAULT_TOKEN are missing; using env vars.")
+            _cache = {}
+            return _cache
 
     try:
         response = requests.get(
@@ -70,6 +106,7 @@ def load_vault_secrets() -> dict[str, str]:
         _cache = {}
         return _cache
 
-    logger.info("Vault secrets loaded successfully (%d keys).", len(secrets))
+    logger.info("Vault secrets loaded successfully via AppRole (%d keys).", len(secrets))
     _cache = {str(k): str(v) for k, v in secrets.items()}
     return _cache
+
