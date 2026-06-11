@@ -266,6 +266,9 @@ void DrawStateMenu(Game* game) {
     DrawCenteredText("POKER RACE", 80, 60, GOLD);
     DrawCenteredText(T(STR_SUBTITLE), 150, 30, WHITE);
 
+    // Panel oscuro detrás de los botones para contraste con el fondo verde
+    DrawRectangle(screenW/2 - 120, 280, 240, 230, (Color){0, 0, 0, 170});
+
     // Botón JUGAR
     float btnX = screenW / 2 - 100;
     float btnY = 300;
@@ -286,7 +289,10 @@ void DrawStateMenu(Game* game) {
 void DrawStateInstructions(Game* game) {
     int screenW = GetScreenWidth();
     int screenH = GetScreenHeight();
-    
+
+    // Panel oscuro para mejorar contraste del texto
+    DrawRectangle(screenW/2 - 390, 20, 780, screenH - 110, (Color){0, 0, 0, 170});
+
     DrawCenteredText(T(STR_HOW_TO_PLAY_TITLE), 40, 40, GOLD);
 
     // Panel de instrucciones
@@ -340,45 +346,48 @@ void DrawStateConfig(Game* game) {
     int screenW = GetScreenWidth();
     int screenH = GetScreenHeight();
     int centerX = screenW / 2;
-    
+
+    // Panel oscuro para mejorar contraste
+    DrawRectangle(centerX - 320, 20, 640, screenH - 110, (Color){0, 0, 0, 170});
+
     DrawCenteredText(T(STR_AUDIO_SETTINGS), 50, 42, GOLD);
-    
+
     // Obtener volúmenes actuales
     int masterVol = 100, musicVol = 50, sfxVol = 80;
     AudioGetVolumes(&masterVol, &musicVol, &sfxVol);
-    
-    int baseY = 160;
+
+    int baseY = 180;
     int gapY = 100;
-    
+
     // Master Volume
-    DrawText("Master:", centerX - 180, baseY, 28, BLACK);
-    DrawButton("-", centerX - 60, baseY - 5, 40, 40, (Color){220, 220, 220, 255}, BLACK);
-    DrawRectangle(centerX, baseY, 200, 30, (Color){30, 30, 30, 255});
-    DrawRectangle(centerX, baseY, (int)(masterVol * 2.0f), 30, GOLD);
-    DrawButton("+", centerX + 210, baseY - 5, 40, 40, (Color){220, 220, 220, 255}, BLACK);
+    DrawText("Master:", centerX - 240, baseY, 28, WHITE);
+    DrawButton("-", centerX - 120, baseY - 5, 40, 40, (Color){80, 80, 80, 255}, WHITE);
+    DrawRectangle(centerX - 60, baseY, 200, 30, (Color){30, 30, 30, 255});
+    DrawRectangle(centerX - 60, baseY, (int)(masterVol * 2.0f), 30, GOLD);
+    DrawButton("+", centerX + 150, baseY - 5, 40, 40, (Color){80, 80, 80, 255}, WHITE);
     char buf[16];
     snprintf(buf, sizeof(buf), "%d%%", masterVol);
-    DrawText(buf, centerX + 260, baseY + 5, 20, BLACK);
-    
+    DrawText(buf, centerX + 200, baseY + 5, 20, WHITE);
+
     // Music Volume
-    DrawText(T(STR_LABEL_MUSIC), centerX - 180, baseY + gapY, 28, BLACK);
-    DrawButton("-", centerX - 60, baseY + gapY - 5, 40, 40, (Color){220, 220, 220, 255}, BLACK);
-    DrawRectangle(centerX, baseY + gapY, 200, 30, (Color){30, 30, 30, 255});
-    DrawRectangle(centerX, baseY + gapY, (int)(musicVol * 2.0f), 30, GOLD);
-    DrawButton("+", centerX + 210, baseY + gapY - 5, 40, 40, (Color){220, 220, 220, 255}, BLACK);
+    DrawText(T(STR_LABEL_MUSIC), centerX - 240, baseY + gapY, 28, WHITE);
+    DrawButton("-", centerX - 120, baseY + gapY - 5, 40, 40, (Color){80, 80, 80, 255}, WHITE);
+    DrawRectangle(centerX - 60, baseY + gapY, 200, 30, (Color){30, 30, 30, 255});
+    DrawRectangle(centerX - 60, baseY + gapY, (int)(musicVol * 2.0f), 30, GOLD);
+    DrawButton("+", centerX + 150, baseY + gapY - 5, 40, 40, (Color){80, 80, 80, 255}, WHITE);
     snprintf(buf, sizeof(buf), "%d%%", musicVol);
-    DrawText(buf, centerX + 260, baseY + gapY + 5, 20, BLACK);
-    
+    DrawText(buf, centerX + 200, baseY + gapY + 5, 20, WHITE);
+
     // SFX Volume
-    DrawText("SFX:", centerX - 180, baseY + gapY * 2, 28, BLACK);
-    DrawButton("-", centerX - 60, baseY + gapY * 2 - 5, 40, 40, (Color){220, 220, 220, 255}, BLACK);
-    DrawRectangle(centerX, baseY + gapY * 2, 200, 30, (Color){30, 30, 30, 255});
-    DrawRectangle(centerX, baseY + gapY * 2, (int)(sfxVol * 2.0f), 30, GOLD);
-    DrawButton("+", centerX + 210, baseY + gapY * 2 - 5, 40, 40, (Color){220, 220, 220, 255}, BLACK);
+    DrawText("SFX:", centerX - 240, baseY + gapY * 2, 28, WHITE);
+    DrawButton("-", centerX - 120, baseY + gapY * 2 - 5, 40, 40, (Color){80, 80, 80, 255}, WHITE);
+    DrawRectangle(centerX - 60, baseY + gapY * 2, 200, 30, (Color){30, 30, 30, 255});
+    DrawRectangle(centerX - 60, baseY + gapY * 2, (int)(sfxVol * 2.0f), 30, GOLD);
+    DrawButton("+", centerX + 150, baseY + gapY * 2 - 5, 40, 40, (Color){80, 80, 80, 255}, WHITE);
     snprintf(buf, sizeof(buf), "%d%%", sfxVol);
-    DrawText(buf, centerX + 260, baseY + gapY * 2 + 5, 20, BLACK);
-    
-    DrawCenteredText(T(STR_HINT_ADJUST), screenH - 120, 20, BLACK);
+    DrawText(buf, centerX + 200, baseY + gapY * 2 + 5, 20, WHITE);
+
+    DrawCenteredText(T(STR_HINT_ADJUST), screenH - 120, 20, LIGHTGRAY);
 
     // Botón ATRAS (esquina superior derecha)
     DrawButton(T(STR_BTN_BACK), screenW - 140, 20, 120, 40, (Color){60, 60, 60, 220}, WHITE);
@@ -392,7 +401,10 @@ void DrawStateSetupPlayers(Game* game) {
     int screenH = GetScreenHeight();
     int startY = 140;
     int spacing = 100;
-    
+
+    // Panel oscuro para mejorar contraste
+    DrawRectangle(screenW/2 - 280, 20, 560, screenH - 110, (Color){0, 0, 0, 160});
+
     // Título
     DrawCenteredText(T(STR_SETUP_TITLE), 50, 42, WHITE);
 
@@ -430,7 +442,13 @@ void DrawStateSetupPlayers(Game* game) {
 }
 
 void DrawStateDealCards(Game* game) {
-    DrawCenteredText(T(STR_DEALING), GetScreenHeight() / 2, 30, WHITE);
+    int screenW = GetScreenWidth();
+    int screenH = GetScreenHeight();
+
+    // Fondo semitransparente para el texto de reparto
+    DrawRectangle(screenW/2 - 200, screenH/2 - 25, 400, 50, (Color){0, 0, 0, 160});
+
+    DrawCenteredText(T(STR_DEALING), screenH / 2 - 15, 30, WHITE);
 
     char buffer[64];
     snprintf(buffer, sizeof(buffer), T(STR_FMT_ROUND_OF), game->currentRound, game->maxRounds);
@@ -579,7 +597,10 @@ void DrawStateHideScreen(Game* game) {
 void DrawStateShowResults(Game* game) {
     int screenW = GetScreenWidth();
     int screenH = GetScreenHeight();
-    
+
+    // Fondo semitransparente para mejorar legibilidad de los resultados
+    DrawRectangle(0, 0, screenW, screenH, (Color){0, 0, 0, 160});
+
     DrawCenteredText(T(STR_ROUND_RESULTS), 30, 35, GOLD);
 
     // Botón SIGUIENTE

@@ -156,8 +156,8 @@ void GameDraw(Game* game) {
             DrawStateSetupPlayers(game);
             break;
         case STATE_DEAL_CARDS:
-            DrawStateDealCards(game);
             DrawCardAnimations(game); // Dibujar animaciones de reparto
+            DrawStateDealCards(game);
             break;
         case STATE_PLAYER_TURN:
             DrawStatePlayerTurn(game);
@@ -216,35 +216,35 @@ void UpdateStateConfig(Game* game) {
     int masterVol = 100, musicVol = 50, sfxVol = 80;
     AudioGetVolumes(&masterVol, &musicVol, &sfxVol);
     
-    int baseY = 160;
+    int baseY = 180;
     int gapY = 100;
-    
+
     // Slider Master (+/- con botones)
-    if (IsButtonClicked("+", centerX + 210, baseY - 5, 40, 40)) {
+    if (IsButtonClicked("+", centerX + 150, baseY - 5, 40, 40)) {
         masterVol = (masterVol >= 100) ? 100 : masterVol + 10;
         AudioSetMasterVolume(masterVol / 100.0f);
     }
-    if (IsButtonClicked("-", centerX - 60, baseY - 5, 40, 40)) {
+    if (IsButtonClicked("-", centerX - 120, baseY - 5, 40, 40)) {
         masterVol = (masterVol <= 0) ? 0 : masterVol - 10;
         AudioSetMasterVolume(masterVol / 100.0f);
     }
-    
+
     // Slider Música
-    if (IsButtonClicked("+", centerX + 210, baseY + gapY - 5, 40, 40)) {
+    if (IsButtonClicked("+", centerX + 150, baseY + gapY - 5, 40, 40)) {
         musicVol = (musicVol >= 100) ? 100 : musicVol + 10;
         AudioSetMusicVolume(musicVol / 100.0f);
     }
-    if (IsButtonClicked("-", centerX - 60, baseY + gapY - 5, 40, 40)) {
+    if (IsButtonClicked("-", centerX - 120, baseY + gapY - 5, 40, 40)) {
         musicVol = (musicVol <= 0) ? 0 : musicVol - 10;
         AudioSetMusicVolume(musicVol / 100.0f);
     }
-    
+
     // Slider SFX
-    if (IsButtonClicked("+", centerX + 210, baseY + gapY * 2 - 5, 40, 40)) {
+    if (IsButtonClicked("+", centerX + 150, baseY + gapY * 2 - 5, 40, 40)) {
         sfxVol = (sfxVol >= 100) ? 100 : sfxVol + 10;
         AudioSetSFXVolume(sfxVol / 100.0f);
     }
-    if (IsButtonClicked("-", centerX - 60, baseY + gapY * 2 - 5, 40, 40)) {
+    if (IsButtonClicked("-", centerX - 120, baseY + gapY * 2 - 5, 40, 40)) {
         sfxVol = (sfxVol <= 0) ? 0 : sfxVol - 10;
         AudioSetSFXVolume(sfxVol / 100.0f);
     }
