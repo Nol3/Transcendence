@@ -102,6 +102,79 @@ test_attack "Method INVALID blocked" \
 "curl -k -A '$UA' -X INVALID -s -o /dev/null -w '%{http_code}' \"$TARGET/\""
 
 # =========================
+# 🔹 EVASION TESTS
+# =========================
+
+test_attack "Double-encoded traversal" \
+"curl -k -A '$UA' -s -o /dev/null -w '%{http_code}' \"$TARGET/?file=%252e%252e%252f%252e%252e%252fetc%252fpasswd\""
+
+test_attack "Double-encoded XSS" \
+"curl -k -A '$UA' -s -o /dev/null -w '%{http_code}' \"$TARGET/?q=%253Cscript%253Ealert(1)%253C/script%253E\""
+
+test_attack "SQLi mixed case" \
+"curl -k -A '$UA' -s -o /dev/null -w '%{http_code}' \"$TARGET/?id=1%20UnIoN%20SeLeCt%201--\""
+
+test_attack "SQLi comment bypass" \
+"curl -k -A '$UA' -s -o /dev/null -w '%{http_code}' \"$TARGET/?id=1/**/UNION/**/SELECT/**/1\""
+
+test_attack "SVG XSS" \
+"curl -k -A '$UA' -s -o /dev/null -w '%{http_code}' \"$TARGET/?q=%3Csvg%20onload=alert(1)%3E\""
+
+test_attack "Javascript URI XSS" \
+"curl -k -A '$UA' -s -o /dev/null -w '%{http_code}' \"$TARGET/?url=javascript:alert(1)\""
+
+
+# =========================
+# 🔹 HTTP ABUSE TESTS
+# =========================
+
+test_attack "Method CONNECT blocked" \
+"curl -k -A '$UA' -X CONNECT -s -o /dev/null -w '%{http_code}' \"$TARGET/\""
+
+test_attack "Method TRACK blocked" \
+"curl -k -A '$UA' -X TRACK -s -o /dev/null -w '%{http_code}' \"$TARGET/\""
+
+test_attack "Method PROPFIND blocked" \
+"curl -k -A '$UA' -X PROPFIND -s -o /dev/null -w '%{http_code}' \"$TARGET/\""
+
+
+# =========================
+# 🔹 RATE LIMIT TEST
+# =========================
+
+echo ""
+echo "===== RATE LIMIT TEST ====="
+
+RATE_LIMIT_HIT=0
+
+for i in $(seq 1 100)
+do
+  curl -k -A "$UA" \
+    -s -o /dev/null \
+    -w "%{http_code}\n" \
+    "$TARGET/" &
+done
+
+wait > /dev/null 2>&1
+
+RESPONSES=$(
+for i in $(seq 1 100)
+do
+  curl -k -A "$UA" \
+    -s -o /dev/null \
+    -w "%{http_code}\n" \
+    "$TARGET/"
+done
+)
+
+if echo "$RESPONSES" | grep -q "^429$"; then
+  echo "[Rate limiting                    ] → WORKING ✅"
+  ((PASS++))
+else
+  echo "[Rate limiting                    ] → NOT DETECTED ⚠️"
+fi
+
+# =========================
 # 🔹 SUMMARY
 # =========================
 
