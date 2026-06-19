@@ -72,15 +72,13 @@ class GameViewSet(viewsets.ModelViewSet):
         winner_username = (data.get('winner') or '').strip()
         winner = None
         if winner_username:
+            # player1 is the logged-in user. In a local 2–4 player (hotseat)
+            # match the winner may be another local player ("Jugador 2"), which
+            # maps to the opponent slot from this account's perspective.
             if winner_username == game.player1.username:
                 winner = game.player1
-            elif winner_username == game.player2.username:
-                winner = game.player2
             else:
-                return Response(
-                    {'error': 'Winner is not a participant of this game'},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                winner = game.player2
 
         game = finish_game(
             game,

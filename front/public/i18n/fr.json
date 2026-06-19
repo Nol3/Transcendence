@@ -10,8 +10,19 @@
   },
   "home": {
     "subtitle": "Insérez une pièce pour jouer",
+    "title": "TRANSCENDANCE",
     "play": "Jouer maintenant",
-    "tournament": "Tournoi"
+    "tournament": "Tournoi",
+    "leaderboard": "Classement",
+    "howToPlay": "Comment jouer",
+    "howToPlayDesc": "Prêt à défier d'autres joueurs? Rejoignez une partie et prouvez vos compétences!",
+    "rankings": "Voir le Classement Complet",
+    "totalPlayers": "JOUEURS",
+    "gamesPlayed": "MATCHS",
+    "yourStatus": "VOTRE STATUT",
+    "rank": "CLASSEMENT",
+    "streak": "SÉRIE",
+    "tagline": "🪙"
   },
   "auth": {
     "login": {
@@ -49,7 +60,11 @@
     "rule2": "Pioche 1 carte par tour",
     "rule3": "Joue des cartes pour attaquer ou défendre",
     "rule4": "Réduis les PV de l'adversaire à 0 pour gagner",
-    "rule5": "Les cartes spéciales ont des effets uniques"
+    "rule5": "Les cartes spéciales ont des effets uniques",
+    "customizeTitle": "PERSONNALISER",
+    "players": "JOUEURS",
+    "targetScore": "OBJECTIF",
+    "theme": "THÈME"
   },
   "tournament": {
     "title": "Tournoi",
@@ -162,22 +177,6 @@
       "title": "Résiliation",
       "p1": "Nous nous réservons le droit de suspendre ou de résilier les comptes qui violent ces conditions."
     }
-  },
-  "home": {
-    "subtitle": "Insérez une pièce pour jouer",
-    "title": "TRANSCENDANCE",
-    "play": "Jouer maintenant",
-    "tournament": "Tournoi",
-    "leaderboard": "Classement",
-    "howToPlay": "Comment jouer",
-    "howToPlayDesc": "Prêt à défier d'autres joueurs? Rejoignez une partie et prouvez vos compétences!",
-    "rankings": "Voir le Classement Complet",
-    "totalPlayers": "JOUEURS",
-    "gamesPlayed": "MATCHS",
-    "yourStatus": "VOTRE STATUT",
-    "rank": "CLASSEMENT",
-    "streak": "SÉRIE",
-    "tagline": "🪙"
   },
   "footer": {
     "tagline": "L'Expérience Ultime du Jeu de Cartes",

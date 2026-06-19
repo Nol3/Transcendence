@@ -10,5 +10,7 @@ export const environment = {
   },
   gameUrl: '/game-embed/',
   gameAssetsUrl: '/game-assets',
-  googleClientId: '', // TODO: paste your Google OAuth Client ID here
+  // OAuth client IDs are public (sent to the browser) — safe to ship. The
+  // client *secret* must never be here; the backend only verifies the ID token.
+  googleClientId: '1067739742379-t0t8p1agm0eoej2l2tjklk80igc30t6k.apps.googleusercontent.com',
 };

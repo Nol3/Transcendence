@@ -86,6 +86,52 @@ void set_player_name_from_json(const char* json_string) {
     cJSON_Delete(root);
 }
 
+// Configuración del juego desde Angular (módulo Game Customization).
+// JSON: { "players": 2-4, "targetScore": 100-1000, "rounds": 1-10,
+//         "theme": "classic|neon|crimson|violet|gold" }
+EMSCRIPTEN_KEEPALIVE
+void set_game_config(const char* json_string) {
+    if (!json_string) return;
+    cJSON* root = cJSON_Parse(json_string);
+    if (!root) return;
+
+    cJSON* players = cJSON_GetObjectItemCaseSensitive(root, "players");
+    if (cJSON_IsNumber(players)) {
+        int p = (int)players->valuedouble;
+        if (p < 2) p = 2;
+        if (p > MAX_PLAYERS) p = MAX_PLAYERS;
+        game.playerCount = p;
+    }
+
+    cJSON* target = cJSON_GetObjectItemCaseSensitive(root, "targetScore");
+    if (cJSON_IsNumber(target)) {
+        int t = (int)target->valuedouble;
+        if (t < 100) t = 100;
+        if (t > 1000) t = 1000;
+        game.targetScore = t;
+    }
+
+    cJSON* rounds = cJSON_GetObjectItemCaseSensitive(root, "rounds");
+    if (cJSON_IsNumber(rounds)) {
+        int r = (int)rounds->valuedouble;
+        if (r < 1) r = 1;
+        if (r > 10) r = 10;
+        game.maxRounds = r;
+    }
+
+    cJSON* theme = cJSON_GetObjectItemCaseSensitive(root, "theme");
+    if (cJSON_IsString(theme) && theme->valuestring) {
+        const char* t = theme->valuestring;
+        if (strcmp(t, "neon") == 0)         g_tableTint = (Color){120, 180, 255, 255};
+        else if (strcmp(t, "crimson") == 0) g_tableTint = (Color){255, 140, 140, 255};
+        else if (strcmp(t, "violet") == 0)  g_tableTint = (Color){200, 150, 255, 255};
+        else if (strcmp(t, "gold") == 0)    g_tableTint = (Color){255, 220, 130, 255};
+        else                                g_tableTint = (Color){255, 255, 255, 255}; // classic
+    }
+
+    cJSON_Delete(root);
+}
+
 void GameInit(Game* game) {
     memset(game, 0, sizeof(Game));
     game->state = STATE_MENU;

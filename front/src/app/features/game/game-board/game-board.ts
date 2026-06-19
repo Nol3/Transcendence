@@ -31,6 +31,8 @@ interface GameFinishedMessage {
   score: string;
 }
 
+type GameTheme = 'classic' | 'neon' | 'crimson' | 'violet' | 'gold';
+
 @Component({
   selector: 'app-game-board',
   standalone: true,
@@ -58,6 +60,16 @@ export class GameBoard implements OnInit, OnDestroy {
   readonly userStats = signal<UserStats | null>(null);
   // Live matchmaking/room presence, driven by RoomService over WebSocket.
   readonly onlineStatus = signal<'offline' | 'searching' | 'matched'>('offline');
+
+  // ── Game Customization (Minor module) ─────────────────────────────
+  // Pushed into the WASM game via postMessage('set-config'). The card game is
+  // local hotseat multiplayer, so `players` (2–4) selects how many humans play
+  // against each other on the same screen.
+  readonly themes: readonly GameTheme[] = ['classic', 'neon', 'crimson', 'violet', 'gold'];
+  readonly players = signal(2);
+  readonly targetScore = signal(300);
+  readonly rounds = signal(5);
+  readonly theme = signal<GameTheme>('classic');
 
   // The Game row this session reports its result to. Created lazily on init.
   private gameId: number | null = null;
@@ -114,6 +126,45 @@ export class GameBoard implements OnInit, OnDestroy {
     const user = this.auth.user();
     if (user?.username) this.sendUsernameToGame(user.username);
     this.sendLangToGame(this.i18n.currentLang());
+    this.sendConfigToGame();
+  }
+
+  // ── Customization controls ────────────────────────────────────────
+  setPlayers(n: number): void {
+    this.players.set(Math.min(4, Math.max(2, n)));
+    this.sendConfigToGame();
+  }
+
+  setTargetScore(n: number): void {
+    this.targetScore.set(Math.min(1000, Math.max(100, n)));
+    this.sendConfigToGame();
+  }
+
+  setRounds(n: number): void {
+    this.rounds.set(Math.min(10, Math.max(1, n)));
+    this.sendConfigToGame();
+  }
+
+  setTheme(t: GameTheme): void {
+    this.theme.set(t);
+    this.sendConfigToGame();
+  }
+
+  private sendConfigToGame(): void {
+    const iframe = this.gameFrame?.nativeElement;
+    if (!iframe?.contentWindow) return;
+    iframe.contentWindow.postMessage(
+      {
+        type: 'set-config',
+        config: {
+          players: this.players(),
+          targetScore: this.targetScore(),
+          rounds: this.rounds(),
+          theme: this.theme(),
+        },
+      },
+      this.gameOrigin,
+    );
   }
 
   private loadStats(): void {
