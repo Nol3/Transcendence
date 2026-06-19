@@ -59,7 +59,33 @@ interface BackendUser {
 interface BackendParticipant {
   id: number;
   user: BackendUser;
+  is_eliminated?: boolean;
   joined_at: string;
+}
+
+interface BackendMatchPlayer {
+  id: number;
+  username: string;
+  avatar?: string | null;
+}
+
+interface BackendMatch {
+  id: number;
+  round: number;
+  position: number;
+  player1: BackendMatchPlayer | null;
+  player2: BackendMatchPlayer | null;
+  winner_slot: 1 | 2 | null;
+  player1_score: number;
+  player2_score: number;
+  status: MatchStatus;
+}
+
+interface BackendRound {
+  id: number;
+  number: number;
+  name: string;
+  matches: BackendMatch[];
 }
 
 interface BackendTournament {
@@ -73,6 +99,7 @@ interface BackendTournament {
   started_at: string | null;
   finished_at: string | null;
   participants: BackendParticipant[];
+  rounds?: BackendRound[];
 }
 
 const ACCESS_TOKEN_KEY = 'access_token';
@@ -101,6 +128,13 @@ export class TournamentService {
   private adapt(t: BackendTournament): Tournament {
     const startDate = t.started_at ?? t.created_at;
     const myId = this.currentUserId();
+
+    // Map userId → elimination flag so bracket slots can be greyed out.
+    const eliminated = new Map<number, boolean>();
+    for (const p of t.participants ?? []) {
+      if (p.user?.id != null) eliminated.set(p.user.id, !!p.is_eliminated);
+    }
+
     return {
       id: String(t.id),
       name: t.name,
@@ -110,8 +144,39 @@ export class TournamentService {
       currentPlayers: t.participants?.length ?? 0,
       prize: undefined,
       startDate: startDate.slice(0, 10),
-      rounds: [],
+      rounds: (t.rounds ?? []).map((r) => this.adaptRound(r, eliminated)),
       isRegistered: myId != null && (t.participants ?? []).some((p) => p.user?.id === myId),
+    };
+  }
+
+  private adaptRound(r: BackendRound, eliminated: Map<number, boolean>): TournamentRound {
+    return {
+      id: String(r.id),
+      name: r.name,
+      matches: (r.matches ?? []).map((m) => this.adaptMatch(m, eliminated)),
+    };
+  }
+
+  private adaptMatch(m: BackendMatch, eliminated: Map<number, boolean>): TournamentMatch {
+    const toPlayer = (p: BackendMatchPlayer | null): TournamentParticipant | undefined =>
+      p
+        ? {
+            id: String(p.id),
+            username: p.username,
+            avatar: p.avatar ?? undefined,
+            isEliminated: eliminated.get(p.id) ?? false,
+          }
+        : undefined;
+
+    return {
+      id: String(m.id),
+      round: m.round,
+      position: m.position,
+      player1: toPlayer(m.player1),
+      player2: toPlayer(m.player2),
+      winner: m.winner_slot ?? undefined,
+      score: m.status === 'completed' ? `${m.player1_score}-${m.player2_score}` : undefined,
+      status: m.status,
     };
   }
 
@@ -161,8 +226,15 @@ export class TournamentService {
     this.ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        if (data.type === 'tournament_update' || data.type === 'match_update') {
-          onUpdate(data.tournament);
+        if (
+          (data.type === 'tournament_update' || data.type === 'match_update') &&
+          data.tournament
+        ) {
+          // The consumer pushes the raw backend payload; adapt it to the UI shape
+          // (and cache it) before handing it to the caller.
+          const adapted = this.adapt(data.tournament as BackendTournament);
+          this._currentTournament.set(adapted);
+          onUpdate(adapted);
         }
       } catch {
         // ignore malformed payloads

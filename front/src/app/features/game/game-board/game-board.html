@@ -4,7 +4,17 @@
   <div class="lobby__header container">
     <div class="lobby__title-row">
       <app-pixel-title [level]="2" color="yellow">{{ 'lobby.title' | translate }}</app-pixel-title>
-      <app-badge variant="success">{{ 'lobby.online' | translate }}</app-badge>
+      @switch (onlineStatus()) {
+        @case ('matched') {
+          <app-badge variant="success">Matched</app-badge>
+        }
+        @case ('searching') {
+          <app-badge variant="warning">Searching…</app-badge>
+        }
+        @default {
+          <app-badge variant="success">{{ 'lobby.online' | translate }}</app-badge>
+        }
+      }
     </div>
     <p class="text-secondary text-sm">
       {{ 'lobby.subtitle' | translate }}

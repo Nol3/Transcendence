@@ -20,6 +20,35 @@
 #define NOTIFY_INT(t, v) ((void)0)
 #endif
 
+// Escapa comillas/backslashes para incrustar texto de forma segura en una
+// cadena literal de JavaScript (evita romper el script o inyección).
+static void JsEscape(const char* in, char* out, size_t out_size) {
+    size_t j = 0;
+    for (size_t i = 0; in && in[i] != '\0' && j + 2 < out_size; i++) {
+        char c = in[i];
+        if (c == '\r' || c == '\n') continue;
+        if (c == '\\' || c == '\'' || c == '"') out[j++] = '\\';
+        out[j++] = c;
+    }
+    out[j] = '\0';
+}
+
+// Notifica al parent window (Angular) el resultado final de la partida.
+// score se envía como "<mi_puntuacion>-<puntuacion_rival>". En desktop es no-op.
+static void EmitGameFinished(const char* winner, int player_score, int opponent_score) {
+#if defined(PLATFORM_WEB)
+    char safe_winner[64];
+    JsEscape(winner, safe_winner, sizeof(safe_winner));
+    char script[256];
+    snprintf(script, sizeof(script),
+        "window.parent.postMessage({type:'game-finished',winner:'%s',score:'%d-%d'},'*');",
+        safe_winner, player_score, opponent_score);
+    emscripten_run_script(script);
+#else
+    (void)winner; (void)player_score; (void)opponent_score;
+#endif
+}
+
 static char g_player_name[128] = "Jugador 1";
 
 EMSCRIPTEN_KEEPALIVE
@@ -532,6 +561,19 @@ void UpdateStateRoundEnd(Game* game) {
         game->state = STATE_GAME_OVER;
         NOTIFY_INT("score", game->players[game->winnerId].score);
         NOTIFY("gameover");
+
+        // Reporta el resultado al parent (Angular). players[0] es el humano
+        // (su nombre se fija vía set-username); el rival es la mejor IA.
+        {
+            int my_score = game->players[0].score;
+            int opp_score = 0;
+            for (int i = 1; i < game->playerCount; i++) {
+                if (game->players[i].score > opp_score)
+                    opp_score = game->players[i].score;
+            }
+            EmitGameFinished(game->players[game->winnerId].name, my_score, opp_score);
+        }
+
         AudioPlayWin();
     } else {
         NOTIFY_INT("round", game->currentRound);

@@ -21,6 +21,7 @@ class LeaderboardView(APIView):
             User.objects.select_related("profile")
             .filter(profile__isnull=False)
             .exclude(profile__elo_rating=0)
+            .exclude(username="AI_Opponent")  # internal bot opponent, not a real player
             .order_by("-profile__elo_rating")
         )
 

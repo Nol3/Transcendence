@@ -29,7 +29,8 @@ ALLOWED_HOSTS = config(
 
 # Application definition
 INSTALLED_APPS = [
-    "daphne",  # ASGI server for WebSockets
+    "daphne",  # ASGI server for WebSockets (must precede staticfiles)
+    "channels",  # WebSocket routing / consumers
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -81,6 +82,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
+
+# Channels layer. In-memory is enough for a single Daphne process (dev/eval).
+# For horizontal scaling, switch to channels_redis.core.RedisChannelLayer.
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}
 
 # Database
 DB_ENGINE = config("DB_ENGINE", default="django.db.backends.sqlite3")
@@ -238,10 +247,19 @@ APPEND_SLASH = True
 
 # Security settings for production
 if not DEBUG:
+    # Nginx/ModSecurity terminates TLS and forwards X-Forwarded-Proto. Without
+    # this, Django thinks every request is plain HTTP and SECURE_SSL_REDIRECT
+    # would 301 forever → infinite redirect loop behind the proxy.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
+    # HSTS — tell browsers to stick to HTTPS. Mirrors the nginx add_header.
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_CONTENT_SECURITY_POLICY = {
         "default-src": ("'self'",),
     }
