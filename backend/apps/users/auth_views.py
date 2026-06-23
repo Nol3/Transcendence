@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from apps.users.serializers import UserSerializer
+from apps.users.serializers import UserSerializer, RegisterSerializer
 from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests as google_requests
 from django.conf import settings
@@ -74,33 +74,18 @@ class RegisterView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        username = request.data.get("username")
-        email = request.data.get("email")
-        password = request.data.get("password")
-
-        if not username or not email or not password:
+        serializer = RegisterSerializer(data=request.data)
+        if not serializer.is_valid():
+            # Surface the first validation message in the flat "error" shape the
+            # frontend already understands, while keeping field detail too.
+            first_error = next(iter(serializer.errors.values()))
+            message = first_error[0] if isinstance(first_error, list) else str(first_error)
             return Response(
-                {"error": "Username, email and password are required"},
+                {"error": message, "errors": serializer.errors},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        from django.contrib.auth.models import User
-        from apps.users.models import UserProfile
-
-        if User.objects.filter(username=username).exists():
-            return Response(
-                {"error": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST
-            )
-
-        if User.objects.filter(email=email).exists():
-            return Response(
-                {"error": "Email already exists"}, status=status.HTTP_400_BAD_REQUEST
-            )
-
-        user = User.objects.create_user(
-            username=username, email=email, password=password
-        )
-        UserProfile.objects.create(user=user)
+        user = serializer.save()
 
         # Generate tokens
         refresh = RefreshToken.for_user(user)

@@ -4,7 +4,17 @@
   <div class="lobby__header container">
     <div class="lobby__title-row">
       <app-pixel-title [level]="2" color="yellow">{{ 'lobby.title' | translate }}</app-pixel-title>
-      <app-badge variant="success">{{ 'lobby.online' | translate }}</app-badge>
+      @switch (onlineStatus()) {
+        @case ('matched') {
+          <app-badge variant="success">Matched</app-badge>
+        }
+        @case ('searching') {
+          <app-badge variant="warning">Searching…</app-badge>
+        }
+        @default {
+          <app-badge variant="success">{{ 'lobby.online' | translate }}</app-badge>
+        }
+      }
     </div>
     <p class="text-secondary text-sm">
       {{ 'lobby.subtitle' | translate }}
@@ -38,6 +48,49 @@
                 <span [class]="'font-pixel ' + stat.color">{{ stat.value }}</span>
               </div>
             }
+          </div>
+        </app-card>
+
+        <!-- Game customization (Minor module) -->
+        <app-card [title]="'lobby.customizeTitle' | translate">
+          <div class="game-config">
+            <!-- Local players (2–4 humans, hotseat) -->
+            <div class="game-config__row">
+              <span class="text-muted font-mono text-sm">{{ 'lobby.players' | translate }}</span>
+              <div class="game-config__stepper">
+                <button type="button" class="game-config__btn"
+                        (click)="setPlayers(players() - 1)" [disabled]="players() <= 2">−</button>
+                <span class="font-pixel neon-text-cyan">{{ players() }}</span>
+                <button type="button" class="game-config__btn"
+                        (click)="setPlayers(players() + 1)" [disabled]="players() >= 4">+</button>
+              </div>
+            </div>
+
+            <!-- Target score -->
+            <div class="game-config__row">
+              <span class="text-muted font-mono text-sm">{{ 'lobby.targetScore' | translate }}</span>
+              <div class="game-config__stepper">
+                <button type="button" class="game-config__btn"
+                        (click)="setTargetScore(targetScore() - 50)" [disabled]="targetScore() <= 100">−</button>
+                <span class="font-pixel neon-text-green">{{ targetScore() }}</span>
+                <button type="button" class="game-config__btn"
+                        (click)="setTargetScore(targetScore() + 50)" [disabled]="targetScore() >= 1000">+</button>
+              </div>
+            </div>
+
+            <!-- Table theme -->
+            <div class="game-config__row game-config__row--themes">
+              <span class="text-muted font-mono text-sm">{{ 'lobby.theme' | translate }}</span>
+              <div class="game-config__themes">
+                @for (t of themes; track t) {
+                  <button type="button"
+                          class="game-config__theme game-config__theme--{{ t }}"
+                          [class.is-active]="theme() === t"
+                          (click)="setTheme(t)"
+                          [attr.aria-label]="t"></button>
+                }
+              </div>
+            </div>
           </div>
         </app-card>
 

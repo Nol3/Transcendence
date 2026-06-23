@@ -133,17 +133,36 @@ Tournament
 ├── id (PK)
 ├── name
 ├── creator_id (FK → User)
+├── winner_id (FK → User, nullable)
 ├── max_players
 ├── status (pending/in_progress/finished)
 ├── created_at, started_at, finished_at
-└── participants (1:M → TournamentParticipant)
+├── participants (1:M → TournamentParticipant)
+└── rounds (1:M → TournamentRound)
 
 TournamentParticipant
 ├── id (PK)
 ├── tournament_id (FK → Tournament)
 ├── user_id (FK → User)
+├── is_eliminated
 ├── joined_at
 └── unique_together(tournament, user)
+
+TournamentRound
+├── id (PK)
+├── tournament_id (FK → Tournament)
+├── number, name
+└── unique_together(tournament, number)
+
+TournamentMatch
+├── id (PK)
+├── tournament_id (FK → Tournament)
+├── round_id (FK → TournamentRound)
+├── position
+├── player1_id, player2_id, winner_id (FK → User, nullable)
+├── player1_score, player2_score
+├── status (pending/live/completed)
+└── finished_at
 
 APIKey
 ├── id (PK)
@@ -154,22 +173,40 @@ APIKey
 
 ## Puntos acumulados (evaluación 42)
 
-| Módulo | Puntos | Estado |
-|--------|--------|--------|
-| Frontend framework (Angular 21) | 1 | ✅ |
-| Design system (12+ componentes) | 1 | ✅ |
-| i18n (EN/ES/FR) | 1 | ✅ |
-| Notification system | 1 | ✅ |
-| Tournament system | 1 | ✅ |
-| Backend framework (Django) | 1 | ✅ |
-| Frontend + Backend integration | 2 | ✅ |
-| ORM (Django ORM) | 1 | ✅ |
-| Public API (5+ endpoints) | 2 | ✅ |
-| Google OAuth2 | +1 | ✅ |
-| Browser Compatibility (Chrome/Firefox/Edge) | 1 | ✅ |
-| **Subtotal** | **14** | ✅ |
+Cada módulo se mapea a un módulo del subject. **Major = 2 pts, Minor = 1 pt.**
+El uso de un framework en front **y** back se cuenta **una sola vez** como el
+Major "framework para frontend y backend" (no se duplica con minors de cada lado).
 
-**Objetivo mínimo: 14 puntos** — ✅ Alcanzado
+### Módulos Major (2 pts cada uno)
+
+| Módulo (subject) | Pts | Estado | Justificación |
+|---|---|---|---|
+| Framework para frontend **y** backend | 2 | ✅ | Angular 20 (SPA) + Django 4.2 (DRF), integrados con JWT/CORS |
+| Public API segura | 2 | ✅ | API key + rate limiting + docs + ≥5 endpoints (GET/POST/PUT/PATCH/DELETE) |
+| WAF/ModSecurity (hardened) + HashiCorp Vault | 2 | ✅ | ModSecurity bloquea SQLi/XSS (403); Vault (AppRole) gestiona secretos |
+| Web game multijugador | 2 | ✅ | Poker Race (C/WASM): **2-4 jugadores locales** (hotseat), reglas claras, victoria/derrota, stats/ELO al terminar |
+
+### Módulos Minor (1 pt cada uno)
+
+| Módulo (subject) | Pts | Estado | Justificación |
+|---|---|---|---|
+| ORM | 1 | ✅ | Django ORM: User, UserProfile, Game, Tournament, Round, Match, APIKey |
+| Design system (≥10 componentes) | 1 | ✅ | 12+ componentes reutilizables + tokens de diseño (SCSS) |
+| Sistema de notificaciones | 1 | ✅ | ToastComponent + NotificationService (create/update/delete) |
+| i18n (≥3 idiomas) | 1 | ✅ | EN/ES/FR, switcher en UI, todo el texto traducible |
+| Soporte navegadores adicionales | 1 | ✅ | Firefox + Edge testeados (ver `front/BROWSER_COMPAT.md`) |
+| Sistema de torneos | 1 | ✅ | Brackets single-elimination, emparejamientos, registro y progresión |
+| Game customization | 1 | ✅ | Nº de jugadores, puntuación objetivo y tema del tapete (desde la UI web) |
+
+| **Subtotal mandatory** | **15** | ✅ | **Supera el mínimo de 14** |
+
+### Bonus (solo si el mandatory está completo)
+
+| Módulo | Pts | Estado | Nota |
+|---|---|---|---|
+| Remote auth — Google OAuth2 | +2* | ✅ | Sign-in con Google (GSI + verificación de credencial). *Confirmar clasificación exacta contra `subject.pdf`. |
+
+**Total mandatory: 15 pts** — objetivo de 14 superado con margen. Bonus adicional con Google OAuth.
 
 ---
 

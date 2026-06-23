@@ -10,8 +10,19 @@
   },
   "home": {
     "subtitle": "Insert coin to play",
+    "title": "TRANSCENDENCE",
     "play": "Play Now",
-    "tournament": "Tournament"
+    "tournament": "Tournament",
+    "leaderboard": "Leaderboard",
+    "howToPlay": "How to Play",
+    "howToPlayDesc": "Ready to challenge other players? Join a game and prove your skills!",
+    "rankings": "View Full Rankings",
+    "totalPlayers": "PLAYERS",
+    "gamesPlayed": "GAMES",
+    "yourStatus": "YOUR STATUS",
+    "rank": "RANK",
+    "streak": "STREAK",
+    "tagline": "🪙"
   },
   "auth": {
     "login": {
@@ -49,7 +60,11 @@
     "rule2": "Draw 1 card per turn",
     "rule3": "Play cards to attack or defend",
     "rule4": "Reduce opponent HP to 0 to win",
-    "rule5": "Special cards have unique effects"
+    "rule5": "Special cards have unique effects",
+    "customizeTitle": "CUSTOMIZE",
+    "players": "PLAYERS",
+    "targetScore": "TARGET",
+    "theme": "THEME"
   },
   "tournament": {
     "title": "Tournament",
@@ -162,22 +177,6 @@
       "title": "Termination",
       "p1": "We reserve the right to suspend or terminate accounts that violate these terms."
     }
-  },
-  "home": {
-    "subtitle": "Insert coin to play",
-    "title": "TRANSCENDENCE",
-    "play": "Play Now",
-    "tournament": "Tournament",
-    "leaderboard": "Leaderboard",
-    "howToPlay": "How to Play",
-    "howToPlayDesc": "Ready to challenge other players? Join a game and prove your skills!",
-    "rankings": "View Full Rankings",
-    "totalPlayers": "PLAYERS",
-    "gamesPlayed": "GAMES",
-    "yourStatus": "YOUR STATUS",
-    "rank": "RANK",
-    "streak": "STREAK",
-    "tagline": "🪙"
   },
   "footer": {
     "tagline": "The Ultimate Card Game Experience",

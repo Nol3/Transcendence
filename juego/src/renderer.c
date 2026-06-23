@@ -20,6 +20,10 @@ bool g_useTextures = true;  // Por defecto usar texturas si están disponibles
 // Textura de tapete (fondo)
 Texture2D g_tableTexture = {0};
 
+// Tinte del tapete para temas personalizables (set vía set_game_config desde
+// Angular). WHITE = sin tinte (tapete original).
+Color g_tableTint = (Color){255, 255, 255, 255};
+
 // Fuentes personalizadas
 Font g_fontTitle = {0};
 Font g_fontText = {0};
@@ -79,9 +83,14 @@ void UnloadGameFonts(void) {
 
 void DrawTableBackground(void) {
     if (g_tableTexture.id != 0) {
-        DrawTextureEx(g_tableTexture, (Vector2){0, 0}, 0.0f, 1.0f, WHITE);
+        DrawTextureEx(g_tableTexture, (Vector2){0, 0}, 0.0f, 1.0f, g_tableTint);
     } else {
-        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){0, 74, 28, 255});
+        // Fallback: tinta el verde base con el tema seleccionado.
+        Color base = (Color){0, 74, 28, 255};
+        base.r = (unsigned char)(base.r * g_tableTint.r / 255);
+        base.g = (unsigned char)(base.g * g_tableTint.g / 255);
+        base.b = (unsigned char)(base.b * g_tableTint.b / 255);
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), base);
     }
 }
 
@@ -322,9 +331,11 @@ void DrawStateInstructions(Game* game) {
     DrawText(T(STR_HANDS_SECTION), startX, panelY, 24, WHITE);
     panelY += lineHeight;
     DrawText(T(STR_HANDS_LINE1), startX + 20, panelY, 18, LIGHTGRAY);
-    panelY += lineHeight;
+    panelY += lineHeight - 5;
     DrawText(T(STR_HANDS_LINE2), startX + 20, panelY, 18, LIGHTGRAY);
-    panelY += lineHeight + 10;
+    panelY += lineHeight - 5;
+    DrawText(T(STR_HANDS_LINE3), startX + 20, panelY, 18, LIGHTGRAY);
+    panelY += lineHeight + 5;
 
     // Sección: Controles
     DrawText(T(STR_CONTROLS_SECTION), startX, panelY, 24, WHITE);

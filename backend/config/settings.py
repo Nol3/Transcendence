@@ -6,11 +6,17 @@ import os
 from pathlib import Path
 from decouple import config, Csv
 
+from config.vault import load_vault_secrets
+
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Secrets from HashiCorp Vault (empty dict when Vault is disabled/unavailable,
+# in which case the `config(...)` env-var defaults below take over).
+_vault = load_vault_secrets()
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config(
+SECRET_KEY = _vault.get("DJANGO_SECRET_KEY") or config(
     "DJANGO_SECRET_KEY", default="django-insecure-dev-key-change-in-production"
 )
 
@@ -23,7 +29,8 @@ ALLOWED_HOSTS = config(
 
 # Application definition
 INSTALLED_APPS = [
-    "daphne",  # ASGI server for WebSockets
+    "daphne",  # ASGI server for WebSockets (must precede staticfiles)
+    "channels",  # WebSocket routing / consumers
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -75,6 +82,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
+
+# Channels layer. In-memory is enough for a single Daphne process (dev/eval).
+# For horizontal scaling, switch to channels_redis.core.RedisChannelLayer.
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    }
+}
 
 # Database
 DB_ENGINE = config("DB_ENGINE", default="django.db.backends.sqlite3")
@@ -160,8 +175,10 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
-# JWT Configuration
-JWT_SECRET_KEY = config("JWT_SECRET_KEY", default="jwt-secret-key-change-in-production")
+# JWT Configuration — Vault stores this under the key "JWT_SECRET".
+JWT_SECRET_KEY = _vault.get("JWT_SECRET") or config(
+    "JWT_SECRET_KEY", default="jwt-secret-key-change-in-production"
+)
 JWT_ALGORITHM = config("JWT_ALGORITHM", default="HS256")
 JWT_EXPIRATION_HOURS = config("JWT_EXPIRATION_HOURS", default=24, cast=int)
 
@@ -203,8 +220,8 @@ EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 
-# Google OAuth2
-GOOGLE_CLIENT_ID = config("GOOGLE_CLIENT_ID", default="")
+# Google OAuth2 — provisioned via env, but Vault may override it if stored there.
+GOOGLE_CLIENT_ID = _vault.get("GOOGLE_CLIENT_ID") or config("GOOGLE_CLIENT_ID", default="")
 
 # Swagger/OpenAPI Configuration
 SPECTACULAR_SETTINGS = {
@@ -230,10 +247,19 @@ APPEND_SLASH = True
 
 # Security settings for production
 if not DEBUG:
+    # Nginx/ModSecurity terminates TLS and forwards X-Forwarded-Proto. Without
+    # this, Django thinks every request is plain HTTP and SECURE_SSL_REDIRECT
+    # would 301 forever → infinite redirect loop behind the proxy.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
+    # HSTS — tell browsers to stick to HTTPS. Mirrors the nginx add_header.
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_CONTENT_SECURITY_POLICY = {
         "default-src": ("'self'",),
     }

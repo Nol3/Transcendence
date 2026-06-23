@@ -2,7 +2,58 @@
 
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.validators import RegexValidator
 from .models import UserProfile
+
+
+USERNAME_VALIDATOR = RegexValidator(
+    regex=r"^[a-zA-Z0-9_]+$",
+    message="Username may only contain letters, numbers and underscores.",
+)
+
+
+class RegisterSerializer(serializers.Serializer):
+    """Validate and create a new user + profile.
+
+    Enforces: well-formed email (unique), password >= 8 chars, and a username
+    matching ^[a-zA-Z0-9_]+$ (unique).
+    """
+
+    username = serializers.CharField(
+        min_length=3,
+        max_length=150,
+        validators=[USERNAME_VALIDATOR],
+    )
+    email = serializers.EmailField()
+    password = serializers.CharField(min_length=8, write_only=True, trim_whitespace=False)
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Username already exists")
+        return value
+
+    def validate_email(self, value):
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("Email already exists")
+        return value
+
+    def validate_password(self, value):
+        try:
+            validate_password(value)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(list(exc.messages))
+        return value
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data["username"],
+            email=validated_data["email"],
+            password=validated_data["password"],
+        )
+        UserProfile.objects.get_or_create(user=user)
+        return user
 
 
 class UserProfileSerializer(serializers.ModelSerializer):

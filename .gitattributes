@@ -1,0 +1,7 @@
+# Set default behavior to automatic text conversion.
+* text=auto
+
+# Shell scripts must use LF endings: they run inside Linux containers (e.g.
+# scripts/vault-init.sh mounted into the Vault image). CRLF breaks `set -e`
+# with "illegal option" and the container exits non-zero.
+*.sh text eol=lf

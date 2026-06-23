@@ -10,8 +10,19 @@
   },
   "home": {
     "subtitle": "Inserta moneda para jugar",
-    "play": "Jugar ahasdasdasdora",
-    "tournament": "pene"
+    "title": "TRANSCENDENCIA",
+    "play": "Jugar ahora",
+    "tournament": "Torneo",
+    "leaderboard": "Leaderboard",
+    "howToPlay": "Cómo jugar",
+    "howToPlayDesc": "¿Listo para desafiar a otros jugadores? ¡Únete a una partida y demuestra tus habilidades!",
+    "rankings": "Ver Ranking Completo",
+    "totalPlayers": "JUGADORES",
+    "gamesPlayed": "PARTIDAS",
+    "yourStatus": "TU ESTADO",
+    "rank": "RANGO",
+    "streak": "RACHA",
+    "tagline": "🪙"
   },
   "auth": {
     "login": {
@@ -49,7 +60,11 @@
     "rule2": "Roba 1 carta por turno",
     "rule3": "Juega cartas para atacar o defender",
     "rule4": "Reduce los PV del rival a 0 para ganar",
-    "rule5": "Las cartas especiales tienen efectos únicos"
+    "rule5": "Las cartas especiales tienen efectos únicos",
+    "customizeTitle": "PERSONALIZAR",
+    "players": "JUGADORES",
+    "targetScore": "OBJETIVO",
+    "theme": "TEMA"
   },
   "tournament": {
     "title": "Torneo",
@@ -83,7 +98,6 @@
     "veteran": "Veterano (50 partidas)",
     "gameHistory": "Historial de partidas",
     "noGames": "No has jugado ninguna partida aún."
-
   },
   "common": {
     "loading": "Cargando...",
@@ -162,22 +176,6 @@
       "title": "Terminación",
       "p1": "Nos reservamos el derecho de suspender o terminar cuentas que violen estos términos."
     }
-  },
-  "home": {
-    "subtitle": "Inserta moneda para jugar",
-    "title": "TRANSCENDENCIA",
-    "play": "Jugar ahora",
-    "tournament": "Torneo",
-    "leaderboard": "Leaderboard",
-    "howToPlay": "Cómo jugar",
-    "howToPlayDesc": "¿Listo para desafiar a otros jugadores? ¡Únete a una partida y demuestra tus habilidades!",
-    "rankings": "Ver Ranking Completo",
-    "totalPlayers": "JUGADORES",
-    "gamesPlayed": "PARTIDAS",
-    "yourStatus": "TU ESTADO",
-    "rank": "RANGO",
-    "streak": "RACHA",
-    "tagline": "🪙"
   },
   "footer": {
     "tagline": "La Experiencia Definitiva del Juego de Cartas",

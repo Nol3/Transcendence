@@ -68,6 +68,3 @@ Credenciales activas:
   ├───────────┼──────────────────────────────┼─────────────┼───────────────────┤                                                                                                                                  
   │ player1–5 │ player1@test.com             │ password123 │ normal            │                                                                                                                                  
   └───────────┴──────────────────────────────┴─────────────┴───────────────────┘
-
-ID_CLIENTE  1067739742379-t0t8p1agm0eoej2l2tjklk80igc30t6k.apps.googleusercontent.com
-SECRETO_DE_CLIENTE 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

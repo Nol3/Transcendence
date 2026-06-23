@@ -20,6 +20,35 @@
 #define NOTIFY_INT(t, v) ((void)0)
 #endif
 
+// Escapa comillas/backslashes para incrustar texto de forma segura en una
+// cadena literal de JavaScript (evita romper el script o inyección).
+static void JsEscape(const char* in, char* out, size_t out_size) {
+    size_t j = 0;
+    for (size_t i = 0; in && in[i] != '\0' && j + 2 < out_size; i++) {
+        char c = in[i];
+        if (c == '\r' || c == '\n') continue;
+        if (c == '\\' || c == '\'' || c == '"') out[j++] = '\\';
+        out[j++] = c;
+    }
+    out[j] = '\0';
+}
+
+// Notifica al parent window (Angular) el resultado final de la partida.
+// score se envía como "<mi_puntuacion>-<puntuacion_rival>". En desktop es no-op.
+static void EmitGameFinished(const char* winner, int player_score, int opponent_score) {
+#if defined(PLATFORM_WEB)
+    char safe_winner[64];
+    JsEscape(winner, safe_winner, sizeof(safe_winner));
+    char script[256];
+    snprintf(script, sizeof(script),
+        "window.parent.postMessage({type:'game-finished',winner:'%s',score:'%d-%d'},'*');",
+        safe_winner, player_score, opponent_score);
+    emscripten_run_script(script);
+#else
+    (void)winner; (void)player_score; (void)opponent_score;
+#endif
+}
+
 static char g_player_name[128] = "Jugador 1";
 
 EMSCRIPTEN_KEEPALIVE
@@ -52,6 +81,52 @@ void set_player_name_from_json(const char* json_string) {
 
         strncpy(game.players[0].name, g_player_name, sizeof(game.players[0].name) - 1);
         game.players[0].name[sizeof(game.players[0].name) - 1] = '\0';
+    }
+
+    cJSON_Delete(root);
+}
+
+// Configuración del juego desde Angular (módulo Game Customization).
+// JSON: { "players": 2-4, "targetScore": 100-1000, "rounds": 1-10,
+//         "theme": "classic|neon|crimson|violet|gold" }
+EMSCRIPTEN_KEEPALIVE
+void set_game_config(const char* json_string) {
+    if (!json_string) return;
+    cJSON* root = cJSON_Parse(json_string);
+    if (!root) return;
+
+    cJSON* players = cJSON_GetObjectItemCaseSensitive(root, "players");
+    if (cJSON_IsNumber(players)) {
+        int p = (int)players->valuedouble;
+        if (p < 2) p = 2;
+        if (p > MAX_PLAYERS) p = MAX_PLAYERS;
+        game.playerCount = p;
+    }
+
+    cJSON* target = cJSON_GetObjectItemCaseSensitive(root, "targetScore");
+    if (cJSON_IsNumber(target)) {
+        int t = (int)target->valuedouble;
+        if (t < 100) t = 100;
+        if (t > 1000) t = 1000;
+        game.targetScore = t;
+    }
+
+    cJSON* rounds = cJSON_GetObjectItemCaseSensitive(root, "rounds");
+    if (cJSON_IsNumber(rounds)) {
+        int r = (int)rounds->valuedouble;
+        if (r < 1) r = 1;
+        if (r > 10) r = 10;
+        game.maxRounds = r;
+    }
+
+    cJSON* theme = cJSON_GetObjectItemCaseSensitive(root, "theme");
+    if (cJSON_IsString(theme) && theme->valuestring) {
+        const char* t = theme->valuestring;
+        if (strcmp(t, "neon") == 0)         g_tableTint = (Color){120, 180, 255, 255};
+        else if (strcmp(t, "crimson") == 0) g_tableTint = (Color){255, 140, 140, 255};
+        else if (strcmp(t, "violet") == 0)  g_tableTint = (Color){200, 150, 255, 255};
+        else if (strcmp(t, "gold") == 0)    g_tableTint = (Color){255, 220, 130, 255};
+        else                                g_tableTint = (Color){255, 255, 255, 255}; // classic
     }
 
     cJSON_Delete(root);
@@ -532,6 +607,19 @@ void UpdateStateRoundEnd(Game* game) {
         game->state = STATE_GAME_OVER;
         NOTIFY_INT("score", game->players[game->winnerId].score);
         NOTIFY("gameover");
+
+        // Reporta el resultado al parent (Angular). players[0] es el humano
+        // (su nombre se fija vía set-username); el rival es la mejor IA.
+        {
+            int my_score = game->players[0].score;
+            int opp_score = 0;
+            for (int i = 1; i < game->playerCount; i++) {
+                if (game->players[i].score > opp_score)
+                    opp_score = game->players[i].score;
+            }
+            EmitGameFinished(game->players[game->winnerId].name, my_score, opp_score);
+        }
+
         AudioPlayWin();
     } else {
         NOTIFY_INT("round", game->currentRound);

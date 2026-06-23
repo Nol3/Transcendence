@@ -15,6 +15,7 @@
 // Variables globales
 extern CardTextures g_cardTextures;
 extern bool g_useTextures;  // true = usar imagenes, false = procedural
+extern Color g_tableTint;   // tinte del tapete (temas personalizables)
 
 // Fuentes personalizadas
 extern Font g_fontTitle;     // Caldstone - para títulos

@@ -65,6 +65,7 @@
     <script>
         var _pendingUsername = null;
         var _pendingLang = null;
+        var _pendingConfig = null;
 
         // ccall is only safe AFTER the wasm runtime is initialized.
         var _runtimeReady = false;
@@ -80,6 +81,13 @@
             }
         }
 
+        function _applyConfig(config) {
+            if (Module._set_game_config) {
+                Module.ccall('set_game_config', null, ['string'],
+                    [JSON.stringify(config)]);
+            }
+        }
+
         window.addEventListener('message', function(event) {
             if (!event.data) return;
             if (event.data.type === 'set-username') {
@@ -92,6 +100,11 @@
                 if (!lang) return;
                 if (_runtimeReady) _applyLang(lang);
                 else _pendingLang = lang;
+            } else if (event.data.type === 'set-config') {
+                var config = event.data.config;
+                if (!config) return;
+                if (_runtimeReady) _applyConfig(config);
+                else _pendingConfig = config;
             }
         });
 
@@ -107,6 +120,10 @@
                 if (_pendingLang) {
                     _applyLang(_pendingLang);
                     _pendingLang = null;
+                }
+                if (_pendingConfig) {
+                    _applyConfig(_pendingConfig);
+                    _pendingConfig = null;
                 }
             }
         };

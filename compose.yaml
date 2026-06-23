@@ -17,16 +17,26 @@ services:
       - DB_ENGINE=${DB_ENGINE}
       - DB_NAME=${DB_NAME}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+      # Vault (dev mode). When USE_VAULT is on, settings.py pulls secrets from
+      # secret/transcendence; otherwise it falls back to the env vars above.
+      - USE_VAULT=${USE_VAULT:-true}
+      - VAULT_ADDR=${VAULT_ADDR:-http://vault:8200}
     volumes:
       - ./backend:/app
       # Raylib/WASM poker game build (served by Django at /game/).
       # PROJECT_ROOT inside the container is "/", so juego maps to /juego.
       - ./juego:/juego:ro
+      - vault_creds:/vault_creds:ro
     command: >
       sh -c "python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
     networks:
       - transcendence-network
+    depends_on:
+      # Wait until vault-init has finished writing secrets to Vault so the first
+      # settings load can read them (the loader still falls back gracefully).
+      vault-init:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/admin/"]
       interval: 30s
@@ -71,9 +81,11 @@ services:
     image: owasp/modsecurity-crs:nginx
     container_name: ft_transcendence_nginx
     ports:
-    #the image use those ports because they try to avoid "privileged ports"
-      - "8443:443"
-      - "8080:80"
+    # nginx inside the image listens on 8080/8443 (non-root, "avoid privileged
+    # ports"), so the host side maps to those, never to 80/443 — no sudo needed.
+    # Override HTTPS_PORT/HTTP_PORT if 8443/8080 are already taken on the host.
+      - "${HTTPS_PORT:-8443}:8443"
+      - "${HTTP_PORT:-8080}:8080"
     volumes:
       # The OWASP modsecurity creates its own conf file and it cannot be copied from the outside;
       #instead, we leave the default conf as it is and then we OVERRIDE with custom configuration, not the other way around, thats why I create the waf.conf file
@@ -103,7 +115,8 @@ services:
     image: hashicorp/vault:1.15
     container_name: ft_transcendence_vault
     ports:
-      - "8200:8200"
+      # Override VAULT_PORT if 8200 is already taken on the host.
+      - "${VAULT_PORT:-8200}:8200"
     environment:
       VAULT_ADDR: "http://0.0.0.0:8200"
     # apparently it is acceptable to present it in dev mode
@@ -130,6 +143,7 @@ services:
       - transcendence-network
     volumes: 
       - ./scripts/vault-init.sh:/vault-init.sh:ro
+      - vault_creds:/vault_creds
     entrypoint:
       - sh
       - /vault-init.sh
@@ -151,3 +165,4 @@ volumes:
   frontend_data:
     driver: local
   vault_data:
+  vault_creds:

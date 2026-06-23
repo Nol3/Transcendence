@@ -360,3 +360,77 @@
     }
   }
 }
+
+// ── Game customization panel ──────────────────────────────────────
+.game-config {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+
+    &--themes {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  &__stepper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  &__btn {
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--color-neon-cyan);
+    background: transparent;
+    color: var(--color-neon-cyan);
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 700;
+    line-height: 1;
+    transition: background 0.15s ease, color 0.15s ease;
+
+    &:hover:not(:disabled) {
+      background: var(--color-neon-cyan);
+      color: var(--color-bg-primary);
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+  }
+
+  &__themes {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+
+  &__theme {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+
+    &:hover { transform: scale(1.12); }
+    &.is-active { border-color: #fff; }
+
+    &--classic { background: #004a1c; }
+    &--neon    { background: #78b4ff; }
+    &--crimson { background: #ff8c8c; }
+    &--violet  { background: #c896ff; }
+    &--gold    { background: #ffdc82; }
+  }
+}

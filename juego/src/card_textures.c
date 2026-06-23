@@ -37,11 +37,22 @@ bool LoadCardTexturesSet(CardTextures* textures, CardSet set) {
     int failed = 0;
     
     // Cargar las 52 cartas desde BASIC/8BitDeckN.png
-    // Mapeo: suit 0-3 (hearts, diamonds, clubs, spades) × rank 0-12 (A-K)
-    // El número de archivo = suit * 13 + rank + 1
+    // Mapeo: suit 0-3 (hearts, diamonds, clubs, spades)
+    // En las imgenes 8BitDeck, el orden de cada palo es 2, 3, 4... K, A.
+    // Es decir, la imagen 1 es el 2, la imagen 12 es la K, y la imagen 13 es el As.
+    // En nuestro cdigo, rank = 0 es As, y rank = 1..12 son 2..K.
     for (int suit = 0; suit < 4; suit++) {
         for (int rank = 0; rank < 13; rank++) {
-            int deckNumber = suit * 13 + rank + 1;
+            int imageRank;
+            if (rank == 0) {
+                // As es la carta nmero 13 en las imgenes
+                imageRank = 13;
+            } else {
+                // El 2 (rank 1) es la imagen 1, el 3 (rank 2) es la imagen 2, etc.
+                imageRank = rank;
+            }
+            
+            int deckNumber = suit * 13 + imageRank;
             char filename[256];
             snprintf(filename, sizeof(filename), ASSETS_PREFIX "/cards/BASIC/8BitDeck%d.png", deckNumber);
             
