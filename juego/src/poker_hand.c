@@ -27,15 +27,15 @@ const char* GetHandTypeName(HandType type) {
 
 int GetHandBaseScore(HandType type) {
     switch (type) {
-        case HAND_HIGH_CARD:       return 5;
-        case HAND_ONE_PAIR:        return 10;
-        case HAND_TWO_PAIR:        return 20;
-        case HAND_THREE_OF_A_KIND: return 30;
-        case HAND_STRAIGHT:        return 40;
-        case HAND_FLUSH:           return 50;
-        case HAND_FULL_HOUSE:      return 60;
-        case HAND_FOUR_OF_A_KIND:  return 80;
-        case HAND_STRAIGHT_FLUSH:  return 100;
+        case HAND_HIGH_CARD:       return 0;
+        case HAND_ONE_PAIR:        return 100;
+        case HAND_TWO_PAIR:        return 200;
+        case HAND_THREE_OF_A_KIND: return 300;
+        case HAND_STRAIGHT:        return 400;
+        case HAND_FLUSH:           return 500;
+        case HAND_FULL_HOUSE:      return 600;
+        case HAND_FOUR_OF_A_KIND:  return 800;
+        case HAND_STRAIGHT_FLUSH:  return 900;
         default:                   return 0;
     }
 }

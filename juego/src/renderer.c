@@ -331,9 +331,11 @@ void DrawStateInstructions(Game* game) {
     DrawText(T(STR_HANDS_SECTION), startX, panelY, 24, WHITE);
     panelY += lineHeight;
     DrawText(T(STR_HANDS_LINE1), startX + 20, panelY, 18, LIGHTGRAY);
-    panelY += lineHeight;
+    panelY += lineHeight - 5;
     DrawText(T(STR_HANDS_LINE2), startX + 20, panelY, 18, LIGHTGRAY);
-    panelY += lineHeight + 10;
+    panelY += lineHeight - 5;
+    DrawText(T(STR_HANDS_LINE3), startX + 20, panelY, 18, LIGHTGRAY);
+    panelY += lineHeight + 5;
 
     // Sección: Controles
     DrawText(T(STR_CONTROLS_SECTION), startX, panelY, 24, WHITE);

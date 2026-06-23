@@ -35,14 +35,13 @@ endif
 # Linux (incluye WSL)
 ifeq ($(PLATFORM_OS),LINUX)
     CC := gcc
-    # Detectar si estamos en WSL (verificando existencia de directorio Windows)
-    WSL_RAYLIB_DIR := /mnt/c/Users/aleja/Desktop/claude/RayLib/raylib-6.0
-    ifneq ($(wildcard $(WSL_RAYLIB_DIR)/src/raylib.h),)
-        # WSL detectado: usar raylib desde Windows
-        RAYLIB_DIR := $(WSL_RAYLIB_DIR)
+    # Detectar si estamos en WSL (verificando si se ejecuta desde entorno Linux pero usando el raylib local)
+    RAYLIB_DIR := raylib-6.0
+    ifneq ($(wildcard $(RAYLIB_DIR)/src/raylib.h),)
+        # raylib local detectado
         CFLAGS := -Wall -std=c99 -O2 -I$(RAYLIB_DIR)/src
         LDFLAGS := -L$(RAYLIB_DIR)/src -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
-        $(info Detected WSL, using raylib from: $(RAYLIB_DIR))
+        $(info Using local raylib from: $(RAYLIB_DIR))
     else
         # Linux nativo
         CFLAGS := -Wall -std=c99 -O2
