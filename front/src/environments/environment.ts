@@ -1,7 +1,11 @@
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:8000/api',
-  wsUrl: 'ws://localhost:8000/ws',
+  get wsUrl(): string {
+    if (typeof window === 'undefined') return 'ws://localhost:8000/ws';
+    const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    return `${scheme}://${window.location.host}/ws`;
+  },
   // Relative so the game is served same-origin (via nginx proxy → backend),
   // avoiding cross-origin CORS/COEP on index.wasm/.data.
   gameUrl: '/game-embed/',

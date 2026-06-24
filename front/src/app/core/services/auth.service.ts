@@ -34,6 +34,7 @@ export class AuthService {
 
   private readonly _user = signal<User | null>(null);
   private readonly _loading = signal(false);
+  private _gsiInitialized = false;
 
   readonly user = this._user.asReadonly();
   readonly loading = this._loading.asReadonly();
@@ -198,45 +199,24 @@ export class AuthService {
     );
   }
 
-  /** Initialize Google Identity Services and attach One Tap prompt. */
-  initGoogleOneTap(): void {
-    if (!environment.googleClientId || typeof window === 'undefined') return;
-
-    // Wait for GSI script to load
-    const init = () => {
-      if (typeof google === 'undefined') return;
-      google.accounts.id.initialize({
-        client_id: environment.googleClientId,
-        callback: (response) => {
-          this.loginWithGoogle(response.credential).subscribe({
-            next: () => this.router.navigate(['/']),
-            error: () => {},
-          });
-        },
-        auto_select: false,
-        cancel_on_tap_outside: true,
-      });
-      google.accounts.id.prompt();
-    };
-
-    if (document.readyState === 'complete') {
-      init();
-    } else {
-      window.addEventListener('load', init, { once: true });
-    }
+  /** Initialize Google Identity Services once. */
+  private initGSI(callback: (credential: string) => void): void {
+    if (this._gsiInitialized) return;
+    this._gsiInitialized = true;
+    google.accounts.id.initialize({
+      client_id: environment.googleClientId,
+      callback: (response) => callback(response.credential),
+    });
   }
 
   /** Render a Google Sign-In button into the given host element. */
   renderGoogleButton(hostEl: HTMLElement): void {
     if (!environment.googleClientId || typeof google === 'undefined') return;
-    google.accounts.id.initialize({
-      client_id: environment.googleClientId,
-      callback: (response) => {
-        this.loginWithGoogle(response.credential).subscribe({
-          next: () => this.router.navigate(['/']),
-          error: () => {},
-        });
-      },
+    this.initGSI((credential) => {
+      this.loginWithGoogle(credential).subscribe({
+        next: () => this.router.navigate(['/']),
+        error: () => {},
+      });
     });
     google.accounts.id.renderButton(hostEl, {
       type: 'standard',
