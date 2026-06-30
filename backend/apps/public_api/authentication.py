@@ -21,9 +21,10 @@ class ApiKeyAuthentication(BaseAuthentication):
         if not raw_key:
             return None  # Not our auth scheme — try next authenticator
 
+        # Keys are stored hashed — hash the incoming value and look it up by hash.
         try:
             api_key = ApiKey.objects.select_related("user").get(
-                key=raw_key, is_active=True
+                key=ApiKey.hash_key(raw_key), is_active=True
             )
         except ApiKey.DoesNotExist:
             raise AuthenticationFailed("Invalid or revoked API key.")

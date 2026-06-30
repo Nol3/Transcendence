@@ -10,6 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService, UserStats } from '../../../core/services/user.service';
@@ -47,6 +48,13 @@ export class GameBoard implements OnInit, OnDestroy {
   private readonly roomService = inject(RoomService);
   private readonly http = inject(HttpClient);
   private readonly i18n = inject(I18nService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+
+  // When the game is launched from a tournament bracket ("Jugar"), the result is
+  // reported to the tournament match endpoint instead of the generic games one.
+  private tournamentCtx: { tournamentId: string; matchId: string; p1: string; p2: string } | null =
+    null;
 
   @ViewChild('gameFrame') private readonly gameFrame!: ElementRef<HTMLIFrameElement>;
   // gameUrl is absolute in dev (http://localhost:8000/game/) and relative in
@@ -107,6 +115,19 @@ export class GameBoard implements OnInit, OnDestroy {
   ngOnInit() {
     // Listen for the result the WASM game posts when a match ends.
     window.addEventListener('message', this.messageListener);
+
+    // Tournament context (set by the bracket's "Jugar" button).
+    const qp = this.route.snapshot.queryParamMap;
+    const tournamentId = qp.get('tournament');
+    const matchId = qp.get('match');
+    if (tournamentId && matchId) {
+      this.tournamentCtx = {
+        tournamentId,
+        matchId,
+        p1: qp.get('p1') ?? '',
+        p2: qp.get('p2') ?? '',
+      };
+    }
 
     if (this.auth.isAuthenticated()) {
       this.loadStats();
@@ -210,12 +231,19 @@ export class GameBoard implements OnInit, OnDestroy {
   }
 
   private reportResult(winner: string, score: string): void {
-    if (this.gameId == null || !this.auth.isAuthenticated()) return;
+    if (!this.auth.isAuthenticated()) return;
 
     const [p1Raw, p2Raw] = score.split('-');
     const player1_score = Number.parseInt(p1Raw, 10) || 0;
     const player2_score = Number.parseInt(p2Raw, 10) || 0;
 
+    // Tournament match: report to the bracket so the round can advance.
+    if (this.tournamentCtx) {
+      this.reportTournamentResult(winner, player1_score, player2_score);
+      return;
+    }
+
+    if (this.gameId == null) return;
     this.http
       .post(`${environment.apiUrl}/games/${this.gameId}/finish/`, {
         winner,
@@ -230,6 +258,35 @@ export class GameBoard implements OnInit, OnDestroy {
           this.loadStats();
         },
         error: () => {},
+      });
+  }
+
+  /** Push a tournament-match result, then return to the live bracket. */
+  private reportTournamentResult(
+    winner: string,
+    player1_score: number,
+    player2_score: number,
+  ): void {
+    const ctx = this.tournamentCtx;
+    if (!ctx) return;
+
+    // Resolve the winning slot: prefer matching the reported winner name to the
+    // slot usernames; fall back to the higher score.
+    let winner_slot: 1 | 2;
+    if (winner && winner === ctx.p1) winner_slot = 1;
+    else if (winner && winner === ctx.p2) winner_slot = 2;
+    else winner_slot = player1_score >= player2_score ? 1 : 2;
+
+    this.tournamentCtx = null; // guard against double reporting
+    this.http
+      .post(`${environment.apiUrl}/tournament/${ctx.tournamentId}/matches/${ctx.matchId}/result/`, {
+        winner_slot,
+        player1_score,
+        player2_score,
+      })
+      .subscribe({
+        next: () => this.router.navigate(['/tournament', ctx.tournamentId]),
+        error: () => this.router.navigate(['/tournament', ctx.tournamentId]),
       });
   }
 

@@ -6,6 +6,7 @@ import {
   mockAuthLogout,
   mockLeaderboard,
   mockTournaments,
+  mockTournamentFlow,
   setAuthToken,
   spaNavigate,
 } from './helpers';
@@ -49,5 +50,58 @@ test.describe('Tournaments — authenticated', () => {
     // Button text is "+ Create Tournament"
     const createBtn = page.getByRole('button', { name: /create/i });
     await expect(createBtn).toBeVisible({ timeout: 5000 });
+  });
+});
+
+test.describe('Tournaments — bracket flow', () => {
+  test.beforeEach(async ({ page }) => {
+    await setAuthToken(page);
+    await mockAuthMe(page);
+    await mockAuthRefresh(page);
+    await mockAuthLogout(page);
+    await mockLeaderboard(page);
+    await mockTournaments(page);
+    await bootAuthenticated(page);
+    // More specific tournament mocks win over the empty-list one above.
+    await mockTournamentFlow(page);
+    // currentUserId is read from localStorage 'user' when the component builds.
+    await page.evaluate(() =>
+      localStorage.setItem('user', JSON.stringify({ id: 1, username: 'testuser' })),
+    );
+  });
+
+  test('opens bracket from the active tab and shows match actions', async ({ page }) => {
+    await spaNavigate(page, '/tournament');
+    await expect(page).toHaveURL('/tournament', { timeout: 5000 });
+
+    // The in-progress tournament shows under the default "active" tab.
+    await page.getByRole('button', { name: /view bracket/i }).click();
+
+    await expect(page.locator('app-bracket')).toBeVisible({ timeout: 5000 });
+    // Current user (creator + player) gets a "Jugar" action on the pending match.
+    await expect(page.getByRole('button', { name: /jugar/i }).first()).toBeVisible({
+      timeout: 5000,
+    });
+  });
+
+  test('reporting a winner completes the match', async ({ page }) => {
+    await spaNavigate(page, '/tournament');
+    await expect(page).toHaveURL('/tournament', { timeout: 5000 });
+
+    await page.getByRole('button', { name: /view bracket/i }).click();
+    await expect(page.locator('app-bracket')).toBeVisible({ timeout: 5000 });
+
+    // Report the current user as winner via the bracket's winner button.
+    await page.getByRole('button', { name: 'testuser', exact: true }).first().click();
+
+    // Backend mock returns the finished bracket → match renders as completed.
+    await expect(page.locator('.bracket__match--completed').first()).toBeVisible({
+      timeout: 5000,
+    });
+  });
+
+  test('deep link /tournament/:id opens the detail view', async ({ page }) => {
+    await spaNavigate(page, '/tournament/1');
+    await expect(page.locator('app-bracket')).toBeVisible({ timeout: 5000 });
   });
 });

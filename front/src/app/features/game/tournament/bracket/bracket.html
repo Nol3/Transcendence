@@ -31,6 +31,23 @@
                 <span class="player-score">-</span>
               }
             </div>
+
+            @if (canAct(match)) {
+              <div class="bracket__actions">
+                <button type="button" class="bracket__btn bracket__btn--play" (click)="playMatch.emit(match)">
+                  ▶ Jugar
+                </button>
+                <div class="bracket__report">
+                  <span class="bracket__report-label">Ganador:</span>
+                  <button type="button" class="bracket__btn bracket__btn--report" (click)="report(match, 1)">
+                    {{ match.player1.username }}
+                  </button>
+                  <button type="button" class="bracket__btn bracket__btn--report" (click)="report(match, 2)">
+                    {{ match.player2.username }}
+                  </button>
+                </div>
+              </div>
+            }
           </div>
         }
       </div>

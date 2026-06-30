@@ -66,5 +66,10 @@ env/
 venv/
 .env
 
-#certificates
+#certificates — never commit private keys / certs (generated at runtime by ssl-init)
 ssl/
+docker/ssl/
+docker/ssl/*.pem
+*.pem
+*.key
+*.crt

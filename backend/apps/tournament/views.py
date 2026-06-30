@@ -2,6 +2,7 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 from .models import Tournament, TournamentParticipant, TournamentMatch
@@ -40,24 +41,39 @@ class TournamentViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def join(self, request, pk=None):
-        """Join a tournament. Generates the bracket once it fills up."""
-        tournament = self.get_object()
-        if tournament.status != 'pending':
-            return Response(
-                {'error': 'Tournament already started'},
-                status=status.HTTP_400_BAD_REQUEST,
+        """Join a tournament. Generates the bracket once it fills up.
+
+        The capacity check and the participant insert run inside a single
+        transaction with a row lock on the Tournament (`select_for_update`), so
+        concurrent joins serialize and can never overshoot `max_players`.
+        """
+        # Resolve + permission-check via the router (404/permissions) first.
+        self.get_object()
+
+        with transaction.atomic():
+            tournament = Tournament.objects.select_for_update().get(pk=pk)
+
+            if tournament.status != 'pending':
+                return Response(
+                    {'error': 'Tournament already started'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            if TournamentParticipant.objects.filter(
+                tournament=tournament, user=request.user
+            ).exists():
+                return Response({'error': 'Already joined'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if tournament.participants.count() >= tournament.max_players:
+                return Response({'error': 'Tournament is full'}, status=status.HTTP_400_BAD_REQUEST)
+
+            participant = TournamentParticipant.objects.create(
+                tournament=tournament, user=request.user
             )
-        if TournamentParticipant.objects.filter(tournament=tournament, user=request.user).exists():
-            return Response({'error': 'Already joined'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if tournament.participants.count() >= tournament.max_players:
-            return Response({'error': 'Tournament is full'}, status=status.HTTP_400_BAD_REQUEST)
-
-        participant = TournamentParticipant.objects.create(tournament=tournament, user=request.user)
-
-        # Auto-seed round 1 when the tournament reaches capacity.
-        if tournament.participants.count() == tournament.max_players:
-            generate_bracket(tournament)
+            # Auto-seed round 1 when the tournament reaches capacity (still under
+            # the lock; generate_bracket is itself atomic and idempotent).
+            if tournament.participants.count() == tournament.max_players:
+                generate_bracket(tournament)
 
         serializer = TournamentParticipantSerializer(participant)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

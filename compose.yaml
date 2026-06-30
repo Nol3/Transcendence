@@ -77,6 +77,30 @@ services:
   # ==========================================
   # Reverse Proxy (Nginx)
   # ==========================================
+  # ==========================================
+  # SSL bootstrap — generates a self-signed cert into the ssl_certs volume so
+  # NO private key is ever committed to git. Idempotent: skips if a cert already
+  # exists. nginx waits for this to finish before starting (depends_on below).
+  # ==========================================
+  ssl-init:
+    image: alpine/openssl:latest
+    container_name: ft_transcendence_ssl_init
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        if [ ! -f /ssl/cert.pem ] || [ ! -f /ssl/key.pem ]; then
+          openssl req -x509 -newkey rsa:4096 -nodes -days 365 \
+            -keyout /ssl/key.pem -out /ssl/cert.pem \
+            -subj "/C=ES/ST=Madrid/L=Madrid/O=42/CN=localhost" &&
+          echo "[SSL-INIT] Self-signed certificate generated.";
+        else
+          echo "[SSL-INIT] Certificate already present, skipping.";
+        fi
+        chmod 644 /ssl/key.pem /ssl/cert.pem || true
+    volumes:
+      - ssl_certs:/ssl
+    restart: "no"
+
   nginx:
     #image: nginx:alpine
     image: owasp/modsecurity-crs:nginx
@@ -93,14 +117,20 @@ services:
       #- ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./docker/waf.conf:/etc/nginx/templates/conf.d/default.conf.template:ro
       - ./docker/modsecurity-override.conf:/etc/nginx/templates/modsecurity.d/modsecurity-override.conf.template:ro
-      - ./docker/ssl:/etc/nginx/ssl:ro
+      # Certs come from the ssl_certs volume populated by ssl-init at runtime,
+      # never from a git-tracked ./docker/ssl bind mount.
+      - ssl_certs:/etc/nginx/ssl:ro
     environment:
       - MODSEC_AUDIT_ENGINE=On
     networks:
       - transcendence-network
     depends_on:
-      - backend
-      - frontend
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_started
+      ssl-init:
+        condition: service_completed_successfully
     healthcheck:
       # Use 127.0.0.1 (not localhost → ::1, nginx binds IPv4 only) over HTTPS
       # directly: port 80 only 301-redirects, and the cert is self-signed.
@@ -167,3 +197,5 @@ volumes:
     driver: local
   vault_data:
   vault_creds:
+  # Holds the runtime-generated self-signed TLS cert (see ssl-init service).
+  ssl_certs:

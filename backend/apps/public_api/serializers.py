@@ -17,12 +17,21 @@ class ApiKeyCreateSerializer(serializers.Serializer):
 
 
 class ApiKeyResponseSerializer(serializers.ModelSerializer):
-    """Full key shown once on creation."""
+    """Full key shown once on creation.
+
+    `key` is the one-time plaintext carried on the freshly created instance
+    (`plain_key`); it is never read back from the database (which holds the hash).
+    """
+
+    key = serializers.SerializerMethodField()
 
     class Meta:
         model = ApiKey
         fields = ["id", "name", "key", "is_active", "created_at", "last_used_at"]
         read_only_fields = ["id", "key", "is_active", "created_at", "last_used_at"]
+
+    def get_key(self, obj) -> str | None:
+        return getattr(obj, "plain_key", None)
 
 
 class ApiKeyListSerializer(serializers.ModelSerializer):

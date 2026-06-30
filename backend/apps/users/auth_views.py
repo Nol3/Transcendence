@@ -196,8 +196,12 @@ class GoogleLoginView(APIView):
                 credential,
                 google_requests.Request(),
                 client_id,
+                clock_skew_in_seconds=30,
             )
         except ValueError as exc:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Google ID token verification failed: {exc}")
             return Response(
                 {"error": f"Invalid Google token: {exc}"},
                 status=status.HTTP_401_UNAUTHORIZED,

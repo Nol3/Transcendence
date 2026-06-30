@@ -242,10 +242,13 @@ See `docs/PERFORMANCE_AUDIT.md` for detailed metrics and targets.
 
 ## Ejecución rápida
 
-### Con Docker
+### Con Docker (un solo comando)
 ```bash
-docker compose up
+docker compose up --build
+# App lista en: https://localhost:8443  (TLS + WAF; acepta el cert autofirmado)
 ```
+El servicio `ssl-init` genera el certificado TLS autofirmado en caliente dentro de
+un volumen, por lo que **no hay ninguna clave privada versionada en el repositorio**.
 
 ### Desarrollo local
 
@@ -275,44 +278,57 @@ npm start
 
 ## URLs de acceso
 
+**Punto de entrada principal (evaluación):** **https://localhost:8443** — todo el
+tráfico pasa por el reverse proxy Nginx con **TLS + WAF (ModSecurity)**. Acepta el
+certificado autofirmado la primera vez. El frontend habla con el backend por HTTPS
+mediante rutas relativas (`/api`, `wss://…/ws`), así que **todas las conexiones van
+cifradas**.
+
 | Servicio | URL |
 |----------|-----|
-| Frontend Angular | http://localhost:4200 |
-| Backend Django | http://localhost:8000 |
-| Juego embebido | http://localhost:8000/game/ |
-| Admin Django | http://localhost:8000/admin/ |
+| **App completa (HTTPS + WAF)** | **https://localhost:8443** |
+| Swagger / OpenAPI | https://localhost:8443/api/docs/ |
+| Admin Django | https://localhost:8443/admin/ |
+| Frontend directo (sin WAF, solo dev) | http://localhost:4200 |
+| Backend directo (sin WAF, solo dev) | http://localhost:8000 |
 
 ---
 
 ## Estado de módulos
 
-### ✅ Completados (13 pts)
-- Frontend Angular 21
-- Design system (Button, Input, Card, Modal, Badge, Avatar, Toast, Spinner, etc.)
-- i18n con 3 idiomas
-- Sistema de notificaciones en tiempo real
-- Sistema de torneos con brackets
-- Backend Django + DRF
-- Integración Frontend ↔ Backend
-- ORM con modelos User, UserProfile, Game, Tournament
-- API pública con API key + rate limiting
-- Google OAuth2
-- **Juego de cartas** — Embedding WASM en `/game-board` via iframe (2 pts)
+**Todos los módulos declarados están implementados y son funcionales — 15 puntos
+mandatory (supera el mínimo de 14).** Ver la tabla de puntuación arriba para el
+mapeo exacto contra el subject.
 
-###  Pendientes
-- **WAF + HashiCorp Vault** — Seguridad avanzada (4 pts)
-- **Compatibilidad navegadores** — Firefox, Edge, Safari (1 pt)
+### ✅ Major (2 pts c/u)
+- **Framework frontend + backend** — Angular 20 (SPA) + Django 4.2 (DRF)
+- **Public API segura** — API key (hasheada) + rate limiting + ≥5 recursos CRUD
+- **WAF/ModSecurity + HashiCorp Vault** — WAF bloquea SQLi/XSS (403); Vault gestiona secretos
+- **Web game multijugador local** — Poker Race (C/WASM), 2-4 jugadores hotseat, ELO al terminar
+
+### ✅ Minor (1 pt c/u)
+- **ORM** — User, UserProfile, Game, Tournament, Round, Match, APIKey
+- **Design system** — 14 componentes reutilizables + tokens (SCSS)
+- **Notificaciones** — ToastComponent + NotificationService
+- **i18n** — EN/ES/FR con switcher en UI
+- **Compatibilidad navegadores** — Chrome, Firefox, Edge (ver `front/BROWSER_COMPAT.md`)
+- **Sistema de torneos** — Brackets single-elimination, registro, reporte de resultados y progresión en vivo (WebSocket)
+- **Game customization** — Nº de jugadores, puntuación objetivo y tema del tapete
+
+### ➕ Bonus
+- **Google OAuth2** — Sign-in con Google (GSI + verificación de credencial)
 
 ---
 
 ## Seguridad
 
-- JWT para autenticación
-- Google OAuth2 integrado
+- Contraseñas hasheadas con PBKDF2 (Django) + JWT (SimpleJWT con rotación/blacklist)
+- Google OAuth2 integrado (verificación de credencial en backend)
+- API keys **almacenadas hasheadas** (SHA-256); el texto plano se muestra una sola vez
 - Rate limiting (100 req/hr en API pública)
-- CORS configurado
-- CSP configurable para embedding del juego
-- **Planificado:** WAF (ModSecurity) + Vault para producción
+- CORS configurado + TLS terminado en el WAF (HTTPS en `:8443`)
+- **WAF (ModSecurity/CRS)** bloquea SQLi/XSS y restringe métodos HTTP
+- **HashiCorp Vault** (AppRole) gestiona los secretos de la app
 
 ---
 

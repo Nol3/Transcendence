@@ -123,7 +123,8 @@ class ApiKeyListCreateView(APIView):
     def post(self, request):
         s = ApiKeyCreateSerializer(data=request.data)
         s.is_valid(raise_exception=True)
-        key = ApiKey.objects.create(user=request.user, name=s.validated_data["name"])
+        # Stores only the hash; `key.plain_key` carries the one-time plaintext.
+        key = ApiKey.create_for_user(request.user, s.validated_data["name"])
         return Response(
             {"data": ApiKeyResponseSerializer(key).data},
             status=status.HTTP_201_CREATED,

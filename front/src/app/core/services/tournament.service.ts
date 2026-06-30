@@ -41,6 +41,7 @@ export interface Tournament {
   startDate: string;
   rounds: TournamentRound[];
   isRegistered: boolean;
+  creatorId: string | null;
 }
 
 export interface CreateTournamentPayload {
@@ -125,6 +126,12 @@ export class TournamentService {
     }
   }
 
+  /** Public, string form of the logged-in user id (UI compares against slot ids). */
+  myUserId(): string | null {
+    const id = this.currentUserId();
+    return id == null ? null : String(id);
+  }
+
   private adapt(t: BackendTournament): Tournament {
     const startDate = t.started_at ?? t.created_at;
     const myId = this.currentUserId();
@@ -146,6 +153,7 @@ export class TournamentService {
       startDate: startDate.slice(0, 10),
       rounds: (t.rounds ?? []).map((r) => this.adaptRound(r, eliminated)),
       isRegistered: myId != null && (t.participants ?? []).some((p) => p.user?.id === myId),
+      creatorId: t.creator?.id != null ? String(t.creator.id) : null,
     };
   }
 
@@ -207,6 +215,26 @@ export class TournamentService {
 
   joinTournament(id: string): Observable<void> {
     return this.http.post<unknown>(`${this.baseUrl}/${id}/join/`, {}).pipe(map(() => undefined));
+  }
+
+  /** Report a tournament match result; backend advances the bracket + broadcasts. */
+  reportMatchResult(
+    tournamentId: string,
+    matchId: string,
+    payload: { winner_slot: 1 | 2; player1_score: number; player2_score: number },
+  ): Observable<Tournament> {
+    return this.http
+      .post<BackendTournament>(
+        `${this.baseUrl}/${tournamentId}/matches/${matchId}/result/`,
+        payload,
+      )
+      .pipe(
+        map((t) => {
+          const adapted = this.adapt(t);
+          this._currentTournament.set(adapted);
+          return adapted;
+        }),
+      );
   }
 
   leaveTournament(id: string): Observable<void> {

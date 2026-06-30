@@ -86,6 +86,79 @@ export async function mockTournaments(page: Page) {
 }
 
 /**
+ * Mock a full in-progress tournament owned by the current user (id 1) with a
+ * single pending final, plus the detail GET and the match-result POST. Register
+ * AFTER mockTournaments so this more specific handler takes precedence.
+ */
+export async function mockTournamentFlow(page: Page) {
+  const player1 = { id: 1, username: 'testuser', avatar: null };
+  const player2 = { id: 2, username: 'rival', avatar: null };
+  const baseMatch = {
+    id: 10,
+    round: 1,
+    position: 0,
+    player1,
+    player2,
+    winner_slot: null as 1 | 2 | null,
+    player1_score: 0,
+    player2_score: 0,
+    status: 'pending' as 'pending' | 'live' | 'completed',
+  };
+  const tournament = {
+    id: 1,
+    name: 'E2E Cup',
+    description: '',
+    creator: player1,
+    max_players: 4,
+    status: 'in_progress',
+    winner: null as null | typeof player1,
+    created_at: '2026-06-30T10:00:00Z',
+    started_at: '2026-06-30T10:05:00Z',
+    finished_at: null as string | null,
+    participants: [
+      { id: 1, user: player1, is_eliminated: false, joined_at: '2026-06-30T10:00:00Z' },
+      { id: 2, user: player2, is_eliminated: false, joined_at: '2026-06-30T10:01:00Z' },
+    ],
+    rounds: [{ id: 1, number: 1, name: 'Final', matches: [baseMatch] }],
+  };
+
+  await page.route(/\/tournament/, (route) => {
+    const req = route.request();
+    const url = req.url();
+    const json = (body: unknown) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+
+    if (req.method() === 'POST' && /\/matches\/\d+\/result\/?(\?|$)/.test(url)) {
+      const finished = {
+        ...tournament,
+        status: 'finished',
+        winner: player1,
+        finished_at: '2026-06-30T10:30:00Z',
+        rounds: [
+          {
+            ...tournament.rounds[0],
+            matches: [
+              {
+                ...baseMatch,
+                winner_slot: 1,
+                player1_score: 1,
+                player2_score: 0,
+                status: 'completed',
+              },
+            ],
+          },
+        ],
+      };
+      return json(finished);
+    }
+    if (req.method() === 'GET' && /\/tournament\/1\/?(\?|$)/.test(url)) {
+      return json(tournament);
+    }
+    return json([tournament]); // list
+  });
+}
+
+/**
  * No-op kept for spec compatibility. Real auth seeding happens inside bootAuthenticated()
  * via the login flow because pre-seeding localStorage triggers a circular-DI bug in
  * AuthService initAuth → http interceptor → inject(AuthService) chain.
@@ -118,6 +191,17 @@ export async function spaNavigate(page: Page, path: string): Promise<void> {
  */
 export async function bootAuthenticated(page: Page): Promise<void> {
   await mockAuthLogin(page);
+  // Home page calls getUserStats() after login — mock to prevent 401→logout cascade
+  await page.route('**/users/me/stats**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        data: { wins: 10, losses: 5, rank: 1, winRate: 67, gamesPlayed: 15, currentStreak: 3, longestStreak: 5 },
+        error: null,
+      }),
+    }),
+  );
   await page.goto('/login');
   await page.locator('input[type="email"]').fill('test@example.com');
   await page.locator('input[type="password"]').fill('password123');
