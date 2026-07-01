@@ -89,6 +89,13 @@ interface BackendRound {
   matches: BackendMatch[];
 }
 
+interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
 interface BackendTournament {
   id: number;
   name: string;
@@ -189,12 +196,14 @@ export class TournamentService {
   }
 
   getTournaments(status?: TournamentStatus): Observable<Tournament[]> {
-    return this.http.get<BackendTournament[]>(`${this.baseUrl}/`).pipe(
-      map((list) => {
-        const adapted = list.map((t) => this.adapt(t));
-        return status ? adapted.filter((t) => t.status === status) : adapted;
-      }),
-    );
+    return this.http
+      .get<PaginatedResponse<BackendTournament>>(`${this.baseUrl}/`)
+      .pipe(
+        map((response) => {
+          const adapted = response.results.map((t) => this.adapt(t));
+          return status ? adapted.filter((t) => t.status === status) : adapted;
+        }),
+      );
   }
 
   getTournament(id: string): Observable<Tournament> {
