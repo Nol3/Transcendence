@@ -18,6 +18,13 @@ export interface Notification {
   duration?: number;
 }
 
+function generateId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
 export interface RealTimeNotification {
   id: string;
   type: RealTimeNotificationType;
@@ -94,7 +101,7 @@ export class NotificationService implements OnDestroy {
   }
 
   show(type: NotificationType, title: string, message?: string, duration = 4000): void {
-    const id = crypto.randomUUID();
+    const id = generateId();
     const notification: Notification = { id, type, title, message, duration };
 
     this._notifications.update((list) => [...list, notification]);
