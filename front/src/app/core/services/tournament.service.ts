@@ -116,7 +116,7 @@ export class TournamentService {
 
   private currentUserId(): number | null {
     if (typeof localStorage === 'undefined') return null;
-    const raw = localStorage.getItem('user');
+    const raw = localStorage.getItem('current_user');
     if (!raw) return null;
     try {
       const u = JSON.parse(raw);
