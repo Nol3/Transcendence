@@ -83,6 +83,8 @@
   },
   "profile": {
     "title": "Player Profile",
+    "playerInfo": "Player Information",
+    "stats": "Statistics",
     "wins": "Wins",
     "losses": "Losses",
     "rank": "Rank",
@@ -98,7 +100,9 @@
     "fiftyWins": "50 Wins",
     "veteran": "Veteran (50 games)",
     "gameHistory": "Game History",
-    "noGames": "You haven't played any games yet."
+    "noGames": "You haven't played any games yet.",
+    "gameResultWin": "Won match",
+    "gameResultLoss": "Lost match"
   },
   "common": {
     "loading": "Loading...",
@@ -110,7 +114,8 @@
     "confirm": "Confirm",
     "status": "Status",
     "ready": "READY",
-    "noResults": "No results found"
+    "noResults": "No results found",
+    "vs": "vs"
   },
   "privacy": {
     "title": "Privacy Policy",
