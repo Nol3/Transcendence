@@ -3,7 +3,7 @@
     @if (user(); as currentUser) {
       <div class="profile-grid">
         <div class="profile-left">
-          <app-card [title]="'PLAYER INFO' | translate" [glowing]="true">
+          <app-card [title]="'profile.playerInfo' | translate" [glowing]="true">
             <div class="profile-header">
               <div class="avatar-section">
                 <div class="avatar-wrapper">
@@ -75,13 +75,13 @@
                   <div class="history-item" [class.history-item--win]="game.result === 'win'" [class.history-item--loss]="game.result === 'loss'">
                     <div class="history-result">
                       @if (game.result === 'win') {
-                        <app-badge variant="success">{{ 'notifications.youWin' | translate }}</app-badge>
+                        <app-badge variant="success">{{ 'profile.gameResultWin' | translate }}</app-badge>
                       } @else {
-                        <app-badge variant="error">{{ 'notifications.youLose' | translate }}</app-badge>
+                        <app-badge variant="error">{{ 'profile.gameResultLoss' | translate }}</app-badge>
                       }
                     </div>
                     <div class="history-details">
-                      <span class="history-opponent">{{ 'common.vs' | translate }} {{ game.opponent.username }}</span>
+                      <span class="history-opponent">{{ currentUser.username }} {{ 'common.vs' | translate }} {{ game.opponent.username }}</span>
                       <span class="history-score text-muted">{{ game.score }}</span>
                     </div>
                     <div class="history-date text-muted">{{ game.playedAt | date:'short' }}</div>
@@ -97,7 +97,7 @@
         </div>
 
         <div class="profile-right">
-          <app-card [title]="'home.stats' | translate" [glowing]="true">
+          <app-card [title]="'profile.stats' | translate" [glowing]="true">
             @if (statsLoading()) {
               <div class="loading-state">
                 <app-spinner [size]="'md'"></app-spinner>

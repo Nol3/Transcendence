@@ -82,6 +82,8 @@
   },
   "profile": {
     "title": "Perfil del jugador",
+    "playerInfo": "Información del jugador",
+    "stats": "Estadísticas",
     "wins": "Victorias",
     "losses": "Derrotas",
     "rank": "Rango",
@@ -97,7 +99,9 @@
     "fiftyWins": "50 victorias",
     "veteran": "Veterano (50 partidas)",
     "gameHistory": "Historial de partidas",
-    "noGames": "No has jugado ninguna partida aún."
+    "noGames": "No has jugado ninguna partida aún.",
+    "gameResultWin": "Partida ganada",
+    "gameResultLoss": "Partida perdida"
   },
   "common": {
     "loading": "Cargando...",
@@ -109,7 +113,8 @@
     "confirm": "Confirmar",
     "status": "Estado",
     "ready": "LISTO",
-    "noResults": "Sin resultados"
+    "noResults": "Sin resultados",
+    "vs": "vs"
   },
   "privacy": {
     "title": "Política de Privacidad",
