@@ -78,6 +78,18 @@
               </div>
             </div>
 
+            <!-- Rounds -->
+            <div class="game-config__row">
+              <span class="text-muted font-mono text-sm">{{ 'lobby.rounds' | translate }}</span>
+              <div class="game-config__stepper">
+                <button type="button" class="game-config__btn"
+                        (click)="setRounds(rounds() - 1)" [disabled]="rounds() <= 1">−</button>
+                <span class="font-pixel neon-text-yellow">{{ rounds() }}</span>
+                <button type="button" class="game-config__btn"
+                        (click)="setRounds(rounds() + 1)" [disabled]="rounds() >= 10">+</button>
+              </div>
+            </div>
+
             <!-- Table theme -->
             <div class="game-config__row game-config__row--themes">
               <span class="text-muted font-mono text-sm">{{ 'lobby.theme' | translate }}</span>
