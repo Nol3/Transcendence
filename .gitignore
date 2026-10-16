@@ -56,6 +56,10 @@ backend/.coverage
 backend/htmlcov/
 backend/db.sqlite3
 backend/db.sqlite3-journal
+# Los otros dos ficheros que crea SQLite al lado de la base de datos (memoria compartida y
+# diario de escritura). Estos dos sí estaban versionados por error; se dejan de seguir.
+backend/db.sqlite3-shm
+backend/db.sqlite3-wal
 
 **/__pycache__/
 *.pyc
