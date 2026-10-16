@@ -1299,6 +1299,25 @@ Frontend (los tres hallazgos de la auditoría que quedaban):
   que lo comprueba **y comprobado que ese e2e falla si se quita la directiva** (un test que no sabes
   si falla cuando el arreglo no está no vale de nada).
 
+Hallazgos que salieron al verificar el despliegue (16-10-2026, después de la auditoría):
+
+- **Los avatares no cargaban.** Tres fallos encadenados: el nginx del borde no tenía regla para
+  `/media/`, así que iba directo al backend; el backend corre con `DEBUG=false` y **no sirve
+  ficheros**; y la redirección a HTTPS apuntaba a `https://backend:8000/...`, un host interno que
+  el navegador no resuelve. Ahora los sirve el nginx del front desde un volumen compartido
+  (`backend/media` en desarrollo, `media_data` en producción), sin pasar por Django.
+- **`ALLOWED_HOSTS` no incluía `backend`**: el nginx del borde reescribe el `Host` con el del
+  upstream, así que esas peticiones recibían un 400. Estaba en el `.env` de la raíz pero el que
+  lee el contenedor es `backend/.env` (por el montaje del código y decouple), y ese no lo tenía.
+- **Dos ficheros auxiliares de SQLite** (`-shm`, `-wal`) estaban versionados; se dejan de seguir.
+- **El consumidor del torneo no estaba muerto**: lo usa la pantalla del bracket, y la URL se
+  construye en `tournament.service.js` con `environment.wsUrl`, así que un grep por la ruta
+  entera no lo encuentra. Restaurado. Los otros dos del lobby antiguo sí: cero peticiones en los
+  registros y ningún uso en el front.
+- **Faltaba el avatar por defecto** que la app referenciaba: ahora existe.
+- El CI **nunca había corrido** (no había remoto). Sus e2e en Firefox y WebKit se han probado a
+  mano: **115 pasan, ninguno falla**.
+
 Trampa que apareció al activar la CSP: los tests de accesibilidad fallaron en bloque porque axe se
 inyecta como script en la página y `script-src 'self'` lo bloquea. Se arregló con un helper que
 quita la cabecera **solo de los documentos** en esos tests (la inyección es la herramienta de
