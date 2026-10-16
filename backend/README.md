@@ -18,7 +18,8 @@ backend/
 │   │   └── admin.py       # Django admin config
 │   ├── games/             # Game logic & history
 │   ├── chat/              # Messaging system
-│   └── tournament/        # Tournament management
+│   ├── tournament/        # Tournament management
+│   └── poker/             # Póker online autoritativo (motor + WebSockets)
 ├── static/                # Static files (CSS, images, etc.)
 ├── media/                 # User-uploaded files
 ├── db.sqlite3             # Database (development)
@@ -93,6 +94,28 @@ backend/
 **Developer:** alcarden
 
 ---
+
+### Poker App (`apps/poker/`)
+
+El póker real del proyecto: motor propio en Python, autoritativo en el servidor.
+
+- `engine/` — reglas Texas Hold'em: baraja, reparto, evaluación de manos (5 cartas) y
+  comparación. Sin dependencias de Django, se puede probar suelto.
+- `tables.py` / `consumers.py` — mesas y WebSockets (`/ws/poker/matchmaking` y
+  `/ws/poker/table/<id>`): cola de espera, reparto de asientos, acciones, chat de mesa
+  y espectadores.
+- `bots.py` — relleno con bots cuando la cola tarda.
+- `tournament_tables.py` — abre la mesa de un match de torneo (el servidor cierra el
+  resultado al terminar; nadie lo declara a mano).
+- `models.py` — `PokerHandRecord` / `PokerHandPlayer`: historial de manos para la web.
+
+Endpoints:
+
+- `GET /api/poker/history/` — partidas del jugador (paginado).
+- `GET /api/poker/history/<game_id>/` — manos de una partida (403 si no es tuya).
+- `GET /api/poker/stats/` — estadísticas agregadas (manos, showdowns, bote mayor…).
+- `GET /api/poker/tables/` — mesas en vivo (para entrar como espectador).
+- `GET|PUT /api/poker/preferences/` — tema y preferencias del jugador.
 
 ### Tournament App (`apps/tournament/`)
 **Responsible for:** Tournament creation, management, participant tracking

@@ -98,7 +98,15 @@ def main():
     save_wav("discard.wav",       generate_sine(0.10, 400, 0.4) + generate_noise(0.08, 0.2))
     save_wav("error.wav",         generate_square(0.10, 200, 0.3) + generate_square(0.10, 150, 0.3))
 
-    print(f"\n{8} archivos de audio creados en {OUTPUT_DIR}/")
+    # Los de las mesas de cartas: la baza, el final de la partida y los detalles del mus.
+    save_wav("trick_win.wav",      generate_sine(0.08, 660, 0.4) + generate_sine(0.12, 990, 0.35))
+    save_wav("lose_round.wav",     [s * 0.4 for s in generate_sine(0.12, 392, 0.5)] +
+                                   [s * 0.4 for s in generate_sine(0.22, 262, 0.5)])
+    save_wav("chip.wav",           generate_noise(0.06, 0.35) + generate_sine(0.05, 320, 0.25))
+    save_wav("whoosh.wav",         generate_noise(0.25, 0.25))
+    save_wav("tick.wav",           generate_sine(0.03, 1200, 0.25))
+
+    print(f"\n{13} archivos de audio creados en {OUTPUT_DIR}/")
 
 if __name__ == "__main__":
     main()

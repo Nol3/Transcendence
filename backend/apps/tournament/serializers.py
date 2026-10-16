@@ -1,16 +1,18 @@
 """Tournament app serializers."""
 from rest_framework import serializers
+
+from apps.users.serializers import PublicUserSerializer
+
 from .models import (
     Tournament,
+    TournamentMatch,
     TournamentParticipant,
     TournamentRound,
-    TournamentMatch,
 )
-from apps.users.serializers import UserSerializer
 
 
 class TournamentParticipantSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = PublicUserSerializer(read_only=True)
 
     class Meta:
         model = TournamentParticipant
@@ -41,13 +43,28 @@ class TournamentMatchSerializer(serializers.ModelSerializer):
     player1 = TournamentPlayerSerializer(read_only=True)
     player2 = TournamentPlayerSerializer(read_only=True)
     winner_slot = serializers.SerializerMethodField()
+    reported_by = serializers.SerializerMethodField()
+    reported_winner_slot = serializers.IntegerField(
+        source='result_winner_slot', read_only=True
+    )
 
     class Meta:
         model = TournamentMatch
         fields = [
             'id', 'round', 'position', 'player1', 'player2',
             'winner_slot', 'player1_score', 'player2_score', 'status',
+            # resultado pendiente de confirmación (quién y a quién declaró)
+            'reported_winner_slot', 'reported_by',
         ]
+
+    def get_reported_by(self, obj):
+        """Usuario que declaró el resultado pendiente (solo su nombre)."""
+        if obj.result_reported_by_id is None:
+            return None
+        return {
+            'id': obj.result_reported_by_id,
+            'username': obj.result_reported_by.username,
+        }
 
     def get_winner_slot(self, obj):
         if obj.winner_id is None:
@@ -68,8 +85,8 @@ class TournamentRoundSerializer(serializers.ModelSerializer):
 
 
 class TournamentSerializer(serializers.ModelSerializer):
-    creator = UserSerializer(read_only=True)
-    winner = UserSerializer(read_only=True)
+    creator = PublicUserSerializer(read_only=True)
+    winner = PublicUserSerializer(read_only=True)
     participants = TournamentParticipantSerializer(many=True, read_only=True)
     rounds = TournamentRoundSerializer(many=True, read_only=True)
 

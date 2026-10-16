@@ -7,7 +7,7 @@
           <h3 class="modal-box__title font-pixel neon-text-cyan">{{ title }}</h3>
         }
         @if (closable) {
-          <button class="modal-box__close" (click)="close()" aria-label="Close modal">✕</button>
+          <button class="modal-box__close" (click)="close()" [attr.aria-label]="'common.closeModal' | translate">✕</button>
         }
       </div>
 

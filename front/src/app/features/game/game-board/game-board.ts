@@ -10,11 +10,10 @@ import {
   ViewChild,
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService, UserStats } from '../../../core/services/user.service';
-import { RoomService } from '../../../core/services/room.service';
 import { BadgeComponent } from '../../../shared/components/badge/badge';
 import { CardComponent } from '../../../shared/components/card/card';
 import { PixelTitleComponent } from '../../../shared/components/pixel-title/pixel-title';
@@ -37,7 +36,7 @@ type GameTheme = 'classic' | 'neon' | 'crimson' | 'violet' | 'gold';
 @Component({
   selector: 'app-game-board',
   standalone: true,
-  imports: [BadgeComponent, CardComponent, PixelTitleComponent, TranslatePipe],
+  imports: [BadgeComponent, CardComponent, PixelTitleComponent, RouterLink, TranslatePipe],
   templateUrl: './game-board.html',
   styleUrl: './game-board.scss',
 })
@@ -45,7 +44,6 @@ export class GameBoard implements OnInit, OnDestroy {
   readonly auth = inject(AuthService);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly userService = inject(UserService);
-  private readonly roomService = inject(RoomService);
   private readonly http = inject(HttpClient);
   private readonly i18n = inject(I18nService);
   private readonly route = inject(ActivatedRoute);
@@ -66,8 +64,9 @@ export class GameBoard implements OnInit, OnDestroy {
   );
 
   readonly userStats = signal<UserStats | null>(null);
-  // Live matchmaking/room presence, driven by RoomService over WebSocket.
-  readonly onlineStatus = signal<'offline' | 'searching' | 'matched'>('offline');
+  // Esta pantalla es el juego LOCAL (hotseat, 2–4 personas en el mismo equipo).
+  // El matchmaking online real vive en /poker, con su propia cola en el servidor;
+  // aquí no se simula ninguna búsqueda de partida.
 
   // ── Game Customization (Minor module) ─────────────────────────────
   // Pushed into the WASM game via postMessage('set-config'). The card game is
@@ -132,13 +131,11 @@ export class GameBoard implements OnInit, OnDestroy {
     if (this.auth.isAuthenticated()) {
       this.loadStats();
       this.createGameSession();
-      this.connectMatchmaking();
     }
   }
 
   ngOnDestroy() {
     window.removeEventListener('message', this.messageListener);
-    this.roomService.disconnect();
   }
 
   readonly rules = ['lobby.rule1', 'lobby.rule2', 'lobby.rule3', 'lobby.rule4', 'lobby.rule5'];
@@ -204,17 +201,6 @@ export class GameBoard implements OnInit, OnDestroy {
       error: () => {
         this.gameId = null;
       },
-    });
-  }
-
-  /** Use RoomService to broadcast presence / find an opponent in real time. */
-  private connectMatchmaking(): void {
-    this.onlineStatus.set('searching');
-    this.roomService.connectToMatchmaking((roomId) => {
-      this.onlineStatus.set('matched');
-      this.roomService.connectToRoomUpdates(roomId, () => {
-        // Room state changes are reflected here as the live match progresses.
-      });
     });
   }
 

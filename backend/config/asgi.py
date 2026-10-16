@@ -2,7 +2,7 @@
 ASGI config for ft_transcendence project.
 
 Routes HTTP to Django's WSGI/ASGI handler and WebSocket traffic to Channels
-consumers (live tournament brackets, game rooms, matchmaking).
+consumers (póker, sala del culo y salas de los juegos nuevos).
 """
 
 import os
@@ -20,13 +20,24 @@ from channels.routing import ProtocolTypeRouter, URLRouter  # noqa: E402
 from channels.security.websocket import AllowedHostsOriginValidator  # noqa: E402
 from django.urls import re_path  # noqa: E402
 
-from apps.games.consumers import MatchmakingConsumer, RoomConsumer  # noqa: E402
-from apps.tournament.consumers import TournamentConsumer  # noqa: E402
+from apps.culo.consumers import CuloConsumer  # noqa: E402
+from apps.poker.consumers import (  # noqa: E402
+    PokerMatchmakingConsumer,
+    TableConsumer,
+)
+from apps.salas.consumers import SalaConsumer  # noqa: E402
 
+# Los restos del lobby antiguo (`ws/rooms/`, `ws/matchmaking`, `ws/tournaments`) se han
+# quitado: no los usaba nadie (ni el front ni un test) y los dos primeros aceptaban la
+# conexión sin autenticar. Un endpoint muerto no es solo ruido: es superficie de ataque.
 websocket_urlpatterns = [
-    re_path(r"ws/rooms/(?P<room_id>[^/?]+)/?$", RoomConsumer.as_asgi()),
-    re_path(r"ws/matchmaking/?$", MatchmakingConsumer.as_asgi()),
-    re_path(r"ws/tournaments/(?P<tournament_id>[^/?]+)/?$", TournamentConsumer.as_asgi()),
+    # Póker online autoritativo (Texas Hold'em)
+    re_path(r"ws/poker/matchmaking/?$", PokerMatchmakingConsumer.as_asgi()),
+    re_path(r"ws/poker/table/(?P<table_id>[^/?]+)/?$", TableConsumer.as_asgi()),
+    # Sala del Culo: el código de la sala viaja en la ruta y el JWT en el query string.
+    re_path(r"ws/culo/room/(?P<code>[^/?]+)/?$", CuloConsumer.as_asgi()),
+    # Salas de los juegos nuevos (genéricas): el juego y el código van en la ruta.
+    re_path(r"ws/salas/(?P<juego>[a-z]+)/(?P<code>[^/?]+)/?$", SalaConsumer.as_asgi()),
 ]
 
 application = ProtocolTypeRouter(

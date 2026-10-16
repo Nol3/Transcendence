@@ -14,6 +14,16 @@
     #define EMSCRIPTEN_KEEPALIVE
 #endif
 
+// Dónde vive la tabla de highscores. En web va a `/persist`, que el shell
+// (minshell.html) monta como **IDBFS**: así la tabla sobrevive a recargar la página
+// en vez de quedarse en el sistema de ficheros en memoria de Emscripten. En
+// escritorio sigue siendo un fichero normal junto al ejecutable.
+#if defined(PLATFORM_WEB)
+    #define HIGHSCORES_PATH "/persist/highscores.dat"
+#else
+    #define HIGHSCORES_PATH "highscores.dat"
+#endif
+
 // Funciones de notificación vacías para desktop
 #ifndef NOTIFY
 #define NOTIFY(t) ((void)0)
@@ -449,11 +459,6 @@ void UpdateStateDealCards(Game* game) {
     // El cambio se hará en GameUpdate cuando dealingInProgress sea false
 }
 
-// Función para verificar si las animaciones de reparto terminaron
-bool IsDealAnimationComplete(Game* game) {
-    return !game->dealingInProgress;
-}
-
 void UpdateStatePlayerTurn(Game* game) {
     Player* current = &game->players[game->currentPlayer];
     
@@ -609,7 +614,8 @@ void UpdateStateRoundEnd(Game* game) {
         NOTIFY("gameover");
 
         // Reporta el resultado al parent (Angular). players[0] es el humano
-        // (su nombre se fija vía set-username); el rival es la mejor IA.
+        // (su nombre se fija vía set-username); el resto son jugadores locales
+        // (hotseat) en el mismo dispositivo: este juego NO tiene IA.
         {
             int my_score = game->players[0].score;
             int opp_score = 0;
@@ -668,27 +674,19 @@ void StartNewRound(Game* game) {
 
 int CalculateRoundWinner(Game* game) {
     int bestPlayer = -1;
-    int bestScore = -1;
-    HandType bestHand = HAND_HIGH_CARD;
-    
+
     for (int i = 0; i < game->playerCount; i++) {
         Player* p = &game->players[i];
-        HandResult* result = &p->lastResult;
-        
-        // Comparar primero por tipo de mano
-        if (result->type > bestHand) {
-            bestHand = result->type;
-            bestScore = result->score;
+
+        // Comparación de póker de verdad: categoría y kickers (CompareHands),
+        // no el score aditivo de la carrera de puntos. A igualdad exacta de
+        // mano gana el jugador que actúa antes (en póker se repartiría el bote).
+        if (bestPlayer < 0 ||
+            CompareHands(&p->lastResult, &game->players[bestPlayer].lastResult) > 0) {
             bestPlayer = i;
-        } else if (result->type == bestHand) {
-            // Desempate por score
-            if (result->score > bestScore) {
-                bestScore = result->score;
-                bestPlayer = i;
-            }
         }
     }
-    
+
     return bestPlayer;
 }
 
@@ -919,7 +917,7 @@ void DrawCardAnimations(Game* game) {
 
 void LoadHighScores(HighScoreEntry* entries, int* count) {
     *count = 0;
-    FILE* file = fopen("highscores.dat", "rb");
+    FILE* file = fopen(HIGHSCORES_PATH, "rb");
     if (file) {
         if (fread(count, sizeof(int), 1, file) != 1) {
             *count = 0;  // Archivo corrupto o vacío
@@ -935,12 +933,22 @@ void LoadHighScores(HighScoreEntry* entries, int* count) {
 
 void SaveHighScores(HighScoreEntry* entries, int count) {
     if (count > MAX_HIGH_SCORES) count = MAX_HIGH_SCORES;
-    FILE* file = fopen("highscores.dat", "wb");
+    FILE* file = fopen(HIGHSCORES_PATH, "wb");
     if (file) {
         fwrite(&count, sizeof(int), 1, file);
         fwrite(entries, sizeof(HighScoreEntry), count, file);
         fclose(file);
     }
+#if defined(PLATFORM_WEB)
+    // IDBFS no vuelca a IndexedDB por su cuenta: hay que pedirlo tras escribir.
+    EM_ASM(
+        if (typeof FS !== 'undefined' && FS.syncfs) {
+            FS.syncfs(false, function (err) {
+                if (err) console.warn('No se pudo guardar la tabla de highscores', err);
+            });
+        }
+    );
+#endif
 }
 
 bool AddHighScore(HighScoreEntry* entries, int* count, const char* name, int score, int roundsWon) {

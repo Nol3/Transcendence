@@ -7,6 +7,7 @@ import {
   mockLeaderboard,
   mockTournaments,
   mockTournamentFlow,
+  mockTournamentPendingConfirmation,
   setAuthToken,
   spaNavigate,
 } from './helpers';
@@ -100,8 +101,53 @@ test.describe('Tournaments — bracket flow', () => {
     });
   });
 
+  test('el botón Jugar lleva a la mesa de póker del match', async ({ page }) => {
+    await spaNavigate(page, '/tournament');
+    await page.getByRole('button', { name: /view bracket/i }).click();
+    await expect(page.locator('app-bracket')).toBeVisible({ timeout: 5000 });
+
+    // «Jugar» abre la mesa real del match en el servidor (5.1): la navegación
+    // lleva a /poker con el torneo y el match en la query.
+    await page.getByRole('button', { name: /jugar/i }).first().click();
+    await expect(page).toHaveURL(/\/poker\?tournament=1&match=10/, { timeout: 5000 });
+  });
+
   test('deep link /tournament/:id opens the detail view', async ({ page }) => {
     await spaNavigate(page, '/tournament/1');
     await expect(page.locator('app-bracket')).toBeVisible({ timeout: 5000 });
+  });
+});
+
+test.describe('Tournaments — confirmación de resultado', () => {
+  test('un resultado declarado por el rival pide confirmación y no avanza solo', async ({
+    page,
+  }) => {
+    await setAuthToken(page);
+    await mockAuthMe(page);
+    await mockAuthRefresh(page);
+    await mockAuthLogout(page);
+    await mockLeaderboard(page);
+    await mockTournaments(page);
+    await bootAuthenticated(page);
+    await mockTournamentPendingConfirmation(page);
+    await page.evaluate(() =>
+      localStorage.setItem('user', JSON.stringify({ id: 1, username: 'testuser' })),
+    );
+
+    await spaNavigate(page, '/tournament/1');
+    await expect(page.locator('app-bracket')).toBeVisible({ timeout: 5000 });
+
+    // El match sigue pendiente: no se marca como completado.
+    await expect(page.locator('.bracket__match--completed')).toHaveCount(0);
+    await expect(page.getByText('CONFIRMA EL RESULTADO')).toBeVisible({ timeout: 5000 });
+    // Y los botones ofrecen confirmar o rechazar (no "elegir ganador").
+    await expect(page.getByRole('button', { name: /confirmar/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /no estoy de acuerdo/i })).toBeVisible();
+
+    // Al confirmar, el mock devuelve el match cerrado.
+    await page.getByRole('button', { name: /confirmar/i }).click();
+    await expect(page.locator('.bracket__match--completed').first()).toBeVisible({
+      timeout: 5000,
+    });
   });
 });

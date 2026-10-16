@@ -1,11 +1,9 @@
 """Leaderboard views."""
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
 from django.contrib.auth.models import User
-from django.db.models import F
-from .serializers import LeaderboardEntrySerializer
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
 class LeaderboardView(APIView):
@@ -28,7 +26,6 @@ class LeaderboardView(APIView):
         total = users.count()
         start = (page - 1) * limit
         end = start + limit
-        users_page = users[start:end]
 
         entries = []
         for rank, user in enumerate(users[start:end], start=start + 1):

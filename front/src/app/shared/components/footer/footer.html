@@ -6,7 +6,7 @@
       <p class="footer__tagline text-secondary">{{ 'footer.tagline' | translate }}</p>
     </div>
 
-    <nav class="footer__nav" aria-label="Footer navigation">
+    <nav class="footer__nav" [attr.aria-label]="'common.footerNav' | translate">
       <div class="footer__nav-group">
         <h4 class="footer__nav-title font-pixel">{{ 'footer.game' | translate }}</h4>
         <a routerLink="/" class="footer__link">{{ 'nav.home' | translate }}</a>

@@ -208,6 +208,96 @@ bool HasStraightFlush(Card* cards, int count, int* highCard) {
 
 // ========== EVALUACIÓN ==========
 
+// Rellena el desempate lexicográfico de póker de una mano ya clasificada.
+// `r1`/`r2` son los valores que devolvieron los detectores para esa categoría
+// (en el color, `r1` es el PALO, no un valor).
+static void FillTiebreak(HandResult* res, const Card* sorted, int n, int r1, int r2) {
+    int counts[15];
+    memset(counts, 0, sizeof(counts));
+
+    if (res->type == HAND_FLUSH) {
+        // Para el color solo cuentan las cartas del palo del color; si no, al
+        // evaluar más de 5 cartas se colarían valores de otros palos.
+        for (int i = 0; i < n; i++) {
+            if (sorted[i].suit == r1) counts[RankValue(sorted[i].rank)]++;
+        }
+    } else {
+        for (int i = 0; i < n; i++) counts[RankValue(sorted[i].rank)]++;
+    }
+
+    int tb[5] = {0, 0, 0, 0, 0};
+    int k = 0;
+
+    switch (res->type) {
+        case HAND_STRAIGHT_FLUSH:
+        case HAND_STRAIGHT:
+            // Cinco valores consecutivos desde el más alto. En la rueda
+            // r1 == 5, así que el As queda como 1 sin caso especial.
+            for (int i = 0; i < 5; i++) tb[i] = r1 - i;
+            break;
+
+        case HAND_FOUR_OF_A_KIND:
+            tb[k++] = r1;                                   // póker
+            for (int r = 14; r >= 2 && k < 5; r--)          // kicker
+                if (r != r1 && counts[r]) tb[k++] = r;
+            break;
+
+        case HAND_FULL_HOUSE:
+            tb[0] = r1;                                     // trío
+            tb[1] = r2;                                     // pareja
+            break;
+
+        case HAND_FLUSH:
+            for (int r = 14; r >= 2 && k < 5; r--)          // 5 cartas del palo
+                if (counts[r]) tb[k++] = r;
+            break;
+
+        case HAND_THREE_OF_A_KIND:
+            tb[k++] = r1;                                   // trío
+            for (int r = 14; r >= 2 && k < 5; r--)          // 2 kickers
+                if (r != r1 && counts[r]) tb[k++] = r;
+            break;
+
+        case HAND_TWO_PAIR:
+            tb[0] = r1;                                     // pareja alta
+            tb[1] = r2;                                     // pareja baja
+            k = 2;
+            for (int r = 14; r >= 2 && k < 5; r--)          // kicker
+                if (r != r1 && r != r2 && counts[r]) tb[k++] = r;
+            break;
+
+        case HAND_ONE_PAIR:
+            tb[k++] = r1;                                   // pareja
+            for (int r = 14; r >= 2 && k < 5; r--)          // 3 kickers
+                if (r != r1 && counts[r]) tb[k++] = r;
+            break;
+
+        default: // HAND_HIGH_CARD
+            for (int r = 14; r >= 2 && k < 5; r--)          // 5 más altas
+                if (counts[r]) tb[k++] = r;
+            break;
+    }
+
+    memcpy(res->tiebreak, tb, sizeof(tb));
+}
+
+// Comparación de manos según las reglas del póker: categoría y, a igualdad de
+// categoría, desempate carta a carta (kickers). El `score` aditivo de abajo
+// sirve para la carrera de puntos del juego, NO para decidir quién gana la
+// ronda: dos manos de la misma categoría pueden tener scores iguales o incluso
+// invertidos (un color A-K-9-5-2 suma menos que A-K-8-6-4).
+int CompareHands(const HandResult* a, const HandResult* b) {
+    if (a->type != b->type) {
+        return (a->type > b->type) ? 1 : -1;
+    }
+    for (int i = 0; i < 5; i++) {
+        if (a->tiebreak[i] != b->tiebreak[i]) {
+            return (a->tiebreak[i] > b->tiebreak[i]) ? 1 : -1;
+        }
+    }
+    return 0;  // misma mano exacta
+}
+
 HandResult EvaluateHand(Card* cards, int count) {
     HandResult result = {0};
     result.type = HAND_HIGH_CARD;
@@ -222,7 +312,9 @@ HandResult EvaluateHand(Card* cards, int count) {
     SortCardsByRank(sorted, n);
     memcpy(result.cards, sorted, sizeof(Card) * (n > 5 ? 5 : n));
 
-    int rank1, rank2;
+    // r1/r2 los rellenan los detectores según la categoría; se inicializan para
+    // que FillTiebreak nunca reciba basura en las categorías que no usan r2.
+    int rank1 = 0, rank2 = 0;
 
     // Se comprueba de la mejor mano a la peor; la primera que encaja gana.
     if (HasStraightFlush(sorted, n, &rank1)) {
@@ -263,5 +355,10 @@ HandResult EvaluateHand(Card* cards, int count) {
     }
 
     strcpy(result.name, GetHandTypeName(result.type));
+
+    // Desempate de póker: sin esto, dos manos de la misma categoría se
+    // comparaban por el score aditivo y ganaba el jugador equivocado.
+    FillTiebreak(&result, sorted, n, rank1, rank2);
+
     return result;
 }

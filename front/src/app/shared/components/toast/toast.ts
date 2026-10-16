@@ -1,9 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { NotificationService, Notification } from '../../../core/services/notification.service';
+import { TranslatePipe } from '../../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-toast',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './toast.html',
   styleUrl: './toast.scss',
 })

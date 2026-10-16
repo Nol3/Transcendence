@@ -21,6 +21,7 @@ DOCKER_COMPOSE := $(shell \
         status health urls diagnose \
         shell-backend shell-frontend \
         migrate \
+        test test-backend test-front test-e2e \
         clean prune \
         help
 
@@ -107,7 +108,32 @@ shell-backend: ## Open an interactive shell inside the backend container
 shell-frontend: ## Open an interactive shell inside the frontend container
 	@$(DOCKER_COMPOSE) exec frontend sh
 
-migrate: ## Run Django database migrations
+# ── Tests ─────────────────────────────────────────────────────────────────────
+# Todo en paralelo: en un solo núcleo estas suites tardan ~5 veces más (la de
+# backend, 21 s en serie y 4 s con --parallel auto; los e2e, 3 min con un worker
+# y 37 s con todos).
+#
+# Se ejecutan DENTRO del contenedor (correrla desde WSL sobre la base de datos real
+# deja el SQLite en un estado que el backend no abre) y con DJANGO_DEBUG=true: el
+# contenedor corre con DJANGO_DEBUG=false, y con eso los settings activan
+# SECURE_SSL_REDIRECT, así que cada petición de los tests recibía un 301 y la suite
+# daba 40 fallos y 29 errores que no tenían nada que ver con el código.
+
+test: test-backend test-front test-e2e ## Run every suite (parallel)
+
+test-backend: ## Backend suite, inside the container, parallel
+	@printf "$(BLUE)$(BOLD)» Backend tests (parallel)...$(RESET)\n"
+	@$(DOCKER_COMPOSE) exec -T -e DJANGO_DEBUG=true backend python manage.py test --parallel auto
+
+test-front: ## Front unit tests (vitest, parallel)
+	@printf "$(BLUE)$(BOLD)» Front unit tests...$(RESET)\n"
+	@cd front && npm test -- --watch=false
+
+test-e2e: ## Browser e2e with all cores (needs the stack up)
+	@printf "$(BLUE)$(BOLD)» e2e (all cores)...$(RESET)\n"
+	@cd front && npx playwright test
+
+migrate: ## Run Django migrations
 	@printf "$(BLUE)» Running Django migrations...$(RESET)\n"
 	@$(DOCKER_COMPOSE) exec -T backend python manage.py migrate
 

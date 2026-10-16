@@ -15,6 +15,29 @@
     gap: var(--space-4);
   }
 
+  /* Acceso al póker online real (cola en /poker), separado del juego local. */
+  &__online-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-neon-cyan, #29e0ff);
+    border-radius: 4px;
+    background: rgba(41, 224, 255, 0.06);
+  }
+
+  &__online-link {
+    color: var(--color-neon-cyan, #29e0ff);
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
   &__body { }
 
   &__grid {

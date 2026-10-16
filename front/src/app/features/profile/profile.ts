@@ -12,6 +12,7 @@ import { BadgeComponent } from '../../shared/components/badge/badge';
 import { DividerComponent } from '../../shared/components/divider/divider';
 import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 import { TranslatePipe } from '../../i18n/translate.pipe';
+import { I18nService } from '../../i18n/i18n.service';
 
 interface Achievement {
   icon: string;
@@ -42,6 +43,7 @@ export class Profile implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly notif = inject(NotificationService);
+  private readonly i18n = inject(I18nService);
   private readonly userService = inject(UserService);
 
   readonly user = this.auth.user;
@@ -178,7 +180,8 @@ export class Profile implements OnInit {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        this.notif.error('File Too Large', 'Avatar must be under 5MB');
+        this.notif.error(this.i18n.t('notify.profile.avatarTooLarge.title'),
+          this.i18n.t('notify.profile.avatarTooLarge.body'));
         return;
       }
 
@@ -218,7 +221,8 @@ export class Profile implements OnInit {
         },
         error: () => {
           this.isSaving.set(false);
-          this.notif.error('Upload Failed', 'Could not upload avatar');
+          this.notif.error(this.i18n.t('notify.profile.uploadFailed.title'),
+            this.i18n.t('notify.profile.uploadFailed.body'));
         },
       });
     } else if (usernameChanged) {

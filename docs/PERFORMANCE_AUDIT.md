@@ -37,7 +37,7 @@ pip install django-debug-toolbar
 | **LCP** (Largest Contentful Paint) | < 2.5s | ✅ Hero image optimized, signals |
 | **CLS** (Cumulative Layout Shift) | < 0.1 | ✅ Fixed header, no ads |
 | **TTFB** (Time to First Byte) | < 0.6s | ✅ Static serving via nginx |
-| **Total JS** | < 200KB | ✅ Angular 21 + production build |
+| **Total JS** | < 200KB | ✅ Angular 20 + production build |
 
 ### Backend Targets
 

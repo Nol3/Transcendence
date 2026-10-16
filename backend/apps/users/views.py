@@ -1,24 +1,75 @@
 """Users app views."""
 
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from rest_framework.decorators import action
 from django.contrib.auth.models import User
-from .models import UserProfile
-from .serializers import UserSerializer, UserUpdateSerializer
+from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
+from PIL import Image
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from apps.games.models import Game
+
+from .models import UserProfile
+from .serializers import PublicUserSerializer, UserSerializer, UserUpdateSerializer
+
+#: Tope del avatar: 2 MB.
+AVATAR_MAX_BYTES = 2 * 1024 * 1024
+
+
+def _revisar_avatar(fichero) -> str | None:
+    """Devuelve el motivo por el que el avatar no vale, o None si está bien.
+
+    Antes se guardaba cualquier cosa que llegara en el campo `avatar`: un `.txt` o un `.html`
+    con JavaScript acababan en el directorio de ficheros públicos, servidos desde el mismo
+    origen que la app (XSS almacenado para quien abriera la URL), y sin tope de tamaño era
+    una forma trivial de llenar el disco. Se comprueba el tamaño y que sea una imagen de
+    verdad (no basta con el `content-type`, que lo pone el cliente).
+    """
+    if fichero.size > AVATAR_MAX_BYTES:
+        megas = AVATAR_MAX_BYTES // (1024 * 1024)
+        return _("El avatar no puede pasar de %(mb)s MB") % {"mb": megas}
+    try:
+        Image.open(fichero).verify()
+    except Exception:
+        return _("El avatar tiene que ser una imagen (JPEG, PNG, WebP o GIF)")
+    finally:
+        fichero.seek(0)
+    return None
 
 
 class UserViewSet(viewsets.ModelViewSet):
     """ViewSet for User management."""
 
-    queryset = User.objects.all()
+    # Orden explícito: sin él, la paginación puede devolver resultados
+    # inconsistentes entre páginas (DRF lo avisa con UnorderedObjectListWarning).
+    queryset = User.objects.select_related("profile").order_by("id")
     serializer_class = UserSerializer
 
+    def get_queryset(self):
+        """Solo se puede **escribir o borrar** la propia cuenta.
+
+        El listado y la ficha pública valen para cualquiera (no llevan email), pero este
+        ViewSet es un ModelViewSet: sin filtrar, cualquiera podía hacer
+        `PATCH /api/users/<id>/` o `DELETE /api/users/<id>/` sobre la cuenta de otro. Las
+        acciones de escritura se quedan en el propio usuario, así que intentar tocar a otro
+        devuelve 404.
+        """
+        if self.action in ("list", "retrieve"):
+            return super().get_queryset()
+        return User.objects.filter(pk=self.request.user.pk)
+
     def get_serializer_class(self):
-        """Return appropriate serializer based on action."""
+        """Return appropriate serializer based on action.
+
+        El listado y la ficha de CUALQUIER usuario usan el serializador público
+        (sin email). El email solo viaja al propio interesado: `me`, login,
+        registro, actualización de perfil y subida de avatar.
+        """
         if self.action == "update_profile":
             return UserUpdateSerializer
+        if self.action in ("list", "retrieve"):
+            return PublicUserSerializer
         return UserSerializer
 
     @action(detail=False, methods=["get"], url_path="me")
@@ -36,7 +87,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         if User.objects.filter(username=username).exists():
             return Response(
-                {"error": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": _("Username already exists")}, status=status.HTTP_400_BAD_REQUEST
             )
 
         user = User.objects.create_user(
@@ -55,13 +106,22 @@ class UserViewSet(viewsets.ModelViewSet):
         games_played = wins + losses
         win_rate = round((wins / games_played * 100) if games_played > 0 else 0, 1)
 
-        won_games = Game.objects.filter(winner=user, status="finished")
+        # Racha de verdad: victorias CONSECUTIVAS, cortando en la primera derrota,
+        # y solo sobre partidas puntuables (las del modo local no compiten).
+        games = (
+            Game.objects.filter(Q(player1=user) | Q(player2=user),
+                                status="finished", rated=True)
+            .distinct()
+            .order_by("finished_at")
+        )
         max_streak = 0
         temp_streak = 0
-        for _ in won_games.order_by("finished_at")[:100]:
-            temp_streak += 1
-            if temp_streak > max_streak:
-                max_streak = temp_streak
+        for game in games:
+            if game.winner_id == user.id:
+                temp_streak += 1
+                max_streak = max(max_streak, temp_streak)
+            else:
+                temp_streak = 0
 
         rank = User.objects.filter(profile__elo_rating__gt=profile.elo_rating).count() + 1
 
@@ -86,7 +146,7 @@ class UserViewSet(viewsets.ModelViewSet):
         try:
             target = User.objects.get(pk=pk)
         except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("User not found")}, status=status.HTTP_404_NOT_FOUND)
         return Response({"data": self._build_stats(target), "error": None})
 
     def _build_history_page(self, request, user, page, limit):
@@ -155,7 +215,7 @@ class UserViewSet(viewsets.ModelViewSet):
         try:
             target = User.objects.get(pk=pk)
         except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("User not found")}, status=status.HTTP_404_NOT_FOUND)
         page = int(request.query_params.get("page", 1))
         limit = int(request.query_params.get("limit", 20))
         history, total = self._build_history_page(request, target, page, limit)
@@ -182,7 +242,7 @@ class UserViewSet(viewsets.ModelViewSet):
                     "data": None,
                     "error": "Authentication required"
                 }, status=status.HTTP_401_UNAUTHORIZED)
-            
+
             profile, _ = UserProfile.objects.get_or_create(user=user)
 
             username = request.data.get("username")
@@ -197,6 +257,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
             avatar = request.FILES.get("avatar")
             if avatar:
+                problema = _revisar_avatar(avatar)
+                if problema:
+                    return Response(
+                        {"data": None, "error": problema},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
                 profile.avatar = avatar
                 profile.save()
 
@@ -229,6 +295,13 @@ class UserViewSet(viewsets.ModelViewSet):
                     "error": "No avatar file provided"
                 }, status=status.HTTP_400_BAD_REQUEST)
 
+            problema = _revisar_avatar(avatar)
+            if problema:
+                return Response({
+                    "data": None,
+                    "error": problema
+                }, status=status.HTTP_400_BAD_REQUEST)
+
             profile.avatar = avatar
             profile.save()
 
@@ -237,7 +310,7 @@ class UserViewSet(viewsets.ModelViewSet):
             host = request.get_host()  # Gets host with port
             path = profile.avatar.url
             avatar_url = f"{scheme}://{host}{path}"
-            
+
             return Response({
                 "data": {"avatarUrl": avatar_url},
                 "error": None

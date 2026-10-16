@@ -1,0 +1,287 @@
+// Mesa del Mentiroso. Mismas clases que la del Culo a propósito: la mesa de cartas del
+// proyecto se ve igual en todos los juegos, y así el jugador no aprende dos interfaces.
+
+.mentiroso {
+  padding: var(--space-4, 1rem) 0 var(--space-6, 2rem);
+
+  &__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-3, 1rem);
+
+    h2 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+  }
+
+  &__acciones {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  &__sonido {
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: none;
+    color: inherit;
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+
+  &__volver {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--accent);
+    }
+  }
+}
+
+// ── Empezar ──────────────────────────────────────────────────────────────────
+.inicio {
+  max-width: 44rem;
+
+  &__intro {
+    margin-bottom: var(--space-4, 1rem);
+  }
+
+  &__ajustes {
+    display: flex;
+    gap: var(--space-4, 1.5rem);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-3, 1rem);
+  }
+
+  &__campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+
+    select {
+      padding: 0.35rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--color-bg-surface, #14141f);
+      color: inherit;
+      font: inherit;
+    }
+  }
+
+  &__empezar {
+    margin-top: var(--space-3, 1rem);
+  }
+}
+
+// ── La mesa ──────────────────────────────────────────────────────────────────
+.mesa {
+  max-width: 60rem;
+
+  &__mano {
+    margin: 0 0 var(--space-3, 0.8rem);
+  }
+
+  &__rivales {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin: 0 0 var(--space-4, 1.2rem);
+    padding: 0;
+    list-style: none;
+  }
+
+  &__centro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: var(--space-4, 1.2rem);
+    margin-bottom: var(--space-4, 1.2rem);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md, 8px);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  &__pila {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  &__dice {
+    margin: 0;
+  }
+
+  &__valores {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  &__valor {
+    padding: 0.25rem 0.55rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--accent);
+    }
+
+    &--elegido {
+      border-color: var(--color-neon-cyan, #4ad9d9);
+      color: var(--color-neon-cyan, #4ad9d9);
+    }
+  }
+
+  &__turno {
+    margin: 0.4rem 0 0;
+    font-size: 0.95rem;
+  }
+}
+
+.rival {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  min-width: 8rem;
+
+  &--turno {
+    border-color: var(--color-neon-cyan, #4ad9d9);
+    box-shadow: 0 0 8px rgba(74, 217, 217, 0.35);
+  }
+
+  &__cartas {
+    font-size: 0.95rem;
+  }
+}
+
+.mano {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4, 1.2rem);
+
+  &--turno .mano__carta {
+    cursor: pointer;
+  }
+
+  &__carta {
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    background: none;
+    cursor: default;
+    transition: transform 120ms ease, border-color 120ms ease;
+
+    &:disabled {
+      opacity: 0.85;
+    }
+
+    &--elegida {
+      border-color: var(--color-neon-cyan, #4ad9d9);
+      transform: translateY(-6px);
+    }
+  }
+}
+
+.controles {
+  margin-bottom: var(--space-4, 1.2rem);
+
+  &__botones {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  &__pista {
+    margin: 0.5rem 0 0;
+  }
+}
+
+.registro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+
+  &__linea--challenge,
+  &__linea--take {
+    color: var(--color-text, inherit);
+  }
+}
+
+// ── Final de mano / partida ──────────────────────────────────────────────────
+.final {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 20;
+
+  &__caja {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    padding: var(--space-5, 1.5rem) var(--space-6, 2rem);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md, 10px);
+    background: var(--color-bg-card, #14141f);
+    text-align: center;
+
+    h3 {
+      margin: 0;
+    }
+  }
+}
+
+// ── Panel de reglas ──────────────────────────────────────────────────────────
+.reglas {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4, 1rem);
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 30;
+
+  &__caja {
+    max-width: 40rem;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: var(--space-5, 1.5rem);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md, 10px);
+    background: var(--color-bg-card, #14141f);
+
+    h3 {
+      margin-top: 0;
+    }
+
+    p {
+      margin: 0 0 0.8rem;
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AvatarComponent } from '../../../../shared/components/avatar/avatar';
 import { BadgeComponent } from '../../../../shared/components/badge/badge';
+import { TranslatePipe } from '../../../../i18n/translate.pipe';
 
 export interface Participant {
   id: string;
@@ -17,7 +18,11 @@ export interface Match {
   player2: Participant;
   winner?: 1 | 2;
   score?: string;
-  status: 'pending' | 'live' | 'completed';
+  status: 'pending' | 'live' | 'awaiting_confirmation' | 'completed';
+  /** Ganador declarado por un jugador, pendiente de que el rival lo confirme. */
+  reportedWinnerSlot?: 1 | 2;
+  /** Quién declaró ese resultado. */
+  reportedBy?: { id: string; username: string };
 }
 
 export interface TournamentRound {
@@ -36,7 +41,7 @@ export interface ReportMatchEvent {
 @Component({
   selector: 'app-bracket',
   standalone: true,
-  imports: [AvatarComponent, BadgeComponent],
+  imports: [AvatarComponent, BadgeComponent, TranslatePipe],
   templateUrl: './bracket.html',
   styleUrl: './bracket.scss',
 })
@@ -74,6 +79,31 @@ export class BracketComponent {
 
   hasTwoPlayers(match: Match): boolean {
     return match.player1?.id !== '?' && match.player2?.id !== '?';
+  }
+
+  /** Hay un resultado declarado esperando confirmación del rival. */
+  isPending(match: Match): boolean {
+    return match.status === 'awaiting_confirmation';
+  }
+
+  /** El usuario actual es quien debe confirmar (juega el match y no lo declaró él). */
+  mustConfirm(match: Match): boolean {
+    if (!this.isPending(match) || this.currentUserId == null) return false;
+    const juega =
+      match.player1.id === this.currentUserId || match.player2.id === this.currentUserId;
+    return juega && match.reportedBy?.id !== this.currentUserId;
+  }
+
+  /** Texto de la etiqueta del botón de reporte, según toque declarar o confirmar. */
+  reportLabel(match: Match, slot: 1 | 2): string {
+    if (this.mustConfirm(match)) {
+      return this.isReportedSlot(match, slot) ? '✔ Confirmar' : '✖ No estoy de acuerdo';
+    }
+    return slot === 1 ? match.player1.username : match.player2.username;
+  }
+
+  isReportedSlot(match: Match, slot: 1 | 2): boolean {
+    return match.reportedWinnerSlot === slot;
   }
 
   report(match: Match, winnerSlot: 1 | 2): void {

@@ -1,0 +1,154 @@
+// Replay de manos (roadmap 7.2). El texto nunca se atenúa con `opacity` (rompe el
+// contraste, lo marca axe): para lo secundario se usa el gris atenuado de la paleta,
+// que ya cumple AA.
+.replay {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-bg-surface, var(--card));
+
+  &__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  &__titulo {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  &__cerrar {
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+  }
+
+  &__vacio {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  &__asientos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  &__asiento {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    min-width: 5.5rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+
+    &--turno {
+      border-color: var(--accent);
+    }
+
+    &--fuera {
+      border-style: dashed;
+
+      .replay__nombre {
+        color: var(--color-text-muted);
+      }
+    }
+  }
+
+  &__nombre {
+    font-weight: 600;
+  }
+
+  &__fichas {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  &__cartas {
+    font-family: monospace;
+  }
+
+  &__mesa {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__tablero {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  &__calle,
+  &__bote {
+    color: var(--color-text-muted);
+  }
+
+  &__controles {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+
+    button {
+      min-width: 2rem;
+      padding: 0.25rem 0.4rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+
+      &:disabled {
+        color: var(--color-text-muted);
+        cursor: default;
+      }
+    }
+  }
+
+  &__play {
+    border-color: var(--accent);
+  }
+
+  &__paso {
+    margin-left: auto;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  &__jugadas {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    max-height: 12rem;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+  }
+
+  &__jugada {
+    display: flex;
+    gap: 0.4rem;
+    font-size: 0.9rem;
+
+    &--ahora {
+      color: var(--accent);
+    }
+  }
+
+  &__quien {
+    min-width: 4rem;
+  }
+}

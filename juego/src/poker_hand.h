@@ -23,7 +23,17 @@ typedef struct {
     int score;
     char name[32];
     Card cards[5];  // Las 5 cartas que forman la mano
+    // Desempate lexicográfico estándar de póker: 5 valores (mayor primero)
+    // normalizados para comparar dos manos de la MISMA categoría. En la
+    // escalera baja (rueda A-2-3-4-5) el As cuenta como 1, así que aquí
+    // aparece {5,4,3,2,1} y no {14,...}.
+    int tiebreak[5];
 } HandResult;
+
+// Compara dos manos como manda el póker: primero la categoría, y a igualdad
+// de categoría el desempate carta a carta (kickers). Devuelve >0 si `a` gana,
+// <0 si gana `b`, 0 si son exactamente la misma mano (empate real).
+int CompareHands(const HandResult* a, const HandResult* b);
 
 // Funciones de evaluación
 HandResult EvaluateHand(Card* cards, int count);

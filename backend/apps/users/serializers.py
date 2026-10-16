@@ -1,12 +1,13 @@
 """Users app serializers."""
 
-from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import RegexValidator
-from .models import UserProfile
+from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
 
+from .models import UserProfile
 
 USERNAME_VALIDATOR = RegexValidator(
     regex=r"^[a-zA-Z0-9_]+$",
@@ -31,19 +32,19 @@ class RegisterSerializer(serializers.Serializer):
 
     def validate_username(self, value):
         if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError("Username already exists")
+            raise serializers.ValidationError(_("Username already exists"))
         return value
 
     def validate_email(self, value):
         if User.objects.filter(email__iexact=value).exists():
-            raise serializers.ValidationError("Email already exists")
+            raise serializers.ValidationError(_("Email already exists"))
         return value
 
     def validate_password(self, value):
         try:
             validate_password(value)
         except DjangoValidationError as exc:
-            raise serializers.ValidationError(list(exc.messages))
+            raise serializers.ValidationError(list(exc.messages)) from exc
         return value
 
     def create(self, validated_data):
@@ -91,11 +92,28 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Datos completos del usuario. **Solo** para el propio usuario autenticado
+    (`/api/auth/me`, login, registro, perfil propio): incluye el email."""
+
     profile = UserProfileSerializer(read_only=True)
 
     class Meta:
         model = User
         fields = ["id", "username", "email", "first_name", "last_name", "profile"]
+
+
+class PublicUserSerializer(serializers.ModelSerializer):
+    """Datos de un usuario que puede ver cualquier otro usuario.
+
+    Nunca incluye el email: el listado de usuarios y las relaciones (chat,
+    partidas, torneos) exponían la dirección de correo de todo el mundo.
+    """
+
+    profile = UserProfileSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ["id", "username", "first_name", "last_name", "profile"]
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

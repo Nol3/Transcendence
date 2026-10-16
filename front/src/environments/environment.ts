@@ -1,10 +1,13 @@
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:8000/api',
+  // En desarrollo se apunta directamente al backend (como apiUrl); el dev-server
+  // de Angular no proxya /ws. En producción se usa la ruta relativa, que nginx
+  // reenvía al backend con el handshake de Upgrade.
   get wsUrl(): string {
     if (typeof window === 'undefined') return 'ws://localhost:8000/ws';
     const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    return `${scheme}://${window.location.host}/ws`;
+    return `${scheme}://localhost:8000/ws`;
   },
   // Relative so the game is served same-origin (via nginx proxy → backend),
   // avoiding cross-origin CORS/COEP on index.wasm/.data.

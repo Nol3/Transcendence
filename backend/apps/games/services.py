@@ -16,8 +16,9 @@ AI_USERNAME = "AI_Opponent"
 
 def get_ai_opponent() -> User:
     """Return (creating if needed) the singleton AI opponent user + profile."""
-    from .models import Game  # noqa: F401  (ensures app is ready)
     from apps.users.models import UserProfile
+
+    from .models import Game  # noqa: F401  (ensures app is ready)
 
     user, _ = User.objects.get_or_create(
         username=AI_USERNAME,
@@ -39,11 +40,14 @@ def _profile(user: User):
 
 
 @transaction.atomic
-def finish_game(game, winner: User | None, player1_score: int, player2_score: int):
+def finish_game(game, winner: User | None, player1_score: int, player2_score: int,
+                rated: bool = True):
     """Persist the result and update ELO/win/loss for both human players.
 
     `winner` is None for a draw. Idempotent: a game already marked finished is
     returned untouched so retried POSTs don't double-count stats.
+    `rated=False` records the result but leaves ratings and win/loss counters
+    untouched (used for practice matches against the bot).
     """
     if game.status == "finished":
         return game
@@ -56,6 +60,9 @@ def finish_game(game, winner: User | None, player1_score: int, player2_score: in
     game.save(update_fields=[
         "player1_score", "player2_score", "winner", "status", "finished_at",
     ])
+
+    if not rated:
+        return game
 
     p1, p2 = game.player1, game.player2
     prof1, prof2 = _profile(p1), _profile(p2)

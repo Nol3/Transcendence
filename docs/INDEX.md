@@ -13,6 +13,14 @@ Welcome to FT Transcendence! This is your complete documentation guide for the p
 ## 📋 Main Documentation
 
 ### For Everyone
+- **[docs/ROADMAP.md](docs/ROADMAP.md)** — Plan de mejora priorizado (P0…P3) con verificación y esfuerzo.
+  **Empieza por su sección «⏸️ DÓNDE RETOMAR»**: estado verificado, cabos sueltos y el siguiente paso recomendado.
+- **[docs/AUDITORIA_PROYECTO.md](docs/AUDITORIA_PROYECTO.md)** — Auditoría del estado actual (integridad, privacidad, calidad)
+- **[docs/AUDITORIA_JUEGO_POKER.md](docs/AUDITORIA_JUEGO_POKER.md)** — Auditoría del juego y plan por fases
+- **[docs/POKER_ONLINE.md](docs/POKER_ONLINE.md)** — Póker online: reglas, protocolo WebSocket, UI y despliegue
+- **[docs/JUEGOS.md](docs/JUEGOS.md)** — Cómo añadir un juego al apartado «Juegos» (catálogo, ruta, textos y, si es online, dónde engancha en el servidor)
+- **[docs/INVESTIGACION_JUEGOS.md](docs/INVESTIGACION_JUEGOS.md)** — Qué juegos de cartas españoles tienen sentido en la web, con jugadores, baraja, dificultad y orden recomendado
+- **[docs/REGLAS_JUEGOS.md](docs/REGLAS_JUEGOS.md)** — Reglas listas para programar de los cuatro juegos elegidos (Mentiroso, Brisca, Tute y Mus): reglamento, variante, estado del motor, acciones, casos límite y bot
 - **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** — Complete development guide
   - Project structure
   - Architecture overview
@@ -35,7 +43,7 @@ Welcome to FT Transcendence! This is your complete documentation guide for the p
   - Testing
 
 ### Frontend Developers  
-- **[frontend/README.md](frontend/README.md)** — Angular app documentation
+- **[front/README.md](front/README.md)** — Angular app documentation
   - Project structure
   - Component development
   - Services & models
@@ -68,10 +76,12 @@ ft_transcendence/
 ├── 🐳 compose.yaml           # Docker orchestration
 ├── .env.example                   # Environment variables template
 │
-├── frontend/                       # Angular 18 application
+├── front/                          # Angular 20 application
 │   ├── src/
 │   │   ├── app/                   # Application logic
-│   │   │   ├── modules/           # Feature modules (auth, games, chat, etc.)
+│   │   │   ├── features/          # Rutas: home, auth, game, poker, chat, profile
+│   │   │   ├── core/              # Servicios (auth, póker, chat, torneo…)
+│   │   │   ├── i18n/              # Traducciones (es/en/fr)
 │   │   │   ├── shared/            # Reusable components
 │   │   │   ├── services/          # API services
 │   │   │   └── models/            # Interfaces & types
@@ -123,7 +133,7 @@ ft_transcendence/
 - [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md) — Local setup
 
 ### 🎨 Frontend Developer
-- [frontend/README.md](frontend/README.md) — Component guide
+- [front/README.md](front/README.md) — Component guide
 - [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) — Project scope
 - [CONTRIBUTING.md](CONTRIBUTING.md) — Code standards
 
@@ -148,7 +158,7 @@ ft_transcendence/
 1. Review [CONTRIBUTING.md](CONTRIBUTING.md)
 2. Choose backend or frontend path:
    - **Backend:** [backend/README.md](backend/README.md) → [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md)
-   - **Frontend:** [frontend/README.md](frontend/README.md) → [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md)
+   - **Frontend:** [front/README.md](front/README.md) → [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md)
 
 ### Making Your First PR
 1. Create feature branch (see [CONTRIBUTING.md](CONTRIBUTING.md))
@@ -171,13 +181,13 @@ ft_transcendence/
 → [backend/README.md](backend/README.md)
 
 **Start working on the frontend**
-→ [frontend/README.md](frontend/README.md)
+→ [front/README.md](front/README.md)
 
 **Learn about API endpoints**
 → [backend/README.md](backend/README.md#📚-apps-overview)
 
 **Add a new component**
-→ [frontend/README.md](frontend/README.md#🏗️-creating-a-new-component)
+→ [front/README.md](front/README.md#🏗️-creating-a-new-component)
 
 **Add a new API endpoint**
 → [backend/README.md](backend/README.md#📝-adding-new-endpoints)

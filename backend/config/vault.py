@@ -50,15 +50,15 @@ def load_vault_secrets() -> dict[str, str]:
         return _cache
 
     addr = os.environ.get("VAULT_ADDR", "http://vault:8200").rstrip("/")
-    
+
     # Try to load AppRole credentials
     role_id = os.environ.get("VAULT_ROLE_ID")
     secret_id = os.environ.get("VAULT_SECRET_ID")
-    
+
     creds_path = "/vault_creds/credentials.env"
     if not (role_id and secret_id) and os.path.exists(creds_path):
         try:
-            with open(creds_path, "r") as f:
+            with open(creds_path) as f:
                 for line in f:
                     if "=" in line:
                         k, v = line.strip().split("=", 1)
@@ -88,7 +88,10 @@ def load_vault_secrets() -> dict[str, str]:
         # Fallback to direct token authentication (dev mode token / manual testing)
         token = os.environ.get("VAULT_TOKEN", "")
         if not token:
-            logger.warning("USE_VAULT is on but AppRole credentials and VAULT_TOKEN are missing; using env vars.")
+            logger.warning(
+                "USE_VAULT is on but AppRole credentials and VAULT_TOKEN are missing; "
+                "using env vars."
+            )
             _cache = {}
             return _cache
 

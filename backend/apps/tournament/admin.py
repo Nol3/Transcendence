@@ -1,10 +1,11 @@
 """Tournament app admin."""
 from django.contrib import admin
+
 from .models import (
     Tournament,
+    TournamentMatch,
     TournamentParticipant,
     TournamentRound,
-    TournamentMatch,
 )
 
 

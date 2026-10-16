@@ -6,7 +6,10 @@
     "profile": "Perfil",
     "login": "Iniciar sesión",
     "register": "Registrarse",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "poker": "Póker",
+    "chat": "Chat",
+    "games": "Juegos"
   },
   "home": {
     "subtitle": "Inserta moneda para jugar",
@@ -22,15 +25,26 @@
     "yourStatus": "TU ESTADO",
     "rank": "RANGO",
     "streak": "RACHA",
-    "tagline": "🪙"
+    "tagline": "🪙",
+    "cards": "CARTAS"
   },
   "auth": {
+    "errors": {
+      "required": "Obligatorio",
+      "minlength": "Mínimo {{n}} caracteres",
+      "maxlength": "Máximo {{n}} caracteres",
+      "loginFailed": "No se pudo entrar. Revisa tus datos.",
+      "registerFailed": "No se pudo crear la cuenta. Inténtalo otra vez."
+    },
     "login": {
       "title": "Iniciar sesión",
       "email": "Correo",
       "password": "Contraseña",
       "submit": "Entrar",
-      "noAccount": "¿Sin cuenta? Regístrate"
+      "noAccount": "¿Sin cuenta? Regístrate",
+      "subtitle": "Introduce tus datos para continuar",
+      "emailPlaceholder": "jugador@ejemplo.com",
+      "noAccountShort": "¿Sin cuenta?"
     },
     "register": {
       "title": "Registrarse",
@@ -38,17 +52,54 @@
       "email": "Correo",
       "password": "Contraseña",
       "submit": "Crear cuenta",
-      "hasAccount": "¿Tienes cuenta? Inicia sesión"
+      "hasAccount": "¿Tienes cuenta? Inicia sesión",
+      "subtitle": "Crea tu perfil de jugador",
+      "usernamePlaceholder": "jugador_uno",
+      "hasAccountShort": "¿Ya tienes cuenta?"
     }
   },
   "game": {
     "title": "Juego de cartas",
-    "insertCoin": "Inserta moneda"
+    "insertCoin": "Inserta moneda",
+    "wasmTitle": "Card Wars — juego WASM",
+    "arcade": {
+      "name": "Card Wars",
+      "desc": "El juego original del proyecto: elige cartas, monta la mejor mano y suma puntos.",
+      "how": "Selecciona cartas de tu mano y busca la combinación que más puntúa."
+    },
+    "poker": {
+      "name": "Póker Texas Hold'em",
+      "desc": "Mesas de 3 a 6 jugadores, con bots o con gente real, torneos, ELO e historial de manos.",
+      "how": "Ciegas, subidas y faroles: llévate el bote con la mejor mano o haciendo que los demás se retiren."
+    },
+    "culo": {
+      "name": "Culo (Presidente)",
+      "desc": "Descarte por combinaciones y rangos: el primero que se queda sin cartas es el Presidente y el último el Culo.",
+      "how": "Juega una o varias cartas del mismo valor; el siguiente responde con la misma cantidad y más valor, o pasa."
+    },
+    "mentiroso": {
+      "name": "El Mentiroso",
+      "desc": "Descártate mintiendo sobre tus cartas… sin que te pillen.",
+      "how": "Se echan cartas boca abajo diciendo qué son. Cualquiera puede gritar «¡mentiroso!»."
+    },
+    "brisca": {
+      "name": "La Brisca",
+      "desc": "El juego de bazas de toda la vida: gana la carta más alta y llévate los tantos.",
+      "how": "Tres cartas, una marca el triunfo, y el que gana la baza roba y sale."
+    },
+    "tute": {
+      "name": "Tute",
+      "desc": "El clásico de bazas: el rey y el caballo cantan cuarenta."
+    },
+    "mus": {
+      "name": "Mus",
+      "desc": "Cuatro jugadores en dos parejas: cuatro lances y muchos envites."
+    }
   },
   "lobby": {
     "title": "SALA DE JUEGO",
     "online": "EN LÍNEA",
-    "subtitle": "Card Wars — retoma la partida donde la dejaste.",
+    "subtitle": "Card Wars — el juego de cartas local: 2–4 personas en el mismo equipo.",
     "rulesTitle": "REGLAS DEL JUEGO",
     "statsTitle": "TUS ESTADÍSTICAS",
     "cardBattle": "BATALLA DE CARTAS",
@@ -56,16 +107,19 @@
     "wins": "VICTORIAS",
     "losses": "DERROTAS",
     "winRate": "% VICT.",
-    "rule1": "Cada jugador empieza con 5 cartas",
-    "rule2": "Roba 1 carta por turno",
-    "rule3": "Juega cartas para atacar o defender",
-    "rule4": "Reduce los PV del rival a 0 para ganar",
-    "rule5": "Las cartas especiales tienen efectos únicos",
+    "rule1": "Cada jugador recibe 8 cartas por ronda",
+    "rule2": "Elige de 1 a 5 cartas para formar tu mejor mano de póker",
+    "rule3": "Puedes descartar hasta 5 cartas una vez por turno",
+    "rule4": "Cada mano suma puntos: gana quien llega antes al objetivo",
+    "rule5": "Modo local: se juega por turnos en el mismo dispositivo",
     "customizeTitle": "PERSONALIZAR",
     "players": "JUGADORES",
     "targetScore": "OBJETIVO",
     "rounds": "RONDAS",
-    "theme": "TEMA"
+    "theme": "TEMA",
+    "localMode": "JUEGO LOCAL",
+    "onlineCta": "Jugar al póker online",
+    "onlineCtaHint": "¿Buscas rival? Hay una cola de espera real: te empareja con otro jugador o, si esperas, con un bot."
   },
   "tournament": {
     "title": "Torneo",
@@ -79,7 +133,12 @@
     "createDescription": "Organiza tu propio torneo y desafía a otros jugadores",
     "name": "Nombre del torneo",
     "description": "Descripción del torneo",
-    "players": "Jugadores"
+    "players": "Jugadores",
+    "live": "EN VIVO",
+    "winnerLabel": "Ganador:",
+    "joined": "Inscrito",
+    "prize": "Premio",
+    "maxPlayers": "Jugadores máx."
   },
   "profile": {
     "title": "Perfil del jugador",
@@ -102,10 +161,11 @@
     "gameHistory": "Historial de partidas",
     "noGames": "No has jugado ninguna partida aún.",
     "gameResultWin": "Partida ganada",
-    "gameResultLoss": "Partida perdida"
+    "gameResultLoss": "Partida perdida",
+    "username": "Usuario"
   },
   "common": {
-    "loading": "Cargando...",
+    "loading": "Cargando",
     "error": "Ocurrió un error",
     "retry": "Reintentar",
     "back": "Volver",
@@ -115,7 +175,16 @@
     "status": "Estado",
     "ready": "LISTO",
     "noResults": "Sin resultados",
-    "vs": "vs"
+    "vs": "vs",
+    "close": "Cerrar",
+    "dismiss": "Descartar",
+    "notifications": "Notificaciones",
+    "mainNav": "Navegación principal",
+    "footerNav": "Navegación del pie",
+    "toggleMenu": "Abrir o cerrar el menú",
+    "closeModal": "Cerrar la ventana",
+    "or": "O",
+    "insertCoin": "INSERTA MONEDA"
   },
   "privacy": {
     "title": "Política de Privacidad",
@@ -191,5 +260,693 @@
     "privacy": "Política de Privacidad",
     "terms": "Términos de Servicio",
     "rights": "Todos los derechos reservados"
+  },
+  "poker": {
+    "title": "PÓKER ONLINE",
+    "subtitle": "Texas Hold'em sin límite contra otro jugador o contra un bot.",
+    "status": {
+      "connecting": "Conectando",
+      "searching": "En cola",
+      "playing": "En partida",
+      "error": "Error"
+    },
+    "error": {
+      "auth": "Tu sesión ha caducado. Vuelve a iniciar sesión.",
+      "connection": "No se pudo conectar con el servidor.",
+      "generic": "Algo ha ido mal.",
+      "tableGone": "Esa mesa ya no existe."
+    },
+    "queue": {
+      "title": "MESA RÁPIDA",
+      "explain": "Entra en la cola y te emparejamos con otro jugador. Si no aparece nadie, jugarás contra un bot.",
+      "stake": "CIEGAS",
+      "find": "BUSCAR PARTIDA",
+      "waiting": "Buscando rival…",
+      "botHint": "Si no aparece nadie en {{seconds}} s, entrará un bot.",
+      "cancel": "CANCELAR",
+      "tableSize": "Jugadores por mesa",
+      "theme": "Tema del tapete"
+    },
+    "rules": {
+      "title": "REGLAS",
+      "1": "Texas Hold'em sin límite, 1 contra 1",
+      "2": "Recibes 2 cartas privadas y hay 5 comunitarias",
+      "3": "Rondas de apuesta: preflop, flop, turn y river",
+      "4": "Puedes pasar, igualar, subir o irte all-in",
+      "5": "Gana la mejor mano de 5 cartas, o quien no se retire"
+    },
+    "table": {
+      "hand": "Mano",
+      "blinds": "Ciegas",
+      "pot": "BOTE",
+      "bot": "BOT",
+      "allIn": "ALL-IN",
+      "folded": "RETIRADO",
+      "waitingFor": "Esperando a {{name}}…",
+      "matchOver": "PARTIDA TERMINADA",
+      "backToLobby": "VOLVER A LA COLA",
+      "leave": "Salir de la mesa"
+    },
+    "street": {
+      "preflop": "PREFLOP",
+      "flop": "FLOP",
+      "turn": "TURN",
+      "river": "RIVER",
+      "complete": "FIN"
+    },
+    "action": {
+      "fold": "Retirarse",
+      "check": "Pasar",
+      "call": "Igualar",
+      "raise": "Subir a",
+      "bet": "Apostar",
+      "allIn": "All-in"
+    },
+    "result": {
+      "won": "¡GANAS LA MANO!",
+      "lost": "PIERDES LA MANO",
+      "wonFold": "GANAS: todos se retiran",
+      "lostFold": "TE RETIRAS",
+      "pot": "Bote",
+      "showdown": "showdown"
+    },
+    "log": {
+      "timeout": "turno agotado",
+      "handResult": "mano resuelta",
+      "matchEnd": "fin de la partida"
+    },
+    "tournament": {
+      "title": "PARTIDA DE TORNEO",
+      "explain": "Te enfrentas a {rival} en una mesa de póker de verdad. La partida empieza cuando llegue.",
+      "waiting": "ESPERANDO AL RIVAL…",
+      "autoResult": "El resultado lo cierra el servidor al terminar la partida: el bracket avanza solo.",
+      "rules": "Sin cola y sin bots: los dos jugadores del bracket entran a la misma mesa, con 1000 fichas y ciegas 5/10. Se juega hasta que uno se quede sin fichas.",
+      "back": "Volver al torneo"
+    },
+    "history": {
+      "title": "HISTORIAL",
+      "subtitle": "Tus partidas de póker y las manos que has jugado.",
+      "backToTable": "Volver a la mesa",
+      "stats": "Estadísticas",
+      "handsPlayed": "Manos jugadas",
+      "handsWon": "Manos ganadas",
+      "winRate": "% de manos ganadas",
+      "showdowns": "Showdowns ganados",
+      "biggestPot": "Bote más grande",
+      "noStats": "Todavía no hay estadísticas.",
+      "matches": "Partidas",
+      "noMatches": "Todavía no has jugado ninguna partida de póker.",
+      "result": {
+        "win": "GANADA",
+        "loss": "PERDIDA",
+        "draw": "EMPATE"
+      },
+      "vs": "contra",
+      "hands": "manos",
+      "handsTitle": "Manos de la partida",
+      "hand": "Mano",
+      "showdown": "SHOWDOWN",
+      "winner": "Gana",
+      "board": "Mesa:",
+      "hidden": "ocultas",
+      "close": "Cerrar",
+      "error": "No se pudo cargar el historial.",
+      "replay": "Ver mano",
+      "replayError": "No se pudo cargar esa mano."
+    },
+    "spectate": {
+      "badge": "ESPECTADOR",
+      "short": "espectador"
+    },
+    "chat": {
+      "title": "Chat de mesa",
+      "empty": "Nadie ha dicho nada todavía. Sé el primero.",
+      "placeholder": "Escribe algo a la mesa…",
+      "send": "Enviar"
+    },
+    "live": {
+      "title": "Mesas en vivo",
+      "explain": "Puedes entrar a mirar cualquier mesa; no verás las cartas ajenas hasta el showdown.",
+      "none": "No hay mesas abiertas ahora mismo.",
+      "live": "EN JUEGO",
+      "finished": "TERMINADA",
+      "watch": "Ver",
+      "refresh": "Actualizar"
+    },
+    "achievements": {
+      "title": "Logros",
+      "empty": "Juega una mano y empezarán a aparecer.",
+      "locked": "Bloqueado",
+      "primera_mano": "Primera mano ganada",
+      "escalera_de_color": "Escalera de color",
+      "tres_seguidas": "Tres manos seguidas"
+    },
+    "card": {
+      "hidden": "carta boca abajo"
+    }
+  },
+  "chat": {
+    "title": "CHAT",
+    "subtitle": "Habla con otros jugadores: rivales, compañeros de torneo o quien quieras.",
+    "conversations": "Conversaciones",
+    "noConversations": "Todavía no tienes conversaciones.",
+    "newConversation": "Nueva conversación",
+    "searchUser": "Buscar jugador…",
+    "noUsers": "No hay jugadores con ese nombre.",
+    "pickOne": "Elige una conversación",
+    "emptyThread": "Elige a alguien de la izquierda (o empieza una conversación nueva) para escribir.",
+    "placeholder": "Escribe un mensaje… (Enter para enviar)",
+    "send": "Enviar",
+    "hint": "Enter envía · Mayús+Enter salta de línea",
+    "error": {
+      "load": "No se pudieron cargar los mensajes.",
+      "send": "No se pudo enviar el mensaje."
+    }
+  },
+  "notifications": {
+    "markAllRead": "Marcar todo como leído",
+    "title": "Notificaciones",
+    "noNotifications": "Sin notificaciones"
+  },
+  "notify": {
+    "login": {
+      "title": "Bienvenido de nuevo",
+      "body": "Sesión iniciada como {{email}}"
+    },
+    "register": {
+      "title": "Bienvenido",
+      "body": "Cuenta creada para {{username}}"
+    },
+    "tournament": {
+      "declared": {
+        "title": "Resultado declarado",
+        "body": "Falta que tu rival lo confirme para que el bracket avance"
+      },
+      "conflict": {
+        "title": "Resultado en conflicto",
+        "body": "Cada jugador declaró un ganador distinto: decide el creador del torneo"
+      },
+      "failed": {
+        "title": "No se pudo enviar",
+        "body": "No se pudo declarar el resultado del match"
+      },
+      "created": {
+        "title": "Torneo creado"
+      },
+      "createFailed": {
+        "title": "No se pudo crear",
+        "body": "No se pudo crear el torneo"
+      },
+      "joined": {
+        "title": "Inscrito"
+      },
+      "joinFailed": {
+        "title": "No se pudo inscribir",
+        "body": "No se pudo inscribir en el torneo"
+      }
+    },
+    "profile": {
+      "avatarTooLarge": {
+        "title": "Archivo demasiado grande",
+        "body": "El avatar debe pesar menos de 5 MB"
+      },
+      "uploadFailed": {
+        "title": "Error al subir",
+        "body": "No se pudo subir el avatar"
+      }
+    }
+  },
+  "replay": {
+    "title": "Mano #{{n}}",
+    "close": "Cerrar",
+    "noActions": "Esta mano no tiene registro de jugadas: se guardó antes de que existiera el replay.",
+    "pot": "Bote",
+    "first": "Primera jugada",
+    "prev": "Jugada anterior",
+    "play": "Reproducir",
+    "pause": "Pausar",
+    "next": "Jugada siguiente",
+    "last": "Última jugada",
+    "step": "Paso {{n}} de {{total}}",
+    "start": "Se reparten las cartas",
+    "blind": "Ciega {{kind}}: {{amount}}",
+    "act": {
+      "fold": "se retira",
+      "check": "pasa",
+      "call": "iguala {{amount}}",
+      "raise": "sube a {{amount}}",
+      "all_in": "all-in ({{amount}})"
+    },
+    "street": {
+      "preflop": "Preflop",
+      "flop": "Flop",
+      "turn": "Turn",
+      "river": "River"
+    },
+    "winner": "gana {{amount}}"
+  },
+  "card": {
+    "rank": {
+      "2": "dos",
+      "3": "tres",
+      "4": "cuatro",
+      "5": "cinco",
+      "6": "seis",
+      "7": "siete",
+      "8": "ocho",
+      "9": "nueve",
+      "T": "diez",
+      "J": "jota",
+      "Q": "reina",
+      "K": "rey",
+      "A": "as"
+    },
+    "suit": {
+      "c": "tréboles",
+      "d": "diamantes",
+      "h": "corazones",
+      "s": "picas"
+    }
+  },
+  "games": {
+    "title": "Juegos",
+    "subtitle": "Todo lo que se puede jugar aquí. Elige uno y dale.",
+    "play": "Jugar",
+    "soon": "Próximamente",
+    "upcoming": "En camino",
+    "mode": {
+      "local": "En local",
+      "bots": "Contra bots",
+      "online": "Online"
+    },
+    "players": {
+      "one": "1 jugador",
+      "twoToSix": "2–6 jugadores",
+      "threeToSix": "3–6 jugadores",
+      "twoToThree": "2–3 jugadores",
+      "four": "4 jugadores"
+    },
+    "tag": {
+      "arcade": "Arcade",
+      "cards": "Cartas",
+      "betting": "Apuestas",
+      "shedding": "Descarte",
+      "tricks": "Bazas"
+    },
+    "back": "Volver a juegos"
+  },
+  "culo": {
+    "backToGames": "Volver a juegos",
+    "intro": "Se reparten todas las cartas. El primero que se descarta es el Presidente y el último el Culo, y entre rondas los extremos intercambian cartas.",
+    "setup": {
+      "players": "Jugadores",
+      "decks": "Barajas",
+      "oneDeck": "1 baraja (40 cartas)",
+      "twoDecks": "2 barajas (80 cartas)",
+      "note": "Con 5 o 6 jugadores se juega mejor con dos barajas: hay más combinaciones posibles."
+    },
+    "start": "Repartir",
+    "leave": "Dejar la mesa",
+    "play": "Jugar",
+    "pass": "Pasar",
+    "yourTurn": "Te toca",
+    "waiting": "Esperando…",
+    "tableFree": "La mesa está libre: abre tú",
+    "noMoves": "No puedes responder a eso: te toca pasar",
+    "card": "{{value}} de {{suit}}",
+    "roundEnd": "Fin de la ronda",
+    "nextRound": "Siguiente ronda",
+    "sound": {
+      "toggle": "Activar o desactivar el sonido"
+    },
+    "rules": {
+      "open": "Cómo se juega",
+      "title": "Cómo se juega al Culo",
+      "goal": {
+        "title": "Objetivo",
+        "text": "Quedarte sin cartas antes que los demás. El primero es el Presidente; el último, el Culo."
+      },
+      "turn": {
+        "title": "Cómo va una ronda",
+        "1": "Se reparten todas las cartas entre los jugadores.",
+        "2": "Quien abre juega una o varias cartas del mismo valor.",
+        "3": "El siguiente responde con exactamente la misma cantidad de cartas y de valor superior, o pasa.",
+        "4": "Puedes pasar aunque tengas jugada: pasar también es una decisión.",
+        "5": "Cuando todos los demás pasan, el último que jugó se lleva las cartas y abre la siguiente."
+      },
+      "values": {
+        "title": "Valor de las cartas",
+        "text": "De menor a mayor. El 5 de oros es la carta más alta, por encima del As, y no se puede jugar junto a otros cincos."
+      },
+      "roles": {
+        "title": "Puestos y roles",
+        "1": "El primero en descartarse es el Presidente.",
+        "2": "El segundo, Vicepresidente.",
+        "3": "El penúltimo, Viceculo, y el último, Culo.",
+        "4": "Con 3 jugadores no hay vices: quedan Presidente, un neutro y Culo."
+      },
+      "exchange": {
+        "title": "Intercambio entre rondas",
+        "1": "El Culo le da sus 2 mejores cartas al Presidente, y el Presidente sus 2 peores al Culo.",
+        "2": "El Viceculo le da su mejor carta al Vicepresidente, que devuelve su peor.",
+        "3": "Los jugadores neutros no intercambian nada."
+      },
+      "tips": {
+        "title": "Ideas para jugar mejor",
+        "1": "No gastes las cartas altas demasiado pronto: guárdalas para cerrar una mano importante.",
+        "2": "Abrir con cuatro o cinco cartas deja a los demás casi sin respuesta.",
+        "3": "Pasar también es táctica: a veces conviene reservar la jugada buena.",
+        "4": "Fíjate en quién está a punto de quedarse sin cartas antes de abrir."
+      }
+    },
+    "exchange": {
+      "title": "Intercambio",
+      "note": "Estas cartas cambian de mano antes de la siguiente ronda."
+    },
+    "log": {
+      "play": "juega {{count}} carta(s)",
+      "pass": "pasa",
+      "trick": "se lleva la baza",
+      "out": "se queda sin cartas ({{place}}º)"
+    },
+    "rank": {
+      "1": "As",
+      "2": "Dos",
+      "3": "Tres",
+      "4": "Cuatro",
+      "5": "Cinco",
+      "6": "Seis",
+      "7": "Siete",
+      "10": "Sota",
+      "11": "Caballo",
+      "12": "Rey"
+    },
+    "suit": {
+      "o": "oros",
+      "c": "copas",
+      "e": "espadas",
+      "b": "bastos"
+    },
+    "role": {
+      "presidente": "Presidente",
+      "vicepresidente": "Vicepresidente",
+      "neutro": "Neutro",
+      "viceculo": "Viceculo",
+      "culo": "Culo"
+    },
+    "menu": {
+      "local": "En local, contra bots",
+      "localHint": "Tú contra bots, en este dispositivo. Sin cuenta de por medio.",
+      "playLocal": "Jugar ya",
+      "friends": "Con amigos",
+      "friendsHint": "Crea una sala, pásale el código a quien quieras y jugáis desde donde estéis.",
+      "create": "Crear sala",
+      "join": "Entrar",
+      "joinHint": "¿Te han dado un código? Escríbelo y entras.",
+      "codePlaceholder": "Código"
+    },
+    "lobby": {
+      "title": "Sala",
+      "share": "Pásales el código o el enlace: en cuanto entren, aparecen aquí.",
+      "copy": "Copiar enlace",
+      "copied": "¡Copiado!",
+      "bot": "bot",
+      "gone": "desconectado",
+      "removeBot": "Quitar el bot",
+      "freeSeat": "Asiento libre",
+      "addBot": "Añadir bot",
+      "waitingHost": "Esperando a que reparta quien creó la sala…"
+    },
+    "online": {
+      "errorCrear": "No se pudo crear la sala. Prueba otra vez.",
+      "salaNoExiste": "Esa sala no existe o ya se ha cerrado.",
+      "salaLlena": "Esa sala está llena.",
+      "sinSesion": "Entra en tu cuenta para jugar online.",
+      "error": {
+        "already_started": "La partida ya ha empezado.",
+        "room_full": "La sala está llena.",
+        "host_only": "Solo quien creó la sala puede hacer eso.",
+        "min_players": "Hacen falta al menos 3 jugadores (añade un bot si sois dos).",
+        "no_codes": "No quedan códigos libres. Prueba otra vez.",
+        "not_your_turn": "Ahora no te toca.",
+        "round_not_over": "La ronda todavía no ha terminado.",
+        "unknown_action": "Esa acción no existe."
+      },
+      "desconectado": "Se ha cortado la conexión con la sala.",
+      "reconectar": "Volver a entrar"
+    }
+  },
+  "baraja": {
+    "rank": {
+      "1": "As",
+      "2": "Dos",
+      "3": "Tres",
+      "4": "Cuatro",
+      "5": "Cinco",
+      "6": "Seis",
+      "7": "Siete",
+      "10": "Sota",
+      "11": "Caballo",
+      "12": "Rey"
+    },
+    "suit": {
+      "o": "oros",
+      "c": "copas",
+      "e": "espadas",
+      "b": "bastos"
+    }
+  },
+  "mentiroso": {
+    "intro": "Se reparte toda la baraja. Por turnos echas cartas boca abajo diciendo qué son: puedes mentir en el valor, nunca en la cantidad. Cualquiera puede desconfiar, y quien se quede sin cartas gana la mano.",
+    "setup": {
+      "players": "Jugadores",
+      "hands": "Manos para ganar"
+    },
+    "start": "Repartir y jugar",
+    "you": "Tú",
+    "pile": "En la mesa",
+    "pileEmpty": "No hay nada en la mesa",
+    "claimed": "Se está diciendo",
+    "claimPrompt": "¿Qué dices que son?",
+    "play": "Poner",
+    "challenge": "¡Mentiroso!",
+    "retire": "Retirar los cuatro",
+    "retireHint": "Tienes las cuatro cartas de un valor: puedes enseñarlas y sacarlas del juego.",
+    "turnYours": "Te toca",
+    "turnOther": "Le toca a {{name}}",
+    "hand": "Mano {{n}} de {{total}}",
+    "wins": "{{n}} de {{total}} manos",
+    "cards": "{{n}} cartas",
+    "handEnd": "¡{{name}} se ha quedado sin cartas y gana la mano!",
+    "matchEnd": "¡{{name}} gana la partida!",
+    "nextHand": "Siguiente mano",
+    "newMatch": "Otra partida",
+    "leave": "Salir",
+    "log": {
+      "play": "{{name}} pone {{count}} y dice «{{rank}}»",
+      "challenge": "{{name}} desconfía de {{other}}",
+      "lie": "Mentía: {{name}} se lleva {{count}} cartas",
+      "true": "Decía la verdad: {{name}} se lleva {{count}} cartas",
+      "retire": "{{name}} retira los cuatro {{rank}}",
+      "out": "{{name}} se queda sin cartas"
+    },
+    "rules": {
+      "title": "Cómo se juega",
+      "goal": "Ganas la mano quedándote sin cartas. La partida es a varias manos.",
+      "round": "Se echan una o varias cartas boca abajo y se dice qué son. El valor lo fija quien abre la ronda y los demás lo siguen: en el valor se puede mentir, en la cantidad no.",
+      "challenge": "Cualquiera —no solo el siguiente— puede gritar «¡mentiroso!». Si mentía, se lleva el montón quien lo puso; si decía la verdad, se lo lleva quien desconfió. Y quien se lleva el montón abre la ronda siguiente.",
+      "out": "A quien se ha quedado sin cartas ya no se le puede desconfiar: la última jugada que vacía una mano es gratis.",
+      "four": "Si reúnes las cuatro cartas de un mismo valor puedes enseñarlas y sacarlas del juego: son cartas que ya no te valen."
+    }
+  },
+  "juego": {
+    "turnYours": "Te toca",
+    "turnOther": "Le toca a {{name}}",
+    "leave": "Salir"
+  },
+  "brisca": {
+    "intro": "Se reparten tres cartas y se descubre la siguiente, que marca el triunfo. Cada uno juega una carta —no hay obligación de asistir— y gana la más alta del triunfo. El que gana la baza roba primero y sale. Al final, cada uno suma los tantos de sus cartas.",
+    "setup": {
+      "players": "Jugadores",
+      "games": "Juegos para ganar"
+    },
+    "start": "Repartir y jugar",
+    "points": "{{n}} tantos",
+    "gamesWon": "{{n}} de {{total}} juegos",
+    "trump": "Triunfo",
+    "trumpGone": "La carta que pintaba ya se la ha llevado alguien",
+    "trickEmpty": "Nadie ha jugado todavía en esta baza",
+    "deck": "Quedan {{n}} cartas por robar",
+    "play": "Jugar",
+    "swap": "Cambiar el triunfo",
+    "swapHint": "Has ganado la baza y tienes el siete de triunfo: puedes quedarte con la carta que pintaba.",
+    "void": "Empate a 60: el juego se anula",
+    "nextGame": "Siguiente juego",
+    "newMatch": "Otra partida",
+    "log": {
+      "trick": "{{name}} gana la baza ({{tantos}} tantos)",
+      "swap": "{{name}} cambia el triunfo por el siete",
+      "gameEnd": "Juego terminado: {{a}} – {{b}}",
+      "matchEnd": "¡{{name}} gana la partida!"
+    },
+    "rules": {
+      "title": "Cómo se juega",
+      "goal": "Gana la partida quien se lleva el número de juegos pactado. Cada juego se gana sumando más tantos que el rival con las cartas de las bazas que te llevas.",
+      "order": "El orden de las cartas no es el de la baraja: de menor a mayor es 2, 4, 5, 6, 7, Sota, Caballo, Rey, 3, As. El tres es la segunda carta más alta.",
+      "trick": "Se reparten tres cartas y se descubre la siguiente, que marca el triunfo. Cada uno juega la carta que quiera: no hay obligación de asistir al palo ni de jugar triunfo. Gana la más alta del triunfo o, si no hay triunfo, la más alta del palo con el que se salió.",
+      "draw": "El que gana la baza se lleva las cartas, roba primero y sale en la siguiente. La carta que marca el triunfo es la última que se roba.",
+      "swap": "Quien gana una baza puede cambiar la carta que pinta por el siete de ese palo, antes de robar y nunca después de la penúltima baza.",
+      "score": "Al contar: As 11, tres 10, rey 4, caballo 3, sota 2; las demás no valen nada. Si los dos llegan a 60 tantos, el juego se anula."
+    }
+  },
+  "tute": {
+    "intro": "El tute de siempre. Ocho cartas cada uno y el resto en la baceta: mientras queden cartas por repartir solo estás obligado a asistir al triunfo; cuando se acaban, hay que asistir, montar y fallar. El rey y el caballo del mismo palo cantan: 40 si son del triunfo (las cuarenta) y 20 si no (las veinte), pero solo después de ganar una baza. Gana quien llega a 101 tantos, o quien canta un tute.",
+    "setup": {
+      "players": "Jugadores"
+    },
+    "start": "Repartir y jugar",
+    "sung": "Cantados: {{n}}",
+    "baceta": "Quedan {{n}} cartas en la baceta",
+    "mustFollow": "Ya no queda baceta: tienes que asistir, montar y fallar.",
+    "mustTrump": "Mientras quede baceta, solo obliga el triunfo.",
+    "canSing": "Puedes cantar:",
+    "cuarenta": "Las cuarenta",
+    "veinte": "Las veinte",
+    "singTute": "¡Tute!",
+    "gameEnd": "Juego terminado",
+    "log": {
+      "cuarenta": "{{name}} canta las cuarenta (40 tantos)",
+      "veinte": "{{name}} canta las veinte (20 tantos)",
+      "tute": "¡{{name}} tiene un tute y gana el juego!",
+      "gameEnd": "Juego terminado: {{a}} – {{b}}"
+    },
+    "rules": {
+      "title": "Cómo se juega al tute",
+      "goal": "Gana quien llega a 101 tantos sumando las cartas de las bazas que se lleva, los acuses que canta y los 10 de la última baza.",
+      "must": "Con cartas en la baceta solo estás obligado a asistir al palo de triunfo, y sin necesidad de montar. Cuando la baceta se acaba, hay que asistir, montar y fallar: si puedes seguir el palo tienes que hacerlo, y si puedes superar la carta más alta de la mesa, también; si no tienes del palo, tienes que jugar triunfo.",
+      "sing": "El rey y el caballo del mismo palo valen 40 tantos si son del triunfo (las cuarenta) y 20 si son de otro palo (las veinte). Solo se pueden cantar después de ganar una baza, y un acuse por baza.",
+      "tute": "Los cuatro reyes o los cuatro caballos en la mano son un tute: se canta y se gana el juego al instante.",
+      "last": "La última baza vale 10 tantos y decide los empates."
+    }
+  },
+  "mus": {
+    "intro": "El mus de cuatro, en parejas: tú juegas con el de enfrente (los asientos 0 y 2 contra el 1 y el 3). Sin triunfo ni palos, y con ocho reyes y ocho ases: el tres vale lo mismo que el rey y el dos lo mismo que el as. Primero se pregunta si hay mus; luego se envida la grande, la chica, los pares y el juego. Gana la pareja que llega a 40 piedras, y la vaca es al mejor de tres juegos.",
+    "start": "Repartir y jugar",
+    "sayMus": "¡Mus!",
+    "cut": "No hay mus",
+    "discard": "Descartar {{n}}",
+    "pass": "Paso",
+    "bet": "Envido",
+    "betAmount": "Piedras",
+    "envido": "Envite de {{n}} piedras",
+    "ordago": "¡Órdago! Se juega la vaca",
+    "ordagoShort": "Órdago",
+    "want": "Quiero",
+    "dontWant": "No quiero",
+    "grande": "Grande",
+    "chica": "Chica",
+    "paresLabel": "Pares",
+    "pares": {
+      "duples": "duples",
+      "medias": "medias",
+      "par": "pareja",
+      "none": "nada"
+    },
+    "juego": "Juego",
+    "partnerPlay": "Tu compañero {{name}} tiene",
+    "gamesWon": "{{n}} de 3 juegos",
+    "gameEnd": "Juego terminado",
+    "nextHand": "Otra mano",
+    "newMatch": "Otra vaca",
+    "phase": {
+      "mus": "¿Hay mus?",
+      "descartar": "Descartando",
+      "lances": "Lance de {{lance}}"
+    },
+    "lance": {
+      "grande": "la grande",
+      "chica": "la chica",
+      "pares": "los pares",
+      "juego": "el juego"
+    },
+    "log": {
+      "mus": "{{name}} quiere mus",
+      "cortar": "{{name}} corta el mus",
+      "descartar": "{{name}} cambia {{n}} cartas",
+      "paso": "{{name}} pasa",
+      "envido": "{{name}} envida {{n}} piedras",
+      "quiero": "{{name}} quiere",
+      "no_quiero": "{{name}} no quiere",
+      "ordago": "{{name}} canta órdago",
+      "lance": {
+        "grande": "{{team}} ganan la grande ({{n}} piedras)",
+        "chica": "{{team}} ganan la chica ({{n}} piedras)",
+        "pares": "{{team}} ganan los pares ({{n}} piedras)",
+        "juego": "{{team}} ganan el juego ({{n}} piedras)"
+      },
+      "nadie": {
+        "grande": "Nadie gana la grande",
+        "chica": "Nadie gana la chica",
+        "pares": "Nadie gana los pares",
+        "juego": "Nadie gana el juego"
+      },
+      "gameEnd": "Se lleva el juego la pareja {{team}}",
+      "vaca": "¡La pareja {{team}} se lleva la vaca!"
+    },
+    "rules": {
+      "title": "Cómo se juega al mus",
+      "goal": "Gana la pareja que llega a 40 piedras. Cada mano se juega a cuatro lances, y en cada lance se puede envidar: si el envite no se quiere, quien lo hizo se lleva una piedra.",
+      "order": "No hay triunfo ni palos. El orden de mayor a menor es rey o tres, caballo, sota, siete, seis, cinco, cuatro, dos o as: el tres vale lo mismo que el rey y el dos lo mismo que el as («ocho reyes y ocho ases»).",
+      "mus": "Antes de nada se pregunta si hay mus, empezando por el mano. En cuanto uno corta, nadie más descarta y se pasa a los lances.",
+      "lances": "Los cuatro lances van en este orden: grande (la carta más alta), chica (la más baja), pares y juego (sumar 31 o más). En el juego el orden es 31, 32, 40, 37, 36, 35, 34 y 33: el 31 es el mejor. Si nadie tiene juego, se juega al punto: gana el que más se acerque al 30.",
+      "bets": "En cada lance se pasa o se envida, con dos piedras de mínimo. El contrario puede querer, no querer, subir el envite o cantar órdago, que se juega la vaca entera. En parejas vale la apuesta más alta de los dos.",
+      "pairs": "En los pares, duples (dos parejas o cuatro iguales) gana a medias (tres iguales), que gana a pareja. A igualdad manda la carta más alta de la combinación."
+    }
+  },
+  "sala": {
+    "create": "Crear una sala",
+    "code": "Código",
+    "join": "Entrar",
+    "back": "Volver al juego",
+    "lobby": "Sala de espera",
+    "share": "Pásale el código o el enlace a quien quieras jugar con él.",
+    "copy": "Copiar enlace",
+    "copied": "¡Copiado!",
+    "bot": "bot",
+    "removeBot": "Quitar el bot",
+    "gone": "desconectado",
+    "freeSeat": "Libre",
+    "addBot": "Añadir un bot",
+    "start": "Repartir y jugar",
+    "waitingHost": "Esperando a que el anfitrión reparta…",
+    "disconnected": "Se ha cortado la conexión.",
+    "reconnect": "Volver a entrar",
+    "leave": "Salir de la sala",
+    "sinSesion": "Tu sesión ha caducado: vuelve a entrar en la cuenta.",
+    "noExiste": "Esa sala no existe (o ya ha terminado).",
+    "llena": "La sala está llena.",
+    "error": {
+      "crear": "No se pudo crear la sala. Inténtalo otra vez.",
+      "codigo": "Escribe el código de la sala (cuatro letras o más).",
+      "noExiste": "No encontramos esa sala. Comprueba el código.",
+      "already_started": "La partida ya ha empezado.",
+      "room_full": "La sala está llena.",
+      "host_only": "Solo el anfitrión puede hacer eso.",
+      "min_players": "Todavía no hay jugadores suficientes.",
+      "no_codes": "No quedan códigos de sala libres.",
+      "not_started": "La partida todavía no ha empezado.",
+      "unknown_action": "Esa jugada no vale.",
+      "not_your_turn": "Ahora no te toca.",
+      "not_your_card": "Esa carta no es tuya.",
+      "no_cards": "No tienes cartas para eso.",
+      "no_rank": "Todavía no se ha cantado nada.",
+      "rank_changed": "Ese valor ya no vale.",
+      "nothing_to_challenge": "Ahora mismo no hay nada que desconfiar.",
+      "self_challenge": "No puedes desconfiar de ti mismo.",
+      "player_out": "Ese jugador ya se ha quedado sin cartas.",
+      "not_four": "Necesitas las cuatro cartas iguales.",
+      "not_playing": "La partida ya ha terminado.",
+      "not_finished": "La partida todavía no ha terminado."
+    }
   }
 }

@@ -27,7 +27,7 @@ class ApiKeyAuthentication(BaseAuthentication):
                 key=ApiKey.hash_key(raw_key), is_active=True
             )
         except ApiKey.DoesNotExist:
-            raise AuthenticationFailed("Invalid or revoked API key.")
+            raise AuthenticationFailed("Invalid or revoked API key.") from None
 
         # Track last usage without blocking the request
         ApiKey.objects.filter(pk=api_key.pk).update(last_used_at=timezone.now())

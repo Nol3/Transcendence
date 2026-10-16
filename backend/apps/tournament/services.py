@@ -76,8 +76,7 @@ def generate_bracket(tournament: Tournament) -> bool:
         name=_round_name(1, match_count),
     )
 
-    position = 0
-    for i in range(0, len(players), 2):
+    for position, i in enumerate(range(0, len(players), 2)):
         p1 = players[i]
         p2 = players[i + 1] if i + 1 < len(players) else None
         match = TournamentMatch.objects.create(
@@ -94,7 +93,6 @@ def generate_bracket(tournament: Tournament) -> bool:
             match.status = 'completed'
             match.finished_at = timezone.now()
             match.save(update_fields=['winner', 'status', 'finished_at'])
-        position += 1
 
     tournament.status = 'in_progress'
     tournament.started_at = timezone.now()
@@ -161,8 +159,7 @@ def _maybe_advance_round(tournament: Tournament, current_round: TournamentRound)
         name=_round_name(next_number, match_count),
     )
 
-    position = 0
-    for i in range(0, len(winners), 2):
+    for position, i in enumerate(range(0, len(winners), 2)):
         p1 = winners[i]
         p2 = winners[i + 1] if i + 1 < len(winners) else None
         match = TournamentMatch.objects.create(
@@ -178,7 +175,6 @@ def _maybe_advance_round(tournament: Tournament, current_round: TournamentRound)
             match.status = 'completed'
             match.finished_at = timezone.now()
             match.save(update_fields=['winner', 'status', 'finished_at'])
-        position += 1
 
     # A round full of byes can cascade into the next round immediately.
     _maybe_advance_round(tournament, next_round)

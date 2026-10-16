@@ -119,24 +119,18 @@ export class AuthService {
   logout(): void {
     // Prevenir logout múltiple
     if (!this._user()) return;
-    
+
+    // Se avisa al servidor **antes** de borrar nada: si no, el refresh sigue valiendo siete
+    // días y «cerrar sesión» no cierra nada. Se ignora el resultado a propósito: si la red
+    // falla, el usuario se va igual (y así no se entra en bucles de logout).
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    if (refreshToken) {
+      this.api.post('/auth/logout', { refreshToken }).subscribe({ error: () => {} });
+    }
+
     this._user.set(null);
     this.clearTokens();
     this.router.navigate(['/login']).catch(() => {});
-    
-    // No enviar logout al backend en bucle
-    // this.api.post('/auth/logout', {}).subscribe({
-    //   complete: () => {
-    //     this._user.set(null);
-    //     this.clearTokens();
-    //     this.router.navigate(['/login']);
-    //   },
-    //   error: () => {
-    //     this._user.set(null);
-    //     this.clearTokens();
-    //     this.router.navigate(['/login']);
-    //   },
-    // });
   }
 
   refreshToken() {

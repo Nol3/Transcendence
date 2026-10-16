@@ -1,0 +1,70 @@
+<div class="replay">
+  <header class="replay__cabecera">
+    <h3 class="replay__titulo">{{ 'replay.title' | translate: { n: hand().hand_number } }}</h3>
+    <button type="button" class="replay__cerrar" (click)="cerrar()"
+            [attr.aria-label]="'replay.close' | translate">✕</button>
+  </header>
+
+  @if (total() === 0) {
+    <p class="replay__vacio">{{ 'replay.noActions' | translate }}</p>
+  } @else {
+    <div class="replay__asientos">
+      @for (p of hand().players; track p.seat) {
+        <div class="replay__asiento"
+             [class.replay__asiento--turno]="vista().turno === p.seat"
+             [class.replay__asiento--fuera]="vista().retirados.has(p.seat)">
+          <span class="replay__nombre">{{ p.name }}</span>
+          <span class="replay__fichas">{{ p.stack_after }}</span>
+          @if (p.hole) {
+            <span class="replay__cartas">
+              @for (c of cards(p.hole); track $index) {
+                <app-playing-card [card]="c" [size]="'sm'" [order]="$index" />
+              }
+            </span>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="replay__mesa">
+      <div class="replay__tablero">
+        @for (c of vista().board; track $index) {
+          <app-playing-card [card]="c" [size]="'lg'" [order]="$index" />
+        }
+        @if (!vista().board.length) {
+          <span class="replay__calle">{{ 'replay.street.' + vista().calle | translate }}</span>
+        }
+      </div>
+      <div class="replay__bote">
+        {{ 'replay.pot' | translate }}: <b>{{ vista().bote }}</b>
+      </div>
+    </div>
+
+    <div class="replay__controles">
+      <button type="button" (click)="primero()" [disabled]="actual() === 0"
+              [attr.aria-label]="'replay.first' | translate">⏮</button>
+      <button type="button" (click)="anterior()" [disabled]="actual() === 0"
+              [attr.aria-label]="'replay.prev' | translate">◀</button>
+      <button type="button" class="replay__play" (click)="reproducir()"
+              [attr.aria-label]="(playing() ? 'replay.pause' : 'replay.play') | translate">
+        {{ playing() ? '⏸' : '▶' }}
+      </button>
+      <button type="button" (click)="siguiente()" [disabled]="actual() >= total() - 1"
+              [attr.aria-label]="'replay.next' | translate">▶</button>
+      <button type="button" (click)="ultimo()" [disabled]="actual() >= total() - 1"
+              [attr.aria-label]="'replay.last' | translate">⏭</button>
+      <span class="replay__paso">
+        {{ 'replay.step' | translate: { n: actual() + 1, total: total() } }}
+      </span>
+    </div>
+
+    <ol class="replay__jugadas">
+      @for (l of vista().lineas; track $index) {
+        <li class="replay__jugada" [class.replay__jugada--ahora]="$index === vista().lineas.length - 1">
+          @if (l.nombre) { <b class="replay__quien">{{ l.nombre }}</b> }
+          <span>{{ l.clave | translate: l.params }}</span>
+        </li>
+      }
+    </ol>
+  }
+</div>

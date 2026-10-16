@@ -1,4 +1,4 @@
-import { Component, Input, computed, signal } from '@angular/core';
+import { Component, Input, signal } from '@angular/core';
 
 export type AvatarSize = 'sm' | 'md' | 'lg' | 'xl';
 

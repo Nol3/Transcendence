@@ -1,0 +1,41 @@
+=== Mano (semilla 7) — ciegas 5/10, botón: Ana ===
+Cartas privadas: Ana=['6d', '2s']  Bot Málaga=['7h', 'Qc']
+
+[PREFLOP] tablero: -   bote: 15
+   Ana          FOLD
+
+TABLERO FINAL: 
+Nadie mostró cartas: todos se retiraron menos uno.
+BOTE REPARTIDO:
+   Bot Málaga   gana    10  (sin showdown)
+STACKS FINALES: Ana=995  Bot Málaga=1005
+SUMA: 2000 (debe ser 2000)
+
+=== Mano (semilla 21) — ciegas 5/10, botón: Ana ===
+Cartas privadas: Ana=['8c', 'Ts']  Bot Málaga=['4h', '5d']
+
+[PREFLOP] tablero: -   bote: 15
+   Ana          CALL
+   Bot Málaga   CHECK
+
+[FLOP] tablero: 7c 2s Ad   bote: 20
+   Bot Málaga   CHECK
+   Ana          CHECK
+
+[TURN] tablero: 7c 2s Ad Td   bote: 20
+   Bot Málaga   CHECK
+   Ana          CHECK
+
+[RIVER] tablero: 7c 2s Ad Td 9d   bote: 20
+   Bot Málaga   CHECK
+   Ana          CHECK
+
+TABLERO FINAL: 7c 2s Ad Td 9d
+SHOWDOWN:
+   Ana          ['8c', 'Ts']  ->  Pareja
+   Bot Málaga   ['4h', '5d']  ->  Carta alta
+BOTE REPARTIDO:
+   Ana          gana    20  (Pareja)
+STACKS FINALES: Ana=1010  Bot Málaga=990
+SUMA: 2000 (debe ser 2000)
+

@@ -1,0 +1,24 @@
+# Configuración de ruff para el backend (ver ROADMAP 2.4).
+#
+# El objetivo es un lint útil y sin ruido: las reglas clásicas de estilo y errores
+# (pycodestyle, pyflakes, isort) más un puñado de buenas prácticas (UP, B, SIM).
+# El ancho de línea va a 100, que es el que usa el proyecto.
+line-length = 100
+target-version = "py311"
+exclude = [".venv", "venv", "media", "__pycache__"]
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+[lint.per-file-ignores]
+# Las migraciones las genera Django: no se les pasa el linter de estilo.
+"*/migrations/*.py" = ["E", "F", "W", "I", "UP", "B", "SIM"]
+# Los tests usan datos de ejemplo y nombres largos a propósito.
+"*/tests/*.py" = ["E501"]
+# El motor de póker es aritmética densa: el bucle con enumerate y los zip cortos
+# son deliberados y más legibles así.
+"apps/poker/engine/*.py" = ["SIM113", "B905"]
+"apps/poker/bots.py" = ["SIM113"]
+
+[lint.isort]
+known-first-party = ["apps", "config"]

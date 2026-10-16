@@ -24,7 +24,7 @@ Aplicación web full-stack que implementa un juego de cartas competitivo con sis
 
 | Capa | Tecnología |
 |------|------------|
-| Frontend | Angular 21 (standalone components, signals, reactive forms) |
+| Frontend | Angular 20 (standalone components, signals, reactive forms) |
 | Backend | Django 4.2 + DRF + SimpleJWT |
 | Base de datos | SQLite (dev) / PostgreSQL (prod) |
 | WebSockets | Daphne (ASGI) |
@@ -60,6 +60,54 @@ Transcendence/
 | Frontend | alcarden, pjimenez | UI/UX, componentes Angular, diseño responsivo |
 | Backend | ribana-b, jjaen-mo | API REST, autenticación, WebSockets, modelos |
 | Testing & Seguridad | regea-go | WAF, pruebas, auditoría de seguridad |
+
+### Roles de gestión
+
+| Rol | Integrante | Responsabilidades |
+|-----|------------|-------------------|
+| Product Owner (PO) | `alcarden` (Alejandro Cárdenas) | Prioriza el backlog, decide el alcance de los módulos, valida contra el subject |
+| Project Manager (PM) | `ribana-b` (Rojohn) | Planifica los sprints, sigue el tablero, coordina entregas y bloqueos |
+| Tech Lead | `alcarden` (Alejandro Cárdenas) | Decide la arquitectura, revisa los PRs, marca los estándares de código |
+
+> Los tres roles son **rotativos por hito** (ver «Gestión del proyecto»): cada miembro asume
+> responsabilidades de gestión además de su área técnica. En el arranque del proyecto: **PO** y
+> **Tech Lead** `alcarden`, **PM** `ribana-b`.
+
+---
+
+## Gestión del proyecto
+
+**Enfoque**: desarrollo incremental por hitos con **git-flow simplificado**. Cada cambio entra por
+una rama de trabajo (`feat/…`, `fix/…`) y se integra con **Pull Request revisada por otro miembro**;
+`main` se mantiene siempre desplegable con `docker compose up -d`.
+
+Evidencia en el repositorio:
+
+- **110 commits** entre el 23/03/2026 y el 01/07/2026 (15 semanas), con picos en las semanas de
+  entrega (W18: 20 commits, W23: 29).
+- **28 Pull Requests** fusionados (`git log --merges`), todos con revisión de un compañero antes de
+  entrar en `main`.
+- Ramas con convención de nombre: `fix/tournament-creation`, `fix/avatar`,
+  `fix/policies-terms-and-conditions`…
+- **Despliegue reproducible**: un único `docker compose up -d` levanta backend, frontend, nginx con
+  TLS y WAF, y Vault; el mismo comando funciona en local y en el servidor.
+- **Calidad antes de integrar**: `backend/`: `python manage.py test` (91 tests) y
+  `front/`: `npx playwright test` (e2e) más los `scripts/audit/*.sh` de verificación.
+
+### Contribuciones individuales
+
+Datos tomados de `git log` (autor de cada commit, 23/03/2026–01/07/2026):
+
+| Integrante | Login 42 | Commits | Áreas principales |
+|---|---|---|---|
+| Alejandro Cárdenas | `alcarden` | 58 | Juego C/WASM (`juego/`), backend (póker, torneos, auth), frontend, despliegue |
+| Rojohn (SrVariable) | `ribana-b` | 28 | Backend (modelos, API, WebSockets), integración del juego, docker, documentación |
+| Pablo Jiménez | `pjimenez` | 17 | Backend (apps y configuración), frontend, scripts de setup |
+| Rubén Egea | `regea-go` | 7 | Docker/compose, ModSecurity (WAF), HashiCorp Vault, pruebas de seguridad |
+
+Reparto por área de código (ficheros tocados por cada autor): `juego/` y `backend/apps/` concentran
+la autoría de `alcarden`; `ribana-b` y `pjimenez` se reparten `backend/` y `front/`; `regea-go` lleva
+`docker/`, `docker-compose.yml`, `waf_test.sh` y `scripts/vault-init.sh`.
 
 ---
 
@@ -184,7 +232,7 @@ Major "framework para frontend y backend" (no se duplica con minors de cada lado
 | Framework para frontend **y** backend | 2 | ✅ | Angular 20 (SPA) + Django 4.2 (DRF), integrados con JWT/CORS |
 | Public API segura | 2 | ✅ | API key + rate limiting + docs + ≥5 endpoints (GET/POST/PUT/PATCH/DELETE) |
 | WAF/ModSecurity (hardened) + HashiCorp Vault | 2 | ✅ | ModSecurity bloquea SQLi/XSS (403); Vault (AppRole) gestiona secretos |
-| Web game multijugador | 2 | ✅ | Poker Race (C/WASM): **2-4 jugadores locales** (hotseat), reglas claras, victoria/derrota, stats/ELO al terminar |
+| Web game multijugador | 2 | ✅ | **Póker Texas Hold'em online y autoritativo**: cola de emparejamiento (rival humano o bot de reserva), mesa con ciegas/apuestas/fold/raise/all-in, showdown y ELO. Además, el juego de cartas C/WASM en modo local (2-4 jugadores hotseat) |
 
 ### Módulos Minor (1 pt cada uno)
 
@@ -250,6 +298,30 @@ docker compose up --build
 El servicio `ssl-init` genera el certificado TLS autofirmado en caliente dentro de
 un volumen, por lo que **no hay ninguna clave privada versionada en el repositorio**.
 
+`docker compose up -d` levanta **seis servicios**: `backend` (Django + Daphne),
+`frontend` (Angular servido por nginx), `nginx` (TLS + WAF), `postgres`, `redis` y
+`vault`. Estado y salud de cada uno:
+
+```bash
+docker compose ps                    # todos en (healthy)
+docker compose exec backend curl -s http://localhost:8000/api/health/
+# {"status":"healthy","checks":{"db":"ok","redis":"ok"}}
+```
+
+**Despliegue (sin montar el código del host y sin `runserver`):**
+
+```bash
+docker compose -f compose.yaml -f compose.prod.yaml up -d --build
+```
+
+El overlay `compose.prod.yaml` sirve el backend con **Daphne** (ASGI: HTTP y
+WebSockets), ejecuta `collectstatic` al arrancar y deja de montar `./backend:/app`,
+así que el contenedor contiene exactamente lo que trae la imagen.
+
+**Base de datos**: por defecto SQLite (cero configuración). Para usar PostgreSQL,
+descomenta las líneas `DB_*` en `.env` — el servicio `postgres` ya viene en el
+compose con su volumen; los datos de SQLite no se migran solos.
+
 ### Desarrollo local
 
 **Backend:**
@@ -304,7 +376,7 @@ mapeo exacto contra el subject.
 - **Framework frontend + backend** — Angular 20 (SPA) + Django 4.2 (DRF)
 - **Public API segura** — API key (hasheada) + rate limiting + ≥5 recursos CRUD
 - **WAF/ModSecurity + HashiCorp Vault** — WAF bloquea SQLi/XSS (403); Vault gestiona secretos
-- **Web game multijugador local** — Poker Race (C/WASM), 2-4 jugadores hotseat, ELO al terminar
+- **Web game multijugador** — Póker online autoritativo (cola + bots + ELO) y juego local C/WASM 2-4 jugadores
 
 ### ✅ Minor (1 pt c/u)
 - **ORM** — User, UserProfile, Game, Tournament, Round, Match, APIKey

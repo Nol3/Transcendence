@@ -75,12 +75,14 @@ export async function mockLeaderboard(page: Page) {
 }
 
 export async function mockTournaments(page: Page) {
-  // TournamentService uses HttpClient directly (not ApiService), expects a plain array
+  // TournamentService espera la respuesta PAGINADA de DRF ({results: [...]}), no
+  // un array plano: con un array, `response.results.map(...)` revienta y la lista
+  // se queda vacía (por eso los e2e del bracket no encontraban el botón).
   await page.route(/\/tournament/, (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify([]),
+      body: JSON.stringify({ count: 0, next: null, previous: null, results: [] }),
     }),
   );
 }
@@ -154,7 +156,8 @@ export async function mockTournamentFlow(page: Page) {
     if (req.method() === 'GET' && /\/tournament\/1\/?(\?|$)/.test(url)) {
       return json(tournament);
     }
-    return json([tournament]); // list
+    // Lista: mismo sobre paginado que devuelve DRF.
+    return json({ count: 1, next: null, previous: null, results: [tournament] });
   });
 }
 
@@ -163,6 +166,25 @@ export async function mockTournamentFlow(page: Page) {
  * via the login flow because pre-seeding localStorage triggers a circular-DI bug in
  * AuthService initAuth → http interceptor → inject(AuthService) chain.
  */
+/**
+ * Quita la cabecera `Content-Security-Policy` **solo de los documentos** de la página.
+ *
+ * axe se inyecta como script en la página y `script-src 'self'` lo bloquea, así que sin esto
+ * los tests de accesibilidad fallan por la política y no por la accesibilidad. Es legítimo
+ * hacerlo aquí: la inyección de axe es la herramienta de auditoría, no un flujo de usuario.
+ * De que la política se envíe de verdad ya se encargan los tests del backend (`CspTests`) y
+ * la comprobación con `curl` contra el stack.
+ */
+export async function quitarCspDeLosDocumentos(page: Page): Promise<void> {
+  await page.route('**/*', async (route) => {
+    if (route.request().resourceType() !== 'document') return route.continue();
+    const respuesta = await route.fetch();
+    const cabeceras = { ...respuesta.headers() };
+    delete cabeceras['content-security-policy'];
+    await route.fulfill({ response: respuesta, headers: cabeceras });
+  });
+}
+
 export async function setAuthToken(_page: Page) {
   // intentionally empty
 }
@@ -209,3 +231,72 @@ export async function bootAuthenticated(page: Page): Promise<void> {
   await page.waitForURL('/', { timeout: 8000 });
   await page.waitForLoadState('networkidle');
 }
+/**
+ * Mock de un match con resultado DECLARADO por el rival y pendiente de que el
+ * usuario actual lo confirme (estado `awaiting_confirmation`). Registra la ruta
+ * del POST de resultado para que, al confirmar, el match quede completado.
+ */
+export async function mockTournamentPendingConfirmation(page: Page) {
+  const me = { id: 1, username: 'testuser', avatar: null };
+  const rival = { id: 2, username: 'rival', avatar: null };
+  const pendingMatch = {
+    id: 10,
+    round: 1,
+    position: 0,
+    player1: me,
+    player2: rival,
+    winner_slot: null,
+    player1_score: 0,
+    player2_score: 0,
+    status: 'awaiting_confirmation',
+    reported_winner_slot: 2, // el rival dice que gana él
+    reported_by: { id: 2, username: 'rival' },
+  };
+  const base = {
+    id: 1,
+    name: 'E2E Cup',
+    description: '',
+    creator: me,
+    max_players: 4,
+    status: 'in_progress',
+    winner: null,
+    created_at: '2026-06-30T10:00:00Z',
+    started_at: '2026-06-30T10:05:00Z',
+    finished_at: null,
+    participants: [
+      { id: 1, user: me, is_eliminated: false, joined_at: '2026-06-30T10:00:00Z' },
+      { id: 2, user: rival, is_eliminated: false, joined_at: '2026-06-30T10:01:00Z' },
+    ],
+    rounds: [{ id: 1, number: 1, name: 'Final', matches: [pendingMatch] }],
+  };
+
+  await page.route(/\/tournament/, (route) => {
+    const req = route.request();
+    const url = req.url();
+    const json = (body: unknown) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+
+    if (req.method() === 'POST' && /\/matches\/\d+\/result\/?/.test(url)) {
+      return json({
+        ...base,
+        rounds: [
+          {
+            ...base.rounds[0],
+            matches: [
+              {
+                ...pendingMatch,
+                status: 'completed',
+                winner_slot: 2,
+                player1_score: 0,
+                player2_score: 1,
+              },
+            ],
+          },
+        ],
+      });
+    }
+    if (req.method() === 'GET' && /\/tournament\/1\/?/.test(url)) return json(base);
+    return json({ count: 1, next: null, previous: null, results: [base] });
+  });
+}
+

@@ -1,7 +1,12 @@
 """Public API views — API key authenticated endpoints."""
 from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
 from rest_framework import status
-from rest_framework.decorators import api_view, authentication_classes, permission_classes, throttle_classes
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -21,7 +26,6 @@ from .serializers import (
     PublicUserSerializer,
 )
 from .throttling import ApiKeyBurstThrottle, ApiKeyThrottle
-
 
 # ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -141,7 +145,7 @@ class ApiKeyDetailView(APIView):
         try:
             key = ApiKey.objects.get(pk=pk, user=request.user)
         except ApiKey.DoesNotExist:
-            return Response({"error": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Not found.")}, status=status.HTTP_404_NOT_FOUND)
         key.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -168,7 +172,7 @@ class PublicUserDetailView(APIView):
         try:
             user = User.objects.select_related("profile").get(pk=pk)
         except User.DoesNotExist:
-            return Response({"error": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Not found.")}, status=status.HTTP_404_NOT_FOUND)
         return Response({"data": PublicUserSerializer(user).data})
 
 
@@ -205,16 +209,31 @@ class PublicGameDetailView(APIView):
         except Game.DoesNotExist:
             return None
 
+    @staticmethod
+    def _puede_tocar(game, user) -> bool:
+        """Solo los jugadores de la partida pueden modificarla o borrarla.
+
+        Cualquier usuario con sesión se puede crear una API key, así que «tener key» no
+        puede ser el único requisito: sin esto, cualquiera editaba o borraba partidas ajenas
+        desde la API pública.
+        """
+        return user in (game.player1, game.player2)
+
     def get(self, request, pk):
         game = self._get_game(pk)
         if not game:
-            return Response({"error": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Not found.")}, status=status.HTTP_404_NOT_FOUND)
         return Response({"data": PublicGameSerializer(game).data})
 
     def put(self, request, pk):
         game = self._get_game(pk)
         if not game:
-            return Response({"error": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Not found.")}, status=status.HTTP_404_NOT_FOUND)
+        if not self._puede_tocar(game, request.user):
+            return Response(
+                {"error": _("You can only change your own games.")},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         s = PublicGameSerializer(game, data=request.data)
         s.is_valid(raise_exception=True)
         s.save()
@@ -223,7 +242,12 @@ class PublicGameDetailView(APIView):
     def patch(self, request, pk):
         game = self._get_game(pk)
         if not game:
-            return Response({"error": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Not found.")}, status=status.HTTP_404_NOT_FOUND)
+        if not self._puede_tocar(game, request.user):
+            return Response(
+                {"error": _("You can only change your own games.")},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         s = PublicGameSerializer(game, data=request.data, partial=True)
         s.is_valid(raise_exception=True)
         s.save()
@@ -232,7 +256,12 @@ class PublicGameDetailView(APIView):
     def delete(self, request, pk):
         game = self._get_game(pk)
         if not game:
-            return Response({"error": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Not found.")}, status=status.HTTP_404_NOT_FOUND)
+        if not self._puede_tocar(game, request.user):
+            return Response(
+                {"error": _("You can only change your own games.")},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         game.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -269,20 +298,38 @@ class PublicTournamentDetailView(APIView):
 
     def _get_tournament(self, pk):
         try:
-            return Tournament.objects.select_related("creator").prefetch_related("participants").get(pk=pk)
+            return (
+                Tournament.objects.select_related("creator")
+                .prefetch_related("participants")
+                .get(pk=pk)
+            )
         except Tournament.DoesNotExist:
             return None
+
+    @staticmethod
+    def _puede_tocar(tournament, user) -> bool:
+        """Solo quien lo creó puede modificar o borrar un torneo.
+
+        Cualquier usuario con sesión se puede crear una API key, así que sin esta comprobación
+        la API pública borraba torneos de cualquiera (con su bracket entero).
+        """
+        return tournament.creator_id == user.id
 
     def get(self, request, pk):
         t = self._get_tournament(pk)
         if not t:
-            return Response({"error": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Not found.")}, status=status.HTTP_404_NOT_FOUND)
         return Response({"data": PublicTournamentSerializer(t).data})
 
     def put(self, request, pk):
         t = self._get_tournament(pk)
         if not t:
-            return Response({"error": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Not found.")}, status=status.HTTP_404_NOT_FOUND)
+        if not self._puede_tocar(t, request.user):
+            return Response(
+                {"error": _("You can only change your own tournaments.")},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         s = PublicTournamentSerializer(t, data=request.data)
         s.is_valid(raise_exception=True)
         s.save()
@@ -291,7 +338,12 @@ class PublicTournamentDetailView(APIView):
     def patch(self, request, pk):
         t = self._get_tournament(pk)
         if not t:
-            return Response({"error": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Not found.")}, status=status.HTTP_404_NOT_FOUND)
+        if not self._puede_tocar(t, request.user):
+            return Response(
+                {"error": _("You can only change your own tournaments.")},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         s = PublicTournamentSerializer(t, data=request.data, partial=True)
         s.is_valid(raise_exception=True)
         s.save()
@@ -300,7 +352,12 @@ class PublicTournamentDetailView(APIView):
     def delete(self, request, pk):
         t = self._get_tournament(pk)
         if not t:
-            return Response({"error": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": _("Not found.")}, status=status.HTTP_404_NOT_FOUND)
+        if not self._puede_tocar(t, request.user):
+            return Response(
+                {"error": _("You can only change your own tournaments.")},
+                status=status.HTTP_403_FORBIDDEN,
+            )
         t.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

@@ -1,0 +1,239 @@
+// ── Historial de póker ───────────────────────────────────────
+.history-page {
+  padding-bottom: var(--space-16);
+
+  &__header {
+    padding-block: var(--space-8) var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__back {
+    color: var(--color-neon-cyan, #29e0ff);
+    text-decoration: none;
+    align-self: flex-start;
+
+    &:hover { text-decoration: underline; }
+  }
+
+  &__error {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-neon-magenta, #e635c5);
+    border-radius: 4px;
+    color: var(--color-neon-magenta, #e635c5);
+  }
+
+  &__error-close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: var(--space-8);
+    align-items: start;
+
+    @media (max-width: 1024px) {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+  }
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    min-width: 0;
+  }
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+}
+
+.matches {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+
+  &__item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    color: inherit;
+    text-align: left;
+
+    &:hover { border-color: var(--color-neon-cyan, #29e0ff); }
+    &.is-active {
+      border-color: var(--color-neon-cyan, #29e0ff);
+      background: rgba(41, 224, 255, 0.08);
+    }
+  }
+
+  &__vs { font-size: 0.75rem; }
+  &__stacks { margin-left: auto; }
+}
+
+.hands {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.hand {
+  padding: var(--space-3);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+
+  &__head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+  }
+
+  // Botón del replay (roadmap 7.2): abre la mano paso a paso.
+  &__replay-btn {
+    margin-left: auto;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--accent, #4ad9d9);
+    border-radius: 6px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+
+  &__board {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-2);
+  }
+
+  &__players {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__player {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    border-radius: 4px;
+
+    &--won {
+      border-left: 3px solid var(--color-neon-yellow, #ffd93d);
+      background: rgba(255, 217, 61, 0.06);
+    }
+
+    &--folded { opacity: 0.5; }
+  }
+
+  &__won { color: var(--color-neon-green, #4ade80); }
+}
+
+/* Cartas pequeñas del historial */
+.card {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.15rem;
+  padding: 0.15rem 0.35rem;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.25));
+  border-radius: 3px;
+  background: rgba(5, 5, 10, 0.6);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+
+  &--red { color: #ff6b6b; }
+
+  &--small { font-size: 0.7rem; }
+}
+
+// ── Logros (roadmap 7.1) ──────────────────────────────────────────────────
+.logros {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+
+    // El estado bloqueado se ve en el icono (en gris y apagado) y en el borde. No se
+    // baja la opacidad del texto: eso rompe el contraste (axe marca `color-contrast`).
+    &:not(&--on) {
+      .logros__icon {
+        filter: grayscale(1);
+        opacity: 0.5;
+      }
+
+      .logros__name,
+      .logros__progress {
+        color: var(--color-text-muted);
+      }
+    }
+
+    &--on {
+      border-color: var(--accent);
+    }
+  }
+
+  &__icon {
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  &__name {
+    font-size: 0.9rem;
+  }
+}

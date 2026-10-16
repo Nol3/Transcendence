@@ -1,0 +1,214 @@
+// ── Página de chat ───────────────────────────────────────────
+.chat-page {
+  padding-bottom: var(--space-16);
+
+  &__header {
+    padding-block: var(--space-8) var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__error {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-neon-magenta, #e635c5);
+    border-radius: 4px;
+    color: var(--color-neon-magenta, #e635c5);
+  }
+
+  &__error-close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: var(--space-8);
+    align-items: start;
+
+    @media (max-width: 1024px) {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+  }
+}
+
+// ── Lista de conversaciones ──────────────────────────────────
+.convs {
+  list-style: none;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 46vh;
+  overflow-y: auto;
+
+  &__item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: left;
+    color: inherit;
+
+    &:hover {
+      border-color: var(--color-neon-cyan, #29e0ff);
+    }
+
+    &.is-active {
+      border-color: var(--color-neon-cyan, #29e0ff);
+      background: rgba(41, 224, 255, 0.08);
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__name {
+    font-size: 0.8rem;
+  }
+
+  &__last {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__badge {
+    min-width: 1.4rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: var(--color-neon-magenta, #e635c5);
+    color: #0a0a12;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-align: center;
+  }
+}
+
+// ── Selector de usuario nuevo ────────────────────────────────
+.picker {
+  margin-top: var(--space-3);
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  padding-top: var(--space-3);
+
+  &__search {
+    width: 100%;
+    padding: var(--space-2);
+    margin-bottom: var(--space-2);
+    background: transparent;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.2));
+    border-radius: 4px;
+    color: inherit;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 26vh;
+    overflow-y: auto;
+  }
+
+  &__item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: inherit;
+    text-align: left;
+
+    &:hover {
+      background: rgba(41, 224, 255, 0.08);
+    }
+  }
+}
+
+// ── Conversación ─────────────────────────────────────────────
+.thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 32vh;
+  max-height: 52vh;
+  overflow-y: auto;
+  padding: var(--space-3) 0;
+
+  &__row {
+    display: flex;
+    justify-content: flex-start;
+
+    &--mine {
+      justify-content: flex-end;
+    }
+  }
+
+  &__bubble {
+    max-width: 78%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.18));
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.03);
+
+    &--mine {
+      border-color: var(--color-neon-cyan, #29e0ff);
+      background: rgba(41, 224, 255, 0.08);
+    }
+  }
+
+  &__text {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  &__time {
+    align-self: flex-end;
+    font-size: 0.7rem;
+  }
+}
+
+.compose {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+
+  &__input {
+    flex: 1;
+    resize: vertical;
+    padding: var(--space-2) var(--space-3);
+    background: transparent;
+    border: 1px solid var(--border, rgba(255, 255, 255, 0.2));
+    border-radius: 4px;
+    color: inherit;
+    font-family: inherit;
+  }
+}

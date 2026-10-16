@@ -4,7 +4,7 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export type TournamentStatus = 'pending' | 'in_progress' | 'finished';
-export type MatchStatus = 'pending' | 'live' | 'completed';
+export type MatchStatus = 'pending' | 'live' | 'awaiting_confirmation' | 'completed';
 
 export interface TournamentParticipant {
   id: string;
@@ -22,6 +22,9 @@ export interface TournamentMatch {
   winner?: 1 | 2;
   score?: string;
   status: MatchStatus;
+  /** Ganador declarado por un jugador y aún sin confirmar por el rival. */
+  reportedWinnerSlot?: 1 | 2;
+  reportedBy?: { id: string; username: string };
 }
 
 export interface TournamentRound {
@@ -80,6 +83,8 @@ interface BackendMatch {
   player1_score: number;
   player2_score: number;
   status: MatchStatus;
+  reported_winner_slot: 1 | 2 | null;
+  reported_by: { id: number; username: string } | null;
 }
 
 interface BackendRound {
@@ -192,6 +197,10 @@ export class TournamentService {
       winner: m.winner_slot ?? undefined,
       score: m.status === 'completed' ? `${m.player1_score}-${m.player2_score}` : undefined,
       status: m.status,
+      reportedWinnerSlot: m.reported_winner_slot ?? undefined,
+      reportedBy: m.reported_by
+        ? { id: String(m.reported_by.id), username: m.reported_by.username }
+        : undefined,
     };
   }
 

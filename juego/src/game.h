@@ -98,9 +98,6 @@ void UpdateStateGameOver(Game* game);
 
 // Utilidades del juego
 void StartNewRound(Game* game);
-void DealCardsToPlayer(Game* game, int playerId);
-void SelectCardForPlayer(Player* player, int handIndex);
-void DeselectCardForPlayer(Player* player, int selectedIndex);
 void DiscardAndDrawCards(Game* game, Player* player);
 int CalculateRoundWinner(Game* game);
 bool CheckGameEnd(Game* game);
@@ -113,7 +110,6 @@ void SortHandBySuit(Player* player);  // Ordenar por palo (agrupado)
 void StartDealAnimation(Game* game);
 void UpdateCardAnimations(Game* game);
 void DrawCardAnimations(Game* game);
-bool IsDealAnimationComplete(Game* game);
 
 // Funciones de high scores
 void LoadHighScores(HighScoreEntry* entries, int* count);

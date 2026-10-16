@@ -1,0 +1,353 @@
+<div class="culo animate-fade-in">
+
+  <header class="culo__cabecera container">
+    <div>
+      <app-pixel-title [level]="2" color="green">{{ 'game.culo.name' | translate }}</app-pixel-title>
+      <p class="text-secondary text-sm">{{ 'game.culo.desc' | translate }}</p>
+    </div>
+    <div class="culo__acciones">
+      <button type="button" class="culo__btn" (click)="reglasAbiertas.set(true)">
+        📖 {{ 'culo.rules.open' | translate }}
+      </button>
+      <button type="button" class="culo__btn" (click)="alternarSonido()"
+              [attr.aria-pressed]="sonidoActivo()"
+              [attr.aria-label]="'culo.sound.toggle' | translate">
+        {{ sonidoActivo() ? '🔊' : '🔇' }}
+      </button>
+      <a class="culo__btn font-pixel" routerLink="/games">← {{ 'culo.backToGames' | translate }}</a>
+    </div>
+  </header>
+
+  <!-- Se ha caído la conexión a mitad de partida: se puede volver sin salir de la mesa. -->
+  @if (modo() === 'online' && codigoSala() && online.connection() === 'closed') {
+    <div class="culo__error container" role="alert">
+      <span>{{ 'culo.online.desconectado' | translate }}</span>
+      <button type="button" class="culo__reconectar" (click)="reconectar()">
+        {{ 'culo.online.reconectar' | translate }}
+      </button>
+    </div>
+  }
+
+  @if (online.error() || online.errorTexto()) {
+    <div class="culo__error container" role="alert">
+      <span>{{ online.error() ? (online.error()! | translate) : online.errorTexto() }}</span>
+      <button type="button" (click)="online.limpiarError()"
+              [attr.aria-label]="'common.close' | translate">✕</button>
+    </div>
+  }
+
+  <!-- ── Sin partida: las tres formas de empezar ───────────────────────────── -->
+  @if (!estado() && !sala()) {
+    <section class="inicio container">
+      <p class="inicio__intro">{{ 'culo.intro' | translate }}</p>
+
+      <div class="inicio__ajustes">
+        <label class="inicio__campo inicio__campo--barajas">
+          <span>{{ 'culo.setup.decks' | translate }}</span>
+          <select [value]="barajas()" (change)="barajas.set(+$any($event.target).value === 2 ? 2 : 1)">
+            <option [value]="1">{{ 'culo.setup.oneDeck' | translate }}</option>
+            <option [value]="2">{{ 'culo.setup.twoDecks' | translate }}</option>
+          </select>
+        </label>
+
+        <label class="inicio__campo inicio__campo--jugadores">
+          <span>{{ 'culo.setup.players' | translate }}</span>
+          <select [value]="jugadores()" (change)="jugadores.set(+$any($event.target).value)">
+            @for (n of [3, 4, 5, 6]; track n) {
+              <option [value]="n">{{ n }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <div class="inicio__modos">
+        <article class="modo">
+          <h3 class="modo__titulo font-pixel">{{ 'culo.menu.local' | translate }}</h3>
+          <p class="modo__texto text-muted text-sm">{{ 'culo.menu.localHint' | translate }}</p>
+          <app-button class="modo__local" variant="primary" [fullWidth]="true" (click)="jugarLocal()">
+            {{ 'culo.menu.playLocal' | translate }}
+          </app-button>
+        </article>
+
+        <article class="modo">
+          <h3 class="modo__titulo font-pixel">{{ 'culo.menu.friends' | translate }}</h3>
+          <p class="modo__texto text-muted text-sm">{{ 'culo.menu.friendsHint' | translate }}</p>
+          <app-button variant="primary" [fullWidth]="true" [disabled]="creando()" (click)="crearSala()">
+            {{ 'culo.menu.create' | translate }}
+          </app-button>
+        </article>
+
+        <article class="modo">
+          <h3 class="modo__titulo font-pixel">{{ 'culo.menu.join' | translate }}</h3>
+          <p class="modo__texto text-muted text-sm">{{ 'culo.menu.joinHint' | translate }}</p>
+          <div class="modo__codigo">
+            <input type="text" maxlength="4" class="font-pixel"
+                   [value]="codigoEntrada()"
+                   (input)="codigoEntrada.set($any($event.target).value.toUpperCase())"
+                   [attr.placeholder]="'culo.menu.codePlaceholder' | translate"
+                   [attr.aria-label]="'culo.menu.codePlaceholder' | translate" />
+            <app-button variant="ghost" (click)="entrarSala()">
+              {{ 'culo.menu.join' | translate }}
+            </app-button>
+          </div>
+        </article>
+      </div>
+
+      <p class="inicio__nota text-muted text-sm">{{ 'culo.setup.note' | translate }}</p>
+    </section>
+  }
+
+  <!-- ── Lobby de la sala ─────────────────────────────────────────────────── -->
+  @if (sala(); as s) {
+    @if (s.status === 'lobby') {
+      <section class="lobby container">
+        <h3 class="lobby__titulo font-pixel neon-text-cyan">{{ 'culo.lobby.title' | translate }}</h3>
+        <p class="text-muted text-sm">{{ 'culo.lobby.share' | translate }}</p>
+
+        <div class="lobby__codigo">
+          <span class="lobby__code font-pixel">{{ s.code }}</span>
+          <button type="button" class="lobby__copiar" (click)="copiarEnlace()">
+            {{ (copiado() ? 'culo.lobby.copied' : 'culo.lobby.copy') | translate }}
+          </button>
+        </div>
+
+        <ul class="lobby__jugadores">
+          @for (p of s.players; track $index) {
+            <li class="lobby__jugador" [class.lobby__jugador--fuera]="!p.connected">
+              <span class="font-pixel">{{ p.username }}</span>
+              @if (p.isBot) { <span class="text-muted text-sm">{{ 'culo.lobby.bot' | translate }}</span> }
+              @if (!p.connected) { <span class="text-muted text-sm">{{ 'culo.lobby.gone' | translate }}</span> }
+              @if (soyAnfitrion() && p.isBot) {
+                <button type="button" class="lobby__quitar" (click)="quitarBot()"
+                        [attr.aria-label]="'culo.lobby.removeBot' | translate">✕</button>
+              }
+            </li>
+          }
+          @if (s.players.length < 6) {
+            <li class="lobby__hueco text-muted text-sm">{{ 'culo.lobby.freeSeat' | translate }}</li>
+          }
+        </ul>
+
+        <div class="lobby__acciones">
+          @if (soyAnfitrion()) {
+            <app-button variant="ghost" (click)="anadirBot()">{{ 'culo.lobby.addBot' | translate }}</app-button>
+            <app-button class="lobby__repartir" variant="primary" (click)="repartir()">
+              {{ 'culo.start' | translate }}
+            </app-button>
+          } @else {
+            <span class="text-muted">{{ 'culo.lobby.waitingHost' | translate }}</span>
+          }
+          <app-button variant="ghost" (click)="salir()">{{ 'culo.leave' | translate }}</app-button>
+        </div>
+      </section>
+    }
+  }
+
+  @if (estado()) {
+
+    <!-- ── La mesa ─────────────────────────────────────────────────────────── -->
+    <section class="mesa container">
+
+      <ul class="mesa__rivales">
+        @for (r of rivales(); track r.id) {
+          <li class="rival"
+              [class.rival--turno]="estado()!.turn === r.id && estado()!.phase === 'playing'"
+              [class.rival--fuera]="r.hand.length === 0">
+            <span class="rival__nombre font-pixel">{{ r.name }}</span>
+            <span class="rival__cartas font-mono">{{ cartasDe(r) }} 🂠</span>
+            @if (r.role) {
+              <span class="rival__rol text-sm">{{ rolClave(r.role) | translate }}</span>
+            }
+          </li>
+        }
+      </ul>
+
+      <div class="mesa__centro">
+        @if (estado()!.table; as jugada) {
+          <div class="jugada">
+            <span class="jugada__quien font-pixel">{{ estado()!.players[jugada.by].name }}</span>
+            <div class="jugada__cartas">
+              @for (c of jugada.cards; track c.id) {
+                <app-playing-card [card]="codigo(c)" deck="spanish" [size]="'md'" [order]="$index" />
+              }
+            </div>
+          </div>
+        } @else {
+          <p class="mesa__libre">{{ 'culo.tableFree' | translate }}</p>
+        }
+      </div>
+
+      <div class="mano" [class.mano--turno]="miTurno()">
+        @for (c of miMano(); track c.id) {
+          <button type="button" class="mano__carta"
+                  [class.mano__carta--sel]="estaSeleccionada(c)"
+                  [disabled]="!miTurno()"
+                  (click)="toca(c)"
+                  [attr.aria-pressed]="estaSeleccionada(c)"
+                  [attr.aria-label]="'culo.card' | translate: { value: ('culo.rank.' + c.rank | translate), suit: ('culo.suit.' + c.suit | translate) }">
+            <app-playing-card [card]="codigo(c)" deck="spanish" [size]="'lg'" [order]="$index" />
+          </button>
+        }
+      </div>
+
+      <div class="controles">
+        @if (miTurno()) {
+          <span class="controles__aviso font-pixel neon-text-green">
+            @if (jugadasPosibles() === 0) {
+              {{ 'culo.noMoves' | translate }}
+            } @else {
+              {{ 'culo.yourTurn' | translate }}
+            }
+          </span>
+        } @else if (estado()!.phase === 'playing') {
+          <span class="controles__aviso text-muted">{{ 'culo.waiting' | translate }}</span>
+        }
+        <div class="controles__botones">
+          <app-button variant="primary" [disabled]="!jugadaValida()" (click)="jugar()">
+            {{ 'culo.play' | translate }}
+          </app-button>
+          <app-button variant="ghost" [disabled]="!miTurno()" (click)="pasar()">
+            {{ 'culo.pass' | translate }}
+          </app-button>
+          <app-button variant="ghost" (click)="salir()">{{ 'culo.leave' | translate }}</app-button>
+        </div>
+      </div>
+
+      <ul class="registro">
+        @for (linea of registro(); track $index) {
+          <li class="registro__linea" [class]="'registro__linea--' + linea.kind">
+            @switch (linea.kind) {
+              @case ('play') {
+                <b>{{ linea.player }}</b>
+                {{ 'culo.log.play' | translate: { count: linea.count ?? 0 } }}
+              }
+              @case ('pass') {
+                <b>{{ linea.player }}</b> {{ 'culo.log.pass' | translate }}
+              }
+              @case ('trick') {
+                <b>{{ linea.player }}</b> {{ 'culo.log.trick' | translate }}
+              }
+              @case ('out') {
+                <b>{{ linea.player }}</b>
+                {{ 'culo.log.out' | translate: { place: linea.place ?? 0 } }}
+              }
+            }
+          </li>
+        }
+      </ul>
+    </section>
+
+    <!-- ── Fin de ronda ────────────────────────────────────────────────────── -->
+    @if (estado()!.phase === 'round-end') {
+      <div class="fin" role="dialog" [attr.aria-label]="'culo.roundEnd' | translate" aria-modal="true" appFocoDialogo>
+        <div class="fin__caja">
+          <h3 class="font-pixel neon-text-yellow">{{ 'culo.roundEnd' | translate }}</h3>
+
+          <ol class="fin__lista">
+            @for (p of clasificacion(); track p.id) {
+              <li class="fin__puesto" [class]="'fin__puesto--' + p.role">
+                <span class="fin__puesto-num font-mono">{{ p.place }}</span>
+                <span class="fin__puesto-nombre font-pixel">{{ p.name }}</span>
+                <span class="fin__puesto-rol">{{ rolClave(p.role!) | translate }}</span>
+              </li>
+            }
+          </ol>
+
+          @if (intercambios().length) {
+            <div class="fin__intercambio">
+              <h4 class="font-pixel">{{ 'culo.exchange.title' | translate }}</h4>
+              <ul>
+                @for (s of intercambios(); track $index) {
+                  <li>
+                    <b>{{ estado()!.players[s.from].name }}</b>
+                    → <b>{{ estado()!.players[s.to].name }}</b>:
+                    @for (c of s.cards; track c.id) {
+                      <app-playing-card [card]="codigo(c)" deck="spanish" [size]="'sm'" />
+                    }
+                  </li>
+                }
+              </ul>
+              <p class="text-muted text-sm">{{ 'culo.exchange.note' | translate }}</p>
+            </div>
+          }
+
+          <app-button variant="primary" size="lg" (click)="siguienteRonda()">
+            {{ 'culo.nextRound' | translate }}
+          </app-button>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- ── Cómo se juega ──────────────────────────────────────────────────────── -->
+  @if (reglasAbiertas()) {
+    <div class="reglas" role="dialog" [attr.aria-label]="'culo.rules.title' | translate" aria-modal="true" appFocoDialogo>
+      <div class="reglas__caja">
+        <header class="reglas__cabecera">
+          <h3 class="font-pixel neon-text-cyan">{{ 'culo.rules.title' | translate }}</h3>
+          <button type="button" class="reglas__cerrar" (click)="cerrarReglas()"
+                  [attr.aria-label]="'common.close' | translate">✕</button>
+        </header>
+
+        <div class="reglas__cuerpo">
+          <section>
+            <h4 class="font-pixel">{{ 'culo.rules.goal.title' | translate }}</h4>
+            <p>{{ 'culo.rules.goal.text' | translate }}</p>
+          </section>
+
+          <section>
+            <h4 class="font-pixel">{{ 'culo.rules.turn.title' | translate }}</h4>
+            <ol>
+              <li>{{ 'culo.rules.turn.1' | translate }}</li>
+              <li>{{ 'culo.rules.turn.2' | translate }}</li>
+              <li>{{ 'culo.rules.turn.3' | translate }}</li>
+              <li>{{ 'culo.rules.turn.4' | translate }}</li>
+              <li>{{ 'culo.rules.turn.5' | translate }}</li>
+            </ol>
+          </section>
+
+          <section>
+            <h4 class="font-pixel">{{ 'culo.rules.values.title' | translate }}</h4>
+            <p>{{ 'culo.rules.values.text' | translate }}</p>
+            <div class="reglas__valores">
+              @for (v of valores; track v) {
+                <span class="reglas__valor" [class.reglas__valor--top]="v === 5">
+                  {{ 'culo.rank.' + v | translate }}
+                </span>
+              }
+            </div>
+          </section>
+
+          <section>
+            <h4 class="font-pixel">{{ 'culo.rules.roles.title' | translate }}</h4>
+            <ul>
+              <li>{{ 'culo.rules.roles.1' | translate }}</li>
+              <li>{{ 'culo.rules.roles.2' | translate }}</li>
+              <li>{{ 'culo.rules.roles.3' | translate }}</li>
+              <li>{{ 'culo.rules.roles.4' | translate }}</li>
+            </ul>
+          </section>
+
+          <section>
+            <h4 class="font-pixel">{{ 'culo.rules.exchange.title' | translate }}</h4>
+            <ul>
+              <li>{{ 'culo.rules.exchange.1' | translate }}</li>
+              <li>{{ 'culo.rules.exchange.2' | translate }}</li>
+              <li>{{ 'culo.rules.exchange.3' | translate }}</li>
+            </ul>
+          </section>
+
+          <section>
+            <h4 class="font-pixel">{{ 'culo.rules.tips.title' | translate }}</h4>
+            <ul>
+              <li>{{ 'culo.rules.tips.1' | translate }}</li>
+              <li>{{ 'culo.rules.tips.2' | translate }}</li>
+              <li>{{ 'culo.rules.tips.3' | translate }}</li>
+              <li>{{ 'culo.rules.tips.4' | translate }}</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </div>
+  }
+</div>

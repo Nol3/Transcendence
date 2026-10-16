@@ -25,10 +25,13 @@
 
       <div class="hero__actions">
         @if (auth.isAuthenticated()) {
-          <app-button variant="primary" size="lg" routerLink="/game">
+          <app-button variant="primary" size="lg" routerLink="/poker">
+            {{ 'nav.poker' | translate }}
+          </app-button>
+          <app-button variant="secondary" size="lg" routerLink="/game">
             {{ 'home.play' | translate }}
           </app-button>
-          <app-button variant="secondary" size="lg" routerLink="/tournament">
+          <app-button variant="ghost" size="lg" routerLink="/tournament">
             {{ 'home.tournament' | translate }}
           </app-button>
         } @else {
@@ -62,7 +65,7 @@
         </div>
         <div class="stats-bar__item">
           <span class="stats-bar__value font-pixel neon-text-cyan">52</span>
-          <span class="stats-bar__label font-pixel">CARDS</span>
+          <span class="stats-bar__label font-pixel">{{ 'home.cards' | translate }}</span>
         </div>
         <div class="stats-bar__item">
           <span class="stats-bar__value font-pixel neon-text-cyan">{{ leaderboard().length }}</span>

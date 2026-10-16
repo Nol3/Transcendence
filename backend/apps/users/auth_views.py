@@ -1,21 +1,31 @@
 """Custom authentication views compatible with frontend."""
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
+import contextlib
+
+from django.conf import settings
+from django.contrib.auth import authenticate
+from django.utils.translation import gettext_lazy as _
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token as google_id_token
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-from django.contrib.auth import authenticate
+from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle, ScopedRateThrottle
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from apps.users.serializers import UserSerializer, RegisterSerializer
-from google.oauth2 import id_token as google_id_token
-from google.auth.transport import requests as google_requests
-from django.conf import settings
+
+from apps.users.serializers import RegisterSerializer, UserSerializer
 
 
 class LoginView(APIView):
     """Custom login view compatible with frontend."""
 
     permission_classes = [AllowAny]
+    # Límite propio y más estricto que el general: aquí es donde se prueban contraseñas.
+    # `ScopedRateThrottle` es el que mira `throttle_scope`; los generales (anónimo y usuario)
+    # se siguen aplicando además.
+    throttle_classes = [AnonRateThrottle, ScopedRateThrottle]
+    throttle_scope = "login"
 
     def post(self, request):
         email = request.data.get("email")
@@ -23,29 +33,30 @@ class LoginView(APIView):
 
         if not email or not password:
             return Response(
-                {"error": "Email and password are required"},
+                {"error": _("Email and password are required")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         # Try to find user by email or username
         from django.contrib.auth.models import User
 
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            try:
-                user = User.objects.get(username=email)
-            except User.DoesNotExist:
-                return Response(
-                    {"error": "Invalid credentials"},
-                    status=status.HTTP_401_UNAUTHORIZED,
-                )
+        # `filter().first()` y no `get()`: con dos cuentas con el mismo email, `get()` lanza
+        # `MultipleObjectsReturned` y el login devolvía 500 para siempre (bastaba con que
+        # alguien registrara el email de la víctima para dejarla fuera).
+        user = User.objects.filter(email__iexact=email).order_by("id").first()
+        if user is None:
+            user = User.objects.filter(username__iexact=email).order_by("id").first()
+        if user is None:
+            return Response(
+                {"error": _("Invalid credentials")},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
 
         # Authenticate with username
         user = authenticate(username=user.username, password=password)
         if user is None:
             return Response(
-                {"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED
+                {"error": _("Invalid credentials")}, status=status.HTTP_401_UNAUTHORIZED
             )
 
         # Generate tokens
@@ -113,7 +124,7 @@ class MeView(APIView):
     def get(self, request):
         if not request.user or not request.user.is_authenticated:
             return Response(
-                {"error": "User not authenticated"},
+                {"error": _("User not authenticated")},
                 status=status.HTTP_401_UNAUTHORIZED
             )
         user_data = UserSerializer(request.user).data
@@ -121,7 +132,13 @@ class MeView(APIView):
 
 
 class RefreshTokenView(APIView):
-    """Custom refresh token view."""
+    """Refresca el acceso **y rota** el refresh.
+
+    Antes devolvía `str(refresh)`, es decir el **mismo** token de siempre: como la rotación de
+    SimpleJWT solo afecta a su propia vista y esta es propia, el refresh era eterno dentro de
+    sus 7 días y no había forma de revocarlo. Ahora se emite uno nuevo con otro `jti` y el
+    usado entra en la lista negra, así que un refresh robado deja de servir en cuanto se usa.
+    """
 
     permission_classes = [AllowAny]
 
@@ -130,12 +147,17 @@ class RefreshTokenView(APIView):
 
         if not refresh_token:
             return Response(
-                {"error": "Refresh token is required"},
+                {"error": _("Refresh token is required")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
             refresh = RefreshToken(refresh_token)
+            # El orden importa: se revoca el jti actual y **después** se cambia por uno nuevo.
+            refresh.blacklist()
+            refresh.set_jti()
+            refresh.set_exp()
+            refresh.set_iat()
             return Response(
                 {
                     "data": {
@@ -148,16 +170,26 @@ class RefreshTokenView(APIView):
             )
         except Exception:
             return Response(
-                {"error": "Invalid refresh token"}, status=status.HTTP_401_UNAUTHORIZED
+                {"error": _("Invalid refresh token")}, status=status.HTTP_401_UNAUTHORIZED
             )
 
 
 class LogoutView(APIView):
-    """Logout view (invalidate token)."""
+    """Cierra la sesión de verdad: el refresh que se manda queda revocado.
+
+    Antes devolvía 200 y no hacía nada (el comentario lo admitía), así que «cerrar sesión»
+    dejaba el refresh vivo 7 días más. Es `AllowAny` a propósito: la credencial aquí es
+    **poseer** el refresh, y quien no lo tenga no puede revocar el de nadie.
+    """
+
+    permission_classes = [AllowAny]
 
     def post(self, request):
-        # For simplicity, just return success
-        # In production, you would blacklist the token
+        refresh_token = request.data.get("refreshToken")
+        if refresh_token:
+            # Un token ya caducado o inventado no es un problema para quien se va.
+            with contextlib.suppress(Exception):
+                RefreshToken(refresh_token).blacklist()
         return Response({"message": "Logged out successfully"})
 
 
@@ -179,14 +211,14 @@ class GoogleLoginView(APIView):
         credential = request.data.get("credential")
         if not credential:
             return Response(
-                {"error": "Google credential is required"},
+                {"error": _("Google credential is required")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         client_id = settings.GOOGLE_CLIENT_ID
         if not client_id:
             return Response(
-                {"error": "Google OAuth is not configured on the server"},
+                {"error": _("Google OAuth is not configured on the server")},
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
 
@@ -212,15 +244,14 @@ class GoogleLoginView(APIView):
 
         if not email or not email_verified:
             return Response(
-                {"error": "Google account email is not verified"},
+                {"error": _("Google account email is not verified")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        google_name = id_info.get("name", "")
         given_name = id_info.get("given_name", "")
-        picture = id_info.get("picture", "")
 
         from django.contrib.auth.models import User
+
         from apps.users.models import UserProfile
 
         # Get or create the user
@@ -258,8 +289,9 @@ class GoogleLoginView(APIView):
 
     def _unique_username(self, email: str, given_name: str) -> str:
         """Derive a unique username from email or given_name."""
-        from django.contrib.auth.models import User
         import re
+
+        from django.contrib.auth.models import User
 
         base = given_name.lower() if given_name else email.split("@")[0]
         base = re.sub(r"[^a-z0-9_]", "", base)[:20] or "user"

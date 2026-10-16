@@ -32,7 +32,9 @@
   // Text scale
   --color-text-primary:   #eeeef8;
   --color-text-secondary: #9090b8;
-  --color-text-muted:     #505070;
+  // Contraste AA sobre los fondos de la app (#0c0c14 → 5,7:1; #1e1e30 → 4,8:1).
+  // El valor anterior (#505070) daba 2,1:1 y lo marcaba axe en todas las pantallas.
+  --color-text-muted:     #8888aa;
   --color-text-inverse:   #05050a;
 
   // Border

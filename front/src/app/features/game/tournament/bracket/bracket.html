@@ -6,7 +6,12 @@
         @for (match of round.matches; track trackByMatch($index, match)) {
           <div class="bracket__match" [class.bracket__match--live]="match.status === 'live'" [class.bracket__match--completed]="match.status === 'completed'">
             @if (match.status === 'live') {
-              <app-badge variant="error" class="live-badge">LIVE</app-badge>
+              <app-badge variant="error" class="live-badge">{{ 'tournament.live' | translate }}</app-badge>
+            }
+            @if (isPending(match)) {
+              <app-badge variant="warning" class="live-badge">
+                {{ mustConfirm(match) ? 'CONFIRMA EL RESULTADO' : 'PENDIENTE DE CONFIRMACIÓN' }}
+              </app-badge>
             }
             <div class="bracket__player" [class.bracket__player--winner]="match.winner === 1" [class.bracket__player--eliminated]="match.player1.isEliminated">
               <div class="player-info">
@@ -38,12 +43,29 @@
                   ▶ Jugar
                 </button>
                 <div class="bracket__report">
-                  <span class="bracket__report-label">Ganador:</span>
-                  <button type="button" class="bracket__btn bracket__btn--report" (click)="report(match, 1)">
-                    {{ match.player1.username }}
+                  @if (isPending(match) && !mustConfirm(match)) {
+                    <span class="bracket__report-label text-muted">
+                      Esperando a {{ match.reportedBy?.username ?? 'el rival' }}: declaraste que gana
+                      {{ isReportedSlot(match, 1) ? match.player1.username : match.player2.username }}
+                    </span>
+                  } @else if (mustConfirm(match)) {
+                    <span class="bracket__report-label text-muted">
+                      {{ match.reportedBy?.username ?? 'El rival' }} dice que gana
+                      {{ isReportedSlot(match, 1) ? match.player1.username : match.player2.username }}.
+                      Confirma o avisa al creador si no estás de acuerdo.
+                    </span>
+                  } @else {
+                    <span class="bracket__report-label">{{ 'tournament.winnerLabel' | translate }}</span>
+                  }
+                  <button type="button" class="bracket__btn bracket__btn--report"
+                          [class.bracket__btn--reported]="isReportedSlot(match, 1)"
+                          (click)="report(match, 1)">
+                    {{ reportLabel(match, 1) }}
                   </button>
-                  <button type="button" class="bracket__btn bracket__btn--report" (click)="report(match, 2)">
-                    {{ match.player2.username }}
+                  <button type="button" class="bracket__btn bracket__btn--report"
+                          [class.bracket__btn--reported]="isReportedSlot(match, 2)"
+                          (click)="report(match, 2)">
+                    {{ reportLabel(match, 2) }}
                   </button>
                 </div>
               </div>

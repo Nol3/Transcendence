@@ -8,10 +8,11 @@
     </a>
 
     <!-- Desktop nav -->
-    <nav class="header__nav" aria-label="Main navigation">
+    <nav class="header__nav" [attr.aria-label]="'common.mainNav' | translate">
       <a routerLink="/"           routerLinkActive="header__nav-link--active" [routerLinkActiveOptions]="{exact:true}" class="header__nav-link font-pixel">{{ 'nav.home' | translate }}</a>
-      <a routerLink="/game"       routerLinkActive="header__nav-link--active" class="header__nav-link font-pixel">{{ 'nav.game' | translate }}</a>
+      <a routerLink="/games"      routerLinkActive="header__nav-link--active" class="header__nav-link font-pixel">{{ 'nav.games' | translate }}</a>
       <a routerLink="/tournament" routerLinkActive="header__nav-link--active" class="header__nav-link font-pixel">{{ 'nav.tournament' | translate }}</a>
+      <a routerLink="/chat"       routerLinkActive="header__nav-link--active" class="header__nav-link font-pixel">{{ 'nav.chat' | translate }}</a>
       @if (auth.isAuthenticated()) {
         <a routerLink="/profile" routerLinkActive="header__nav-link--active" class="header__nav-link font-pixel">{{ 'nav.profile' | translate }}</a>
       }
@@ -23,7 +24,9 @@
       
       @if (auth.isAuthenticated()) {
         <div class="notif-wrapper">
-          <button class="header__notif-btn" (click)="toggleNotifications()" [class.header__notif-btn--active]="notif.showPanel()">
+          <button class="header__notif-btn" (click)="toggleNotifications()"
+                  [class.header__notif-btn--active]="notif.showPanel()"
+                  [attr.aria-label]="'common.notifications' | translate">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
@@ -38,7 +41,7 @@
               <div class="notif-panel__header">
                 <h4 class="font-pixel">{{ 'notifications.title' | translate }}</h4>
                 @if (notif.unreadCount() > 0) {
-                  <button class="notif-mark-all" (click)="markAllRead()">Mark all read</button>
+                  <button class="notif-mark-all" (click)="markAllRead()">{{ 'notifications.markAllRead' | translate }}</button>
                 }
               </div>
               
@@ -76,7 +79,7 @@
     </div>
 
     <!-- Mobile hamburger -->
-    <button class="header__hamburger" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen()" aria-label="Toggle menu">
+    <button class="header__hamburger" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen()" [attr.aria-label]="'common.toggleMenu' | translate">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -85,8 +88,9 @@
   @if (menuOpen()) {
     <div class="header__mobile-menu animate-slide-up">
       <a routerLink="/"           (click)="closeMenu()" class="header__mobile-link font-pixel">{{ 'nav.home' | translate }}</a>
-      <a routerLink="/game"       (click)="closeMenu()" class="header__mobile-link font-pixel">{{ 'nav.game' | translate }}</a>
+      <a routerLink="/games"      (click)="closeMenu()" class="header__mobile-link font-pixel">{{ 'nav.games' | translate }}</a>
       <a routerLink="/tournament" (click)="closeMenu()" class="header__mobile-link font-pixel">{{ 'nav.tournament' | translate }}</a>
+      <a routerLink="/chat"       (click)="closeMenu()" class="header__mobile-link font-pixel">{{ 'nav.chat' | translate }}</a>
       @if (auth.isAuthenticated()) {
         <a routerLink="/profile"  (click)="closeMenu()" class="header__mobile-link font-pixel">{{ 'nav.profile' | translate }}</a>
         <button class="header__mobile-link header__mobile-link--danger font-pixel" (click)="auth.logout(); closeMenu()">{{ 'nav.logout' | translate }}</button>

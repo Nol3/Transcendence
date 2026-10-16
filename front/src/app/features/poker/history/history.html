@@ -1,0 +1,184 @@
+<div class="history-page animate-fade-in">
+
+  <div class="history-page__header container">
+    <app-pixel-title [level]="2" color="yellow">{{ 'poker.history.title' | translate }}</app-pixel-title>
+    <p class="text-secondary text-sm">{{ 'poker.history.subtitle' | translate }}</p>
+    <a class="history-page__back font-pixel" routerLink="/poker">
+      ← {{ 'poker.history.backToTable' | translate }}
+    </a>
+  </div>
+
+  @if (history.error()) {
+    <div class="history-page__error container" role="alert">
+      <span>{{ history.error()! | translate }}</span>
+      <button type="button" class="history-page__error-close" (click)="history.clearError()" [attr.aria-label]="'common.close' | translate">✕</button>
+    </div>
+  }
+
+  <div class="history-page__body container">
+    <div class="history-page__grid">
+
+      <!-- ── Estadísticas ─────────────────────────────────────────── -->
+      <div class="history-page__side">
+        <app-card [title]="'poker.history.stats' | translate">
+          @if (history.stats(); as stats) {
+            <div class="stats">
+              <div class="stats__row">
+                <span class="text-muted font-mono text-sm">{{ 'poker.history.handsPlayed' | translate }}</span>
+                <span class="font-pixel neon-text-cyan">{{ stats.hands_played }}</span>
+              </div>
+              <div class="stats__row">
+                <span class="text-muted font-mono text-sm">{{ 'poker.history.handsWon' | translate }}</span>
+                <span class="font-pixel neon-text-green">{{ stats.hands_won }}</span>
+              </div>
+              <div class="stats__row">
+                <span class="text-muted font-mono text-sm">{{ 'poker.history.winRate' | translate }}</span>
+                <span class="font-pixel neon-text-yellow">{{ stats.win_rate }}%</span>
+              </div>
+              <div class="stats__row">
+                <span class="text-muted font-mono text-sm">{{ 'poker.history.showdowns' | translate }}</span>
+                <span class="font-pixel">{{ stats.showdowns_won }}/{{ stats.showdowns }}</span>
+              </div>
+              <div class="stats__row">
+                <span class="text-muted font-mono text-sm">{{ 'poker.history.biggestPot' | translate }}</span>
+                <span class="font-pixel neon-text-magenta">{{ stats.biggest_pot }}</span>
+              </div>
+            </div>
+          } @else {
+            <p class="text-secondary text-sm">{{ 'poker.history.noStats' | translate }}</p>
+          }
+        </app-card>
+
+        <!-- ── Logros del póker (roadmap 7.1) ───────────────────────── -->
+        <app-card [title]="'poker.achievements.title' | translate">
+          @if (history.achievements().length === 0) {
+            <p class="text-secondary text-sm">{{ 'poker.achievements.empty' | translate }}</p>
+          } @else {
+            <ul class="logros">
+              @for (logro of history.achievements(); track logro.id) {
+                <li class="logros__item" [class.logros__item--on]="logro.unlocked"
+                    [attr.aria-label]="logro.unlocked
+                      ? ('poker.achievements.' + logro.id | translate)
+                      : ('poker.achievements.locked' | translate)">
+                  <span class="logros__icon" aria-hidden="true">{{ iconFor(logro.id) }}</span>
+                  <span class="logros__body">
+                    <span class="logros__name">{{ 'poker.achievements.' + logro.id | translate }}</span>
+                    @if (!logro.unlocked && logro.target > 1) {
+                      <span class="logros__progress text-muted font-mono text-sm">
+                        {{ logro.progress }}/{{ logro.target }}
+                      </span>
+                    }
+                  </span>
+                </li>
+              }
+            </ul>
+          }
+        </app-card>
+      </div>
+
+      <!-- ── Partidas y manos ─────────────────────────────────────── -->
+      <div class="history-page__main">
+        <app-card [title]="'poker.history.matches' | translate">
+          @if (history.matches().length === 0) {
+            <p class="text-secondary text-sm">{{ 'poker.history.noMatches' | translate }}</p>
+          } @else {
+            <ul class="matches">
+              @for (m of history.matches(); track trackMatch($index, m)) {
+                <li>
+                  <button type="button"
+                          class="matches__item"
+                          [class.is-active]="history.activeGameId() === m.game_id"
+                          (click)="openMatch(m)">
+                    <app-badge [variant]="resultVariant(m)">
+                      {{ 'poker.history.result.' + m.result | translate }}
+                    </app-badge>
+                    <span class="matches__vs font-pixel">
+                      {{ 'poker.history.vs' | translate }} {{ m.opponent?.username ?? '—' }}
+                    </span>
+                    <span class="matches__stacks font-mono text-sm">
+                      {{ m.my_stack }} – {{ m.opponent_stack }}
+                    </span>
+                    <span class="matches__hands text-secondary text-sm">
+                      {{ m.hands }} {{ 'poker.history.hands' | translate }}
+                    </span>
+                    <span class="matches__date text-muted text-sm">{{ formatDate(m.played_at) }}</span>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        </app-card>
+
+        @if (history.activeGameId()) {
+          <app-card [title]="'poker.history.handsTitle' | translate">
+            <div class="hands">
+              @if (replay(); as mano) {
+                <app-hand-replay [hand]="mano" (closed)="cerrarReplay()" />
+              }
+
+              @for (h of history.hands(); track trackHand($index, h)) {
+                <div class="hand">
+                  <div class="hand__head">
+                    <span class="font-pixel neon-text-cyan">
+                      {{ 'poker.history.hand' | translate }} #{{ h.hand_number }}
+                    </span>
+                    @if (h.showdown) {
+                      <app-badge variant="info">{{ 'poker.history.showdown' | translate }}</app-badge>
+                    }
+                    <span class="hand__pot font-pixel neon-text-yellow">
+                      {{ 'poker.table.pot' | translate }} {{ h.pot }}
+                    </span>
+                    <span class="hand__winner text-secondary text-sm">
+                      {{ 'poker.history.winner' | translate }}: {{ h.winner_names || '—' }}
+                    </span>
+                    <button type="button" class="hand__replay-btn" (click)="verMano(h)">
+                      {{ 'poker.history.replay' | translate }}
+                    </button>
+                  </div>
+
+                  @if (cards(h.board).length > 0) {
+                    <div class="hand__board">
+                      <span class="text-muted font-mono text-sm">{{ 'poker.history.board' | translate }}</span>
+                      @for (c of cards(h.board); track $index) {
+                        <app-playing-card [card]="c" [size]="'sm'" [order]="$index" />
+                      }
+                    </div>
+                  }
+
+                  <div class="hand__players">
+                    @for (p of h.players; track p.seat) {
+                      <div class="hand__player" [class.hand__player--won]="p.won > 0"
+                           [class.hand__player--folded]="p.folded">
+                        <span class="font-pixel">{{ p.name }}</span>
+                        @if (p.is_bot) { <app-badge variant="default">{{ 'poker.table.bot' | translate }}</app-badge> }
+                        @if (cards(p.hole).length > 0) {
+                          @for (c of cards(p.hole); track $index) {
+                            <app-playing-card [card]="c" [size]="'sm'" [order]="$index"
+                                              [state]="p.folded ? 'folded' : (p.won > 0 ? 'winner' : 'idle')" />
+                          }
+                        } @else {
+                          <span class="text-muted font-mono text-sm">{{ 'poker.history.hidden' | translate }}</span>
+                        }
+                        @if (p.hand_name) {
+                          <span class="text-secondary text-sm">{{ p.hand_name }}</span>
+                        }
+                        <span class="font-mono text-sm neon-text-yellow">{{ p.stack_after }}</span>
+                        @if (p.won > 0) {
+                          <span class="hand__won font-mono text-sm">+{{ p.won }}</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+            <app-button variant="ghost" (clicked)="closeMatch()">
+              {{ 'poker.history.close' | translate }}
+            </app-button>
+          </app-card>
+        }
+      </div>
+
+    </div>
+  </div>
+</div>

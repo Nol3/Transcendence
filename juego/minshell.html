@@ -110,6 +110,16 @@
 
         var Module = {
             canvas: document.getElementById('canvas'),
+            // La tabla de highscores vive en /persist, montado como IDBFS para que
+            // siga ahí al recargar la página. `syncfs(true)` trae lo guardado; el
+            // juego lo lee al terminar la partida, así que da tiempo de sobra.
+            preRun: [function () {
+                try { FS.mkdir('/persist'); } catch (e) { /* ya existe */ }
+                FS.mount(IDBFS, {}, '/persist');
+                FS.syncfs(true, function (err) {
+                    if (err) console.warn('No se pudo cargar la tabla de highscores', err);
+                });
+            }],
             onRuntimeInitialized: function() {
                 _runtimeReady = true;
                 document.getElementById('loading').classList.add('hidden');

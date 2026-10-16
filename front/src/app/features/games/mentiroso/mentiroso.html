@@ -1,0 +1,234 @@
+<div class="mentiroso container">
+  <!-- ── Cabecera ──────────────────────────────────────────────────────────── -->
+  <header class="mentiroso__cabecera">
+    <h2 class="font-pixel neon-text-yellow">{{ 'game.mentiroso.name' | translate }}</h2>
+    <div class="mentiroso__acciones">
+      <app-button variant="ghost" size="sm" (click)="reglasAbiertas.set(true)">
+        📖 {{ 'mentiroso.rules.title' | translate }}
+      </app-button>
+      <button
+        type="button"
+        class="mentiroso__sonido"
+        (click)="alternarSonido()"
+        [attr.aria-pressed]="sonidoActivo()"
+        [attr.aria-label]="'culo.sound.toggle' | translate"
+      >
+        {{ sonidoActivo() ? '🔊' : '🔇' }}
+      </button>
+      <a class="mentiroso__volver" routerLink="/games">← {{ 'games.back' | translate }}</a>
+    </div>
+  </header>
+
+  <!-- ── Sin partida: elegir modo, sala de espera o ajustes ────────────────── -->
+  @if (modo() === 'menu') {
+    <section class="inicio">
+      <p class="inicio__intro">{{ 'mentiroso.intro' | translate }}</p>
+      <div class="inicio__modos">
+        <app-button class="modo__local" variant="primary" size="lg" (click)="modo.set('local')">
+          {{ 'games.mode.bots' | translate }}
+        </app-button>
+        <app-button class="modo__online" variant="ghost" size="lg" (click)="modo.set('online')">
+          {{ 'games.mode.online' | translate }}
+        </app-button>
+      </div>
+    </section>
+  } @else if (modo() === 'online' && (!estado() || salas.connection() === 'closed')) {
+    <app-sala-lobby
+      juego="mentiroso"
+      [minJugadores]="3"
+      [maxJugadores]="6"
+      (volver)="modo.set('menu')"
+    />
+  } @else if (!estado()) {
+    <section class="inicio">
+      <p class="inicio__intro">{{ 'mentiroso.intro' | translate }}</p>
+
+      <div class="inicio__ajustes">
+        <label class="inicio__campo inicio__campo--jugadores">
+          <span>{{ 'mentiroso.setup.players' | translate }}</span>
+          <select [value]="jugadores()" (change)="jugadores.set(+$any($event.target).value)">
+            @for (n of [3, 4, 5, 6]; track n) {
+              <option [value]="n">{{ n }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="inicio__campo inicio__campo--manos">
+          <span>{{ 'mentiroso.setup.hands' | translate }}</span>
+          <select [value]="manosObjetivo()" (change)="manosObjetivo.set(+$any($event.target).value)">
+            @for (n of [1, 3, 5]; track n) {
+              <option [value]="n">{{ n }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <app-button class="inicio__empezar" variant="primary" size="lg" (click)="empezar()">
+        {{ 'mentiroso.start' | translate }}
+      </app-button>
+    </section>
+  } @else {
+    <!-- ── La mesa ─────────────────────────────────────────────────────────── -->
+    <section class="mesa">
+      <p class="mesa__mano text-muted text-sm">
+        {{ 'mentiroso.hand' | translate: { n: estado()!.hand, total: estado()!.targetWins } }}
+      </p>
+
+      <ul class="mesa__rivales">
+        @for (r of rivales(); track r.id) {
+          <li class="rival" [class.rival--turno]="estado()!.turn === r.id && estado()!.phase === 'playing'">
+            <span class="rival__nombre font-pixel">{{ r.name }}</span>
+            <span class="rival__cartas font-mono">{{ r.hand.length }} 🂠</span>
+            <span class="rival__ganadas text-muted text-sm">
+              {{ 'mentiroso.wins' | translate: { n: r.wins, total: estado()!.targetWins } }}
+            </span>
+          </li>
+        }
+      </ul>
+
+      <div class="mesa__centro">
+        <p class="mesa__pila font-mono">
+          @if (estado()!.pile.length === 0) {
+            {{ 'mentiroso.pileEmpty' | translate }}
+          } @else {
+            {{ 'mentiroso.pile' | translate }}: {{ estado()!.pile.length }} 🂠
+          }
+        </p>
+        @if (estado()!.claimedRank !== null) {
+          <p class="mesa__dice">
+            {{ 'mentiroso.claimed' | translate }}:
+            <strong class="neon-text-cyan">
+              {{ 'baraja.rank.' + estado()!.claimedRank | translate }}
+            </strong>
+          </p>
+        } @else if (miTurno()) {
+          <p class="mesa__dice">{{ 'mentiroso.claimPrompt' | translate }}</p>
+          <div class="mesa__valores">
+            @for (v of valores; track v) {
+              <button
+                type="button"
+                class="mesa__valor"
+                [class.mesa__valor--elegido]="valorElegido() === v"
+                (click)="elegirValor(v)"
+              >
+                {{ 'baraja.rank.' + v | translate }}
+              </button>
+            }
+          </div>
+        }
+
+        <p class="mesa__turno font-pixel">
+          @if (estado()!.phase === 'playing') {
+            @if (miTurno()) {
+              {{ 'mentiroso.turnYours' | translate }}
+            } @else {
+              {{ 'mentiroso.turnOther' | translate: { name: estado()!.players[estado()!.turn].name } }}
+            }
+          }
+        </p>
+      </div>
+
+      <!-- Mi mano -->
+      <div class="mano" [class.mano--turno]="miTurno()">
+        @for (c of miMano(); track c.id) {
+          <button
+            type="button"
+            class="mano__carta"
+            [class.mano__carta--elegida]="estaSeleccionada(c)"
+            [disabled]="!miTurno()"
+            (click)="toca(c)"
+            [attr.aria-label]="'culo.card' | translate: { value: ('baraja.rank.' + c.rank | translate), suit: ('baraja.suit.' + c.suit | translate) }"
+          >
+            <app-playing-card [card]="codigo(c)" deck="spanish" [order]="$index" />
+          </button>
+        }
+      </div>
+
+      <!-- Controles -->
+      <div class="controles">
+        <div class="controles__botones">
+          <app-button
+            class="controles__poner"
+            variant="primary"
+            [disabled]="!puedoPoner()"
+            (click)="poner()"
+          >
+            {{ 'mentiroso.play' | translate }} ({{ seleccion().length }})
+          </app-button>
+          <app-button
+            class="controles__gritar"
+            variant="ghost"
+            [disabled]="!puedoDesconfiar()"
+            (click)="gritar()"
+          >
+            {{ 'mentiroso.challenge' | translate }}
+          </app-button>
+          @if (cuatroIguales() !== null) {
+            <app-button class="controles__retirar" variant="ghost" (click)="retirarCuatro()">
+              {{ 'mentiroso.retire' | translate }}
+            </app-button>
+          }
+        </div>
+        @if (cuatroIguales() !== null) {
+          <p class="controles__pista text-muted text-sm">{{ 'mentiroso.retireHint' | translate }}</p>
+        }
+      </div>
+
+      <!-- Registro -->
+      @if (registro().length > 0) {
+        <ul class="registro">
+          @for (l of registro(); track $index) {
+            <li class="registro__linea" [class]="'registro__linea--' + l.kind">
+              @if (l.rankKey) {
+                {{ l.key | translate: { name: l.params['name'], count: l.params['count'], rank: (l.rankKey | translate) } }}
+              } @else {
+                {{ l.key | translate: l.params }}
+              }
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <!-- ── Final de mano o de partida ───────────────────────────────────────── -->
+    @if (estado()!.phase !== 'playing') {
+      <div class="final" role="alertdialog" aria-modal="true" appFocoDialogo aria-labelledby="mentiroso-final-titulo">
+        <div class="final__caja">
+          @if (estado()!.phase === 'match-end') {
+            <h3 id="mentiroso-final-titulo" class="font-pixel neon-text-yellow">
+              {{ 'mentiroso.matchEnd' | translate: { name: ganador() } }}
+            </h3>
+            <app-button variant="primary" (click)="empezar()">
+              {{ 'mentiroso.newMatch' | translate }}
+            </app-button>
+          } @else {
+            <h3 id="mentiroso-final-titulo" class="font-pixel neon-text-cyan">
+              {{ 'mentiroso.handEnd' | translate: { name: ganador() } }}
+            </h3>
+            <app-button variant="primary" (click)="siguienteMano()">
+              {{ 'mentiroso.nextHand' | translate }}
+            </app-button>
+          }
+          <app-button variant="ghost" (click)="salir()">{{ 'mentiroso.leave' | translate }}</app-button>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- ── Panel de reglas ───────────────────────────────────────────────────── -->
+  @if (reglasAbiertas()) {
+    <div class="reglas" role="dialog" aria-modal="true" appFocoDialogo [attr.aria-label]="'mentiroso.rules.title' | translate">
+      <div class="reglas__caja">
+        <h3 class="font-pixel neon-text-yellow">{{ 'mentiroso.rules.title' | translate }}</h3>
+        <p>{{ 'mentiroso.rules.goal' | translate }}</p>
+        <p>{{ 'mentiroso.rules.round' | translate }}</p>
+        <p>{{ 'mentiroso.rules.challenge' | translate }}</p>
+        <p>{{ 'mentiroso.rules.out' | translate }}</p>
+        <p>{{ 'mentiroso.rules.four' | translate }}</p>
+        <app-button variant="primary" (click)="cerrarReglas()">
+          {{ 'common.close' | translate }}
+        </app-button>
+      </div>
+    </div>
+  }
+</div>

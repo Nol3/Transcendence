@@ -1,0 +1,105 @@
+name: CI
+
+# Se ejecuta en cada push a main y en cada Pull Request: es el mismo conjunto de
+# comprobaciones que se corren a mano antes de integrar.
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (Django · tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Catálogos de traducción
+        # `msgfmt` (paquete gettext) compila los .po de locale/; sin esto los tests
+        # de i18n de la API verían los mensajes sin traducir.
+        run: |
+          sudo apt-get update && sudo apt-get install -y gettext
+          python manage.py compilemessages
+
+      - name: Comprobaciones de Django
+        run: python manage.py check
+
+      - name: Linter (ruff)
+        run: |
+          pip install ruff
+          ruff check .
+
+      - name: Tests con cobertura
+        # Sin Vault ni .env: los valores por defecto del settings bastan para
+        # los tests (sqlite, DEBUG=True, clave de desarrollo).
+        env:
+          USE_VAULT: 'false'
+          DJANGO_DEBUG: 'true'
+        run: |
+          pip install coverage
+          coverage run --source=apps --omit="*/migrations/*,*/tests/*,*/__init__.py" manage.py test
+          coverage report --fail-under=70
+
+  frontend:
+    name: Frontend (Angular · build y e2e)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Linter (ESLint)
+        run: npm run lint
+
+      - name: Traducciones (paridad y literales sueltos)
+        run: npm run i18n:check
+
+      - name: Build de producción
+        run: npm run build
+
+      - name: Tests unitarios
+        run: npm test -- --watch=false
+
+      - name: Instalar navegadores de Playwright
+        # Los tres motores estándar (módulo «Navegadores»): Blink, Gecko y WebKit.
+        # Edge no se puede instalar aquí (usa el del sistema), así que su proyecto
+        # se ejecuta en local, no en CI.
+        run: npx playwright install --with-deps chromium firefox webkit
+
+      - name: Tests end-to-end
+        # Los e2e usan mocks de la API, así que no hace falta backend.
+        run: npx playwright test --project=chromium --project=firefox --project=webkit
+
+      - name: Guardar el informe de Playwright si algo falla
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: front/playwright-report/
+          retention-days: 7

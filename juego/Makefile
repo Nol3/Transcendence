@@ -66,6 +66,7 @@ EMFLAGS := -Wall -std=gnu99 -O2 -I. -Iraylib-6.0/src
 EM_LDFLAGS := -L. -Lraylib-6.0/src \
     -s USE_GLFW=3 \
     -s ASYNCIFY \
+    -lidbfs.js \
     -s TOTAL_MEMORY=67108864 \
     -s FORCE_FILESYSTEM=1 \
     -s EXPORTED_RUNTIME_METHODS=ccall,cwrap \

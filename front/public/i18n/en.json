@@ -6,7 +6,10 @@
     "profile": "Profile",
     "login": "Login",
     "register": "Register",
-    "logout": "Logout"
+    "logout": "Logout",
+    "poker": "Poker",
+    "chat": "Chat",
+    "games": "Games"
   },
   "home": {
     "subtitle": "Insert coin to play",
@@ -22,15 +25,26 @@
     "yourStatus": "YOUR STATUS",
     "rank": "RANK",
     "streak": "STREAK",
-    "tagline": "🪙"
+    "tagline": "🪙",
+    "cards": "CARDS"
   },
   "auth": {
+    "errors": {
+      "required": "Required",
+      "minlength": "Min {{n}} characters",
+      "maxlength": "Max {{n}} characters",
+      "loginFailed": "Login failed. Check your credentials.",
+      "registerFailed": "Registration failed. Try again."
+    },
     "login": {
       "title": "Login",
       "email": "Email",
       "password": "Password",
       "submit": "Sign In",
-      "noAccount": "No account? Register"
+      "noAccount": "No account? Register",
+      "subtitle": "Enter your credentials to continue",
+      "emailPlaceholder": "player@example.com",
+      "noAccountShort": "No account?"
     },
     "register": {
       "title": "Register",
@@ -38,17 +52,54 @@
       "email": "Email",
       "password": "Password",
       "submit": "Create Account",
-      "hasAccount": "Have account? Login"
+      "hasAccount": "Have account? Login",
+      "subtitle": "Create your player profile",
+      "usernamePlaceholder": "player_one",
+      "hasAccountShort": "Already have an account?"
     }
   },
   "game": {
     "title": "Card Game",
-    "insertCoin": "Insert Coin"
+    "insertCoin": "Insert Coin",
+    "wasmTitle": "Card Wars - WASM Game",
+    "arcade": {
+      "name": "Card Wars",
+      "desc": "The project's original game: pick cards, build the best hand and rack up points.",
+      "how": "Select cards from your hand and hunt for the highest-scoring combo."
+    },
+    "poker": {
+      "name": "Texas Hold'em poker",
+      "desc": "Tables for 3 to 6 players, against bots or real people, with tournaments, ELO and hand history.",
+      "how": "Blinds, raises and bluffs: take the pot with the best hand or by making everyone fold."
+    },
+    "culo": {
+      "name": "Culo (President)",
+      "desc": "Combination shedding with ranks: first out is the President, last is the Asshole.",
+      "how": "Play one or more cards of the same value; the next player answers with the same count and a higher value, or passes."
+    },
+    "mentiroso": {
+      "name": "Cheat",
+      "desc": "Shed your cards by lying about them… without getting caught.",
+      "how": "You play cards face down claiming what they are. Anyone can shout “liar!”."
+    },
+    "brisca": {
+      "name": "Brisca",
+      "desc": "The classic trick-taking game: win with the highest card and collect the points.",
+      "how": "Three cards each, one marks the trump, and whoever wins the trick draws and leads."
+    },
+    "tute": {
+      "name": "Tute",
+      "desc": "The classic Spanish trick-taking game: king and horse sing forty."
+    },
+    "mus": {
+      "name": "Mus",
+      "desc": "Four players in two pairs: four rounds and plenty of betting."
+    }
   },
   "lobby": {
     "title": "GAME LOBBY",
     "online": "ONLINE",
-    "subtitle": "Card Wars — pick up where the deck left off.",
+    "subtitle": "Card Wars — the local card game: 2–4 people on the same device.",
     "rulesTitle": "GAME RULES",
     "statsTitle": "YOUR STATS",
     "cardBattle": "CARD BATTLE",
@@ -56,16 +107,19 @@
     "wins": "WINS",
     "losses": "LOSSES",
     "winRate": "W-RATE",
-    "rule1": "Each player starts with 5 cards",
-    "rule2": "Draw 1 card per turn",
-    "rule3": "Play cards to attack or defend",
-    "rule4": "Reduce opponent HP to 0 to win",
-    "rule5": "Special cards have unique effects",
+    "rule1": "Each player is dealt 8 cards per round",
+    "rule2": "Pick 1 to 5 cards to build your best poker hand",
+    "rule3": "You may discard up to 5 cards once per turn",
+    "rule4": "Every hand scores points: first to the target score wins",
+    "rule5": "Local mode: turn-based on the same device",
     "customizeTitle": "CUSTOMIZE",
     "players": "PLAYERS",
     "targetScore": "TARGET",
     "rounds": "ROUNDS",
-    "theme": "THEME"
+    "theme": "THEME",
+    "localMode": "LOCAL PLAY",
+    "onlineCta": "Play online poker",
+    "onlineCtaHint": "Looking for an opponent? A real queue pairs you with another player — or a bot if you wait."
   },
   "tournament": {
     "title": "Tournament",
@@ -80,7 +134,11 @@
     "name": "Tournament Name",
     "description": "Tournament Description",
     "players": "Players",
-    "maxPlayers": "Max Players"
+    "maxPlayers": "Max Players",
+    "live": "LIVE",
+    "winnerLabel": "Winner:",
+    "joined": "Joined",
+    "prize": "Prize"
   },
   "profile": {
     "title": "Player Profile",
@@ -103,10 +161,11 @@
     "gameHistory": "Game History",
     "noGames": "You haven't played any games yet.",
     "gameResultWin": "Won match",
-    "gameResultLoss": "Lost match"
+    "gameResultLoss": "Lost match",
+    "username": "Username"
   },
   "common": {
-    "loading": "Loading...",
+    "loading": "Loading",
     "error": "An error occurred",
     "retry": "Retry",
     "back": "Back",
@@ -116,7 +175,16 @@
     "status": "Status",
     "ready": "READY",
     "noResults": "No results found",
-    "vs": "vs"
+    "vs": "vs",
+    "close": "Close",
+    "dismiss": "Dismiss",
+    "notifications": "Notifications",
+    "mainNav": "Main navigation",
+    "footerNav": "Footer navigation",
+    "toggleMenu": "Toggle menu",
+    "closeModal": "Close modal",
+    "or": "OR",
+    "insertCoin": "INSERT COIN"
   },
   "privacy": {
     "title": "Privacy Policy",
@@ -192,5 +260,693 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "rights": "All rights reserved"
+  },
+  "poker": {
+    "title": "ONLINE POKER",
+    "subtitle": "No-limit Texas Hold'em against another player or a bot.",
+    "status": {
+      "connecting": "Connecting",
+      "searching": "In queue",
+      "playing": "In game",
+      "error": "Error"
+    },
+    "error": {
+      "auth": "Your session expired. Please sign in again.",
+      "connection": "Could not reach the server.",
+      "generic": "Something went wrong.",
+      "tableGone": "That table no longer exists."
+    },
+    "queue": {
+      "title": "QUICK TABLE",
+      "explain": "Join the queue and we'll pair you with another player. If nobody shows up, you'll play a bot.",
+      "stake": "BLINDS",
+      "find": "FIND A MATCH",
+      "waiting": "Looking for an opponent…",
+      "botHint": "If nobody appears within {{seconds}}s, a bot will join.",
+      "cancel": "CANCEL",
+      "tableSize": "Players per table",
+      "theme": "Table theme"
+    },
+    "rules": {
+      "title": "RULES",
+      "1": "No-limit Texas Hold'em, heads-up",
+      "2": "You get 2 hole cards and there are 5 community cards",
+      "3": "Betting rounds: preflop, flop, turn and river",
+      "4": "You can check, call, raise or go all-in",
+      "5": "Best 5-card hand wins, or whoever does not fold"
+    },
+    "table": {
+      "hand": "Hand",
+      "blinds": "Blinds",
+      "pot": "POT",
+      "bot": "BOT",
+      "allIn": "ALL-IN",
+      "folded": "FOLDED",
+      "waitingFor": "Waiting for {{name}}…",
+      "matchOver": "MATCH OVER",
+      "backToLobby": "BACK TO QUEUE",
+      "leave": "Leave the table"
+    },
+    "street": {
+      "preflop": "PREFLOP",
+      "flop": "FLOP",
+      "turn": "TURN",
+      "river": "RIVER",
+      "complete": "END"
+    },
+    "action": {
+      "fold": "Fold",
+      "check": "Check",
+      "call": "Call",
+      "raise": "Raise to",
+      "bet": "Bet",
+      "allIn": "All-in"
+    },
+    "result": {
+      "won": "YOU WIN THE HAND!",
+      "lost": "YOU LOSE THE HAND",
+      "wonFold": "YOU WIN: everyone folded",
+      "lostFold": "YOU FOLDED",
+      "pot": "Pot",
+      "showdown": "showdown"
+    },
+    "log": {
+      "timeout": "turn timed out",
+      "handResult": "hand settled",
+      "matchEnd": "match over"
+    },
+    "tournament": {
+      "title": "TOURNAMENT MATCH",
+      "explain": "You are facing {rival} at a real poker table. The game starts as soon as they arrive.",
+      "waiting": "WAITING FOR YOUR RIVAL…",
+      "autoResult": "The server closes the result when the game ends: the bracket advances on its own.",
+      "rules": "No queue and no bots: both bracket players join the same table with 1000 chips and 5/10 blinds. Play until one of you runs out of chips.",
+      "back": "Back to the tournament"
+    },
+    "history": {
+      "title": "HISTORY",
+      "subtitle": "Your poker matches and the hands you have played.",
+      "backToTable": "Back to the table",
+      "stats": "Stats",
+      "handsPlayed": "Hands played",
+      "handsWon": "Hands won",
+      "winRate": "Hands won %",
+      "showdowns": "Showdowns won",
+      "biggestPot": "Biggest pot",
+      "noStats": "No stats yet.",
+      "matches": "Matches",
+      "noMatches": "You have not played a poker match yet.",
+      "result": {
+        "win": "WON",
+        "loss": "LOST",
+        "draw": "DRAW"
+      },
+      "vs": "vs",
+      "hands": "hands",
+      "handsTitle": "Hands of the match",
+      "hand": "Hand",
+      "showdown": "SHOWDOWN",
+      "winner": "Winner",
+      "board": "Board:",
+      "hidden": "hidden",
+      "close": "Close",
+      "error": "Could not load the history.",
+      "replay": "View hand",
+      "replayError": "That hand could not be loaded."
+    },
+    "spectate": {
+      "badge": "SPECTATOR",
+      "short": "spectator"
+    },
+    "chat": {
+      "title": "Table chat",
+      "empty": "Nobody has said anything yet. Be the first.",
+      "placeholder": "Say something to the table…",
+      "send": "Send"
+    },
+    "live": {
+      "title": "Live tables",
+      "explain": "You can drop in to watch any table; you will not see other players' cards until the showdown.",
+      "none": "No open tables right now.",
+      "live": "LIVE",
+      "finished": "FINISHED",
+      "watch": "Watch",
+      "refresh": "Refresh"
+    },
+    "achievements": {
+      "title": "Achievements",
+      "empty": "Play a hand and they will start showing up.",
+      "locked": "Locked",
+      "primera_mano": "First hand won",
+      "escalera_de_color": "Straight flush",
+      "tres_seguidas": "Three hands in a row"
+    },
+    "card": {
+      "hidden": "face-down card"
+    }
+  },
+  "chat": {
+    "title": "CHAT",
+    "subtitle": "Talk to other players: rivals, tournament mates, anyone.",
+    "conversations": "Conversations",
+    "noConversations": "You have no conversations yet.",
+    "newConversation": "New conversation",
+    "searchUser": "Search player…",
+    "noUsers": "No players match that name.",
+    "pickOne": "Pick a conversation",
+    "emptyThread": "Pick someone on the left (or start a new conversation) to write.",
+    "placeholder": "Write a message… (Enter to send)",
+    "send": "Send",
+    "hint": "Enter sends · Shift+Enter adds a line break",
+    "error": {
+      "load": "Could not load your messages.",
+      "send": "Could not send the message."
+    }
+  },
+  "notifications": {
+    "markAllRead": "Mark all read",
+    "title": "Notifications",
+    "noNotifications": "No notifications"
+  },
+  "notify": {
+    "login": {
+      "title": "Welcome back",
+      "body": "Logged in as {{email}}"
+    },
+    "register": {
+      "title": "Welcome",
+      "body": "Account created for {{username}}"
+    },
+    "tournament": {
+      "declared": {
+        "title": "Result reported",
+        "body": "Waiting for your rival to confirm it so the bracket can advance"
+      },
+      "conflict": {
+        "title": "Conflicting result",
+        "body": "Each player reported a different winner: the tournament creator decides"
+      },
+      "failed": {
+        "title": "Report failed",
+        "body": "Could not report the match result"
+      },
+      "created": {
+        "title": "Tournament created"
+      },
+      "createFailed": {
+        "title": "Create failed",
+        "body": "Could not create tournament"
+      },
+      "joined": {
+        "title": "Joined"
+      },
+      "joinFailed": {
+        "title": "Join failed",
+        "body": "Could not join tournament"
+      }
+    },
+    "profile": {
+      "avatarTooLarge": {
+        "title": "File too large",
+        "body": "Avatar must be under 5MB"
+      },
+      "uploadFailed": {
+        "title": "Upload failed",
+        "body": "Could not upload avatar"
+      }
+    }
+  },
+  "replay": {
+    "title": "Hand #{{n}}",
+    "close": "Close",
+    "noActions": "This hand has no action log: it was stored before replays existed.",
+    "pot": "Pot",
+    "first": "First action",
+    "prev": "Previous action",
+    "play": "Play",
+    "pause": "Pause",
+    "next": "Next action",
+    "last": "Last action",
+    "step": "Step {{n}} of {{total}}",
+    "start": "Cards are dealt",
+    "blind": "{{kind}} blind: {{amount}}",
+    "act": {
+      "fold": "folds",
+      "check": "checks",
+      "call": "calls {{amount}}",
+      "raise": "raises to {{amount}}",
+      "all_in": "all-in ({{amount}})"
+    },
+    "street": {
+      "preflop": "Preflop",
+      "flop": "Flop",
+      "turn": "Turn",
+      "river": "River"
+    },
+    "winner": "wins {{amount}}"
+  },
+  "card": {
+    "rank": {
+      "2": "two",
+      "3": "three",
+      "4": "four",
+      "5": "five",
+      "6": "six",
+      "7": "seven",
+      "8": "eight",
+      "9": "nine",
+      "T": "ten",
+      "J": "jack",
+      "Q": "queen",
+      "K": "king",
+      "A": "ace"
+    },
+    "suit": {
+      "c": "clubs",
+      "d": "diamonds",
+      "h": "hearts",
+      "s": "spades"
+    }
+  },
+  "games": {
+    "title": "Games",
+    "subtitle": "Everything you can play here. Pick one and go.",
+    "play": "Play",
+    "soon": "Coming soon",
+    "upcoming": "Coming up",
+    "mode": {
+      "local": "Offline",
+      "bots": "Vs bots",
+      "online": "Online"
+    },
+    "players": {
+      "one": "1 player",
+      "twoToSix": "2–6 players",
+      "threeToSix": "3–6 players",
+      "twoToThree": "2–3 players",
+      "four": "4 players"
+    },
+    "tag": {
+      "arcade": "Arcade",
+      "cards": "Cards",
+      "betting": "Betting",
+      "shedding": "Shedding",
+      "tricks": "Trick-taking"
+    },
+    "back": "Back to games"
+  },
+  "culo": {
+    "backToGames": "Back to games",
+    "intro": "All cards are dealt. First to run out is the President, last is the Asshole, and between rounds the ends swap cards.",
+    "setup": {
+      "players": "Players",
+      "decks": "Decks",
+      "oneDeck": "1 deck (40 cards)",
+      "twoDecks": "2 decks (80 cards)",
+      "note": "With 5 or 6 players two decks play better: more combinations to go round."
+    },
+    "start": "Deal",
+    "leave": "Leave the table",
+    "play": "Play",
+    "pass": "Pass",
+    "yourTurn": "Your turn",
+    "waiting": "Waiting…",
+    "tableFree": "The table is clear: you open",
+    "noMoves": "You cannot answer that: you have to pass",
+    "card": "{{value}} of {{suit}}",
+    "roundEnd": "Round over",
+    "nextRound": "Next round",
+    "sound": {
+      "toggle": "Turn sound on or off"
+    },
+    "rules": {
+      "open": "How to play",
+      "title": "How to play Culo",
+      "goal": {
+        "title": "Goal",
+        "text": "Get rid of your cards before everyone else. First is the President; last is the Asshole."
+      },
+      "turn": {
+        "title": "How a round goes",
+        "1": "All the cards are dealt out.",
+        "2": "The leader plays one or more cards of the same value.",
+        "3": "The next player answers with exactly the same number of cards and a higher value, or passes.",
+        "4": "You may pass even if you can play: passing is a decision too.",
+        "5": "When everyone else has passed, the last player to play takes the cards and opens the next trick."
+      },
+      "values": {
+        "title": "Card values",
+        "text": "Lowest to highest. The 5 of coins is the highest card, above the Ace, and cannot be played together with other fives."
+      },
+      "roles": {
+        "title": "Places and roles",
+        "1": "First to run out is the President.",
+        "2": "Second is the Vice-President.",
+        "3": "Second-to-last is the Vice-Asshole, and last is the Asshole.",
+        "4": "With 3 players there are no vice roles: President, one neutral and Asshole."
+      },
+      "exchange": {
+        "title": "Swap between rounds",
+        "1": "The Asshole gives their 2 best cards to the President, who gives their 2 worst back.",
+        "2": "The Vice-Asshole gives their best card to the Vice-President, who returns their worst.",
+        "3": "Neutral players swap nothing."
+      },
+      "tips": {
+        "title": "Ideas to play better",
+        "1": "Do not spend your high cards too early: save them to close an important hand.",
+        "2": "Opening with four or five cards leaves the others almost no answer.",
+        "3": "Passing is tactics too: sometimes it pays to keep the good play back.",
+        "4": "Watch who is about to run out before you open."
+      }
+    },
+    "exchange": {
+      "title": "Swap",
+      "note": "These cards change hands before the next round."
+    },
+    "log": {
+      "play": "plays {{count}} card(s)",
+      "pass": "passes",
+      "trick": "takes the trick",
+      "out": "is out ({{place}}th)"
+    },
+    "rank": {
+      "1": "Ace",
+      "2": "Two",
+      "3": "Three",
+      "4": "Four",
+      "5": "Five",
+      "6": "Six",
+      "7": "Seven",
+      "10": "Jack",
+      "11": "Knight",
+      "12": "King"
+    },
+    "suit": {
+      "o": "coins",
+      "c": "cups",
+      "e": "swords",
+      "b": "clubs"
+    },
+    "role": {
+      "presidente": "President",
+      "vicepresidente": "Vice-President",
+      "neutro": "Neutral",
+      "viceculo": "Vice-Asshole",
+      "culo": "Asshole"
+    },
+    "menu": {
+      "local": "Local, against bots",
+      "localHint": "You against bots, on this device. No account needed.",
+      "playLocal": "Play now",
+      "friends": "With friends",
+      "friendsHint": "Create a room, hand the code to whoever you like and play from wherever you are.",
+      "create": "Create room",
+      "join": "Join",
+      "joinHint": "Got a code? Type it in and you are in.",
+      "codePlaceholder": "Code"
+    },
+    "lobby": {
+      "title": "Room",
+      "share": "Send them the code or the link: as they join they show up here.",
+      "copy": "Copy link",
+      "copied": "Copied!",
+      "bot": "bot",
+      "gone": "disconnected",
+      "removeBot": "Remove the bot",
+      "freeSeat": "Free seat",
+      "addBot": "Add bot",
+      "waitingHost": "Waiting for the host to deal…"
+    },
+    "online": {
+      "errorCrear": "The room could not be created. Try again.",
+      "salaNoExiste": "That room does not exist or has already closed.",
+      "salaLlena": "That room is full.",
+      "sinSesion": "Sign in to play online.",
+      "error": {
+        "already_started": "The game has already started.",
+        "room_full": "The room is full.",
+        "host_only": "Only the host can do that.",
+        "min_players": "You need at least 3 players (add a bot if there are two of you).",
+        "no_codes": "No free codes left. Try again.",
+        "not_your_turn": "It is not your turn.",
+        "round_not_over": "The round is not over yet.",
+        "unknown_action": "That action does not exist."
+      },
+      "desconectado": "The connection to the room dropped.",
+      "reconectar": "Reconnect"
+    }
+  },
+  "baraja": {
+    "rank": {
+      "1": "Ace",
+      "2": "Two",
+      "3": "Three",
+      "4": "Four",
+      "5": "Five",
+      "6": "Six",
+      "7": "Seven",
+      "10": "Jack",
+      "11": "Knight",
+      "12": "King"
+    },
+    "suit": {
+      "o": "coins",
+      "c": "cups",
+      "e": "swords",
+      "b": "clubs"
+    }
+  },
+  "mentiroso": {
+    "intro": "The whole deck is dealt. In turn you put cards face down and say what they are: you may lie about the value, never about the count. Anyone can doubt you, and whoever runs out of cards wins the hand.",
+    "setup": {
+      "players": "Players",
+      "hands": "Hands to win"
+    },
+    "start": "Deal and play",
+    "you": "You",
+    "pile": "On the table",
+    "pileEmpty": "Nothing on the table",
+    "claimed": "Being claimed",
+    "claimPrompt": "What do you say they are?",
+    "play": "Play",
+    "challenge": "Liar!",
+    "retire": "Set aside the four",
+    "retireHint": "You hold all four cards of one value: you may show them and take them out of the game.",
+    "turnYours": "Your turn",
+    "turnOther": "{{name}}'s turn",
+    "hand": "Hand {{n}} of {{total}}",
+    "wins": "{{n}} of {{total}} hands",
+    "cards": "{{n}} cards",
+    "handEnd": "{{name}} is out of cards and wins the hand!",
+    "matchEnd": "{{name}} wins the match!",
+    "nextHand": "Next hand",
+    "newMatch": "Another match",
+    "leave": "Leave",
+    "log": {
+      "play": "{{name}} plays {{count}} claiming “{{rank}}”",
+      "challenge": "{{name}} doubts {{other}}",
+      "lie": "It was a lie: {{name}} takes {{count}} cards",
+      "true": "It was true: {{name}} takes {{count}} cards",
+      "retire": "{{name}} sets aside the four {{rank}}",
+      "out": "{{name}} is out of cards"
+    },
+    "rules": {
+      "title": "How to play",
+      "goal": "You win a hand by running out of cards. The match goes to several hands.",
+      "round": "You put one or more cards face down and say what they are. Whoever opens the round sets the value and the rest follow it: you may lie about the value, not about the count.",
+      "challenge": "Anyone —not just the next player— can shout “liar!”. If it was a lie, the one who played takes the pile; if it was true, the doubter takes it. Either way, whoever takes the pile opens the next round.",
+      "out": "Once a player is out of cards they can no longer be doubted: the play that empties a hand is free.",
+      "four": "If you hold all four cards of one value you may show them and set them aside: they are no use to you any more."
+    }
+  },
+  "juego": {
+    "turnYours": "Your turn",
+    "turnOther": "{{name}}'s turn",
+    "leave": "Leave"
+  },
+  "brisca": {
+    "intro": "Three cards are dealt and the next one is turned up, marking the trump. Each player plays a card —there is no obligation to follow suit— and the highest trump wins. The winner takes the trick, draws first and leads. At the end, everyone adds up the value of their cards.",
+    "setup": {
+      "players": "Players",
+      "games": "Games to win"
+    },
+    "start": "Deal and play",
+    "points": "{{n}} points",
+    "gamesWon": "{{n}} of {{total}} games",
+    "trump": "Trump",
+    "trumpGone": "The turned-up card has already been picked up",
+    "trickEmpty": "Nobody has played in this trick yet",
+    "deck": "{{n}} cards left to draw",
+    "play": "Play",
+    "swap": "Swap the trump",
+    "swapHint": "You won the trick and hold the seven of trump: you may take the turned-up card.",
+    "void": "Tied at 60: the game is void",
+    "nextGame": "Next game",
+    "newMatch": "Another match",
+    "log": {
+      "trick": "{{name}} wins the trick ({{tantos}} points)",
+      "swap": "{{name}} swaps the trump for the seven",
+      "gameEnd": "Game over: {{a}} – {{b}}",
+      "matchEnd": "{{name}} wins the match!"
+    },
+    "rules": {
+      "title": "How to play",
+      "goal": "The match goes to whoever wins the agreed number of games. A game is won by scoring more points than your opponent with the cards from the tricks you take.",
+      "order": "The card order is not the deck's: low to high it is 2, 4, 5, 6, 7, Jack, Knight, King, 3, Ace. The three is the second highest card.",
+      "trick": "Three cards are dealt and the next one is turned up, marking the trump. Each player plays whatever card they like: there is no obligation to follow suit or to play trump. The highest trump wins, or if there is no trump, the highest card of the suit that led.",
+      "draw": "The winner of the trick takes the cards, draws first and leads the next one. The card that marks the trump is the last one drawn.",
+      "swap": "Whoever wins a trick may swap the turned-up card for the seven of that suit, before drawing and never after the penultimate trick.",
+      "score": "Counting: Ace 11, three 10, king 4, knight 3, jack 2; the rest are worth nothing. If both reach 60 points, the game is void."
+    }
+  },
+  "tute": {
+    "intro": "The classic tute. Eight cards each and the rest in the stock: while cards remain to be dealt you only have to follow trump; once the stock runs out you must follow suit, beat the trick and trump. King and horse of the same suit sing: 40 if they are trump (las cuarenta) and 20 if not (las veinte), but only after winning a trick. First to 101 points wins, or whoever sings a tute.",
+    "setup": {
+      "players": "Players"
+    },
+    "start": "Deal and play",
+    "sung": "Sung: {{n}}",
+    "baceta": "{{n}} cards left in the stock",
+    "mustFollow": "The stock is empty: you must follow suit, beat the trick and trump.",
+    "mustTrump": "While the stock lasts, only trump is compulsory.",
+    "canSing": "You can sing:",
+    "cuarenta": "Las cuarenta",
+    "veinte": "Las veinte",
+    "singTute": "Tute!",
+    "gameEnd": "Game over",
+    "log": {
+      "cuarenta": "{{name}} sings las cuarenta (40 points)",
+      "veinte": "{{name}} sings las veinte (20 points)",
+      "tute": "{{name}} has a tute and wins the game!",
+      "gameEnd": "Game over: {{a}} – {{b}}"
+    },
+    "rules": {
+      "title": "How to play tute",
+      "goal": "First to 101 points wins, adding up the cards from the tricks you take, the acuses you sing and the 10 for the last trick.",
+      "must": "While the stock has cards you only have to follow trump, and you need not beat it. Once the stock is empty you must follow suit, beat the trick and trump: if you can follow suit you must, and if you can beat the highest card on the table you must too; if you have none of that suit, you must play trump.",
+      "sing": "King and horse of the same suit are worth 40 points if they are trump (las cuarenta) and 20 if they are another suit (las veinte). They can only be sung after winning a trick, one per trick.",
+      "tute": "All four kings or all four horses in hand are a tute: sing it and you win the game instantly.",
+      "last": "The last trick is worth 10 points and settles ties."
+    }
+  },
+  "mus": {
+    "intro": "Four-handed mus in pairs: you play with the person opposite (seats 0 and 2 against 1 and 3). No trump and no suits, and with eight kings and eight aces: the three is worth the same as the king and the two the same as the ace. First you ask whether there is mus; then you bet on grande, chica, pairs and juego. The pair that reaches 40 stones wins, and a vaca is the best of three games.",
+    "start": "Deal and play",
+    "sayMus": "Mus!",
+    "cut": "No mus",
+    "discard": "Discard {{n}}",
+    "pass": "Pass",
+    "bet": "Bet",
+    "betAmount": "Stones",
+    "envido": "A bet of {{n}} stones",
+    "ordago": "Órdago! The whole vaca is at stake",
+    "ordagoShort": "Órdago",
+    "want": "Accept",
+    "dontWant": "Decline",
+    "grande": "High",
+    "chica": "Low",
+    "paresLabel": "Pairs",
+    "pares": {
+      "duples": "double pairs",
+      "medias": "three of a kind",
+      "par": "a pair",
+      "none": "nothing"
+    },
+    "juego": "Game",
+    "partnerPlay": "Your partner {{name}} has",
+    "gamesWon": "{{n}} of 3 games",
+    "gameEnd": "Game over",
+    "nextHand": "Another hand",
+    "newMatch": "Another vaca",
+    "phase": {
+      "mus": "Any mus?",
+      "descartar": "Discarding",
+      "lances": "Round of {{lance}}"
+    },
+    "lance": {
+      "grande": "the high card",
+      "chica": "the low card",
+      "pares": "pairs",
+      "juego": "the game"
+    },
+    "log": {
+      "mus": "{{name}} wants mus",
+      "cortar": "{{name}} cuts the mus",
+      "descartar": "{{name}} swaps {{n}} cards",
+      "paso": "{{name}} passes",
+      "envido": "{{name}} bets {{n}} stones",
+      "quiero": "{{name}} accepts",
+      "no_quiero": "{{name}} declines",
+      "ordago": "{{name}} calls órdago",
+      "lance": {
+        "grande": "{{team}} win the high card ({{n}} stones)",
+        "chica": "{{team}} win the low card ({{n}} stones)",
+        "pares": "{{team}} win the pairs ({{n}} stones)",
+        "juego": "{{team}} win the game ({{n}} stones)"
+      },
+      "nadie": {
+        "grande": "Nobody wins the high card",
+        "chica": "Nobody wins the low card",
+        "pares": "Nobody wins the pairs",
+        "juego": "Nobody wins the game"
+      },
+      "gameEnd": "Pair {{team}} takes the game",
+      "vaca": "Pair {{team}} takes the vaca!"
+    },
+    "rules": {
+      "title": "How to play mus",
+      "goal": "The first pair to 40 stones wins. Each hand is played over four rounds, and in each round you can bet: if the bet is declined, whoever made it takes one stone.",
+      "order": "There is no trump and no suits. From highest to lowest: king or three, horse, jack, seven, six, five, four, two or ace: the three is worth the same as the king and the two the same as the ace (\"eight kings and eight aces\").",
+      "mus": "Before anything else you ask whether there is mus, starting with the dealer. As soon as one player cuts, nobody else discards and the rounds begin.",
+      "lances": "The four rounds go in this order: high card, low card, pairs and game (31 or more). In the game the order is 31, 32, 40, 37, 36, 35, 34 and 33: 31 is the best. If nobody has game, it goes to points: closest to 30 wins.",
+      "bets": "In each round you pass or bet, with two stones minimum. The opponent can accept, decline, raise or call órdago, which puts the whole vaca at stake. In pairs the highest bet of the two partners counts.",
+      "pairs": "In pairs, double pairs (two pairs or four of a kind) beat three of a kind, which beats a pair. Ties go to the highest card in the combination."
+    }
+  },
+  "sala": {
+    "create": "Create a room",
+    "code": "Code",
+    "join": "Join",
+    "back": "Back to the game",
+    "lobby": "Waiting room",
+    "share": "Pass the code or the link to whoever you want to play with.",
+    "copy": "Copy link",
+    "copied": "Copied!",
+    "bot": "bot",
+    "removeBot": "Remove the bot",
+    "gone": "disconnected",
+    "freeSeat": "Free",
+    "addBot": "Add a bot",
+    "start": "Deal and play",
+    "waitingHost": "Waiting for the host to deal…",
+    "disconnected": "The connection dropped.",
+    "reconnect": "Rejoin",
+    "leave": "Leave the room",
+    "sinSesion": "Your session expired: sign in again.",
+    "noExiste": "That room does not exist (or it is over).",
+    "llena": "The room is full.",
+    "error": {
+      "crear": "The room could not be created. Try again.",
+      "codigo": "Type the room code (four letters or more).",
+      "noExiste": "We could not find that room. Check the code.",
+      "already_started": "The game has already started.",
+      "room_full": "The room is full.",
+      "host_only": "Only the host can do that.",
+      "min_players": "There are not enough players yet.",
+      "no_codes": "No free room codes left.",
+      "not_started": "The game has not started yet.",
+      "unknown_action": "That move is not allowed.",
+      "not_your_turn": "It is not your turn.",
+      "not_your_card": "That card is not yours.",
+      "no_cards": "You have no cards for that.",
+      "no_rank": "Nothing has been claimed yet.",
+      "rank_changed": "That value is no longer valid.",
+      "nothing_to_challenge": "There is nothing to challenge right now.",
+      "self_challenge": "You cannot challenge yourself.",
+      "player_out": "That player is already out of cards.",
+      "not_four": "You need all four matching cards.",
+      "not_playing": "The game is already over.",
+      "not_finished": "The game is not over yet."
+    }
   }
 }

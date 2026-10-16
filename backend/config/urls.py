@@ -3,28 +3,27 @@ URL Configuration for ft_transcendence project.
 """
 
 from pathlib import Path
-from django.contrib import admin
-from django.urls import path, re_path, include
-from django.views.generic import RedirectView
-from django.views.static import serve as static_serve
-from django.views.decorators.clickjacking import xframe_options_exempt
-from django.http import JsonResponse
+
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.contrib import admin
+from django.urls import include, path
+from django.views.generic import RedirectView
+from django.views.static import serve as static_serve
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from drf_spectacular.views import SpectacularSwaggerView, SpectacularAPIView
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from apps.users.auth_views import (
+    GoogleLoginView,
     LoginView,
-    RegisterView,
+    LogoutView,
     MeView,
     RefreshTokenView,
-    LogoutView,
-    GoogleLoginView,
+    RegisterView,
 )
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = BASE_DIR.parent
@@ -73,13 +72,57 @@ def game_asset_view(request, path):
 
 
 class HealthCheckView(APIView):
-    """Health check endpoint for Docker containers."""
+    """Comprueba las dependencias del servicio, no solo que Django responda.
+
+    Devuelve 200 si la base de datos y Redis responden, y 503 con el detalle de lo
+    que falla. Así el healthcheck de Docker distingue «el proceso vive» de «el
+    servicio puede atender».
+    """
 
     permission_classes = []
     authentication_classes = []
 
+    @staticmethod
+    def _check_db() -> str:
+        from django.db import connection
+
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+        return "ok"
+
+    @staticmethod
+    def _check_redis() -> str:
+        from django.conf import settings
+
+        if not getattr(settings, "REDIS_URL", ""):
+            return "no-configurado"
+        import redis.asyncio as aioredis
+        from asgiref.sync import async_to_sync
+
+        async def ping() -> bool:
+            cliente = aioredis.from_url(settings.REDIS_URL)
+            try:
+                return bool(await cliente.ping())
+            finally:
+                await cliente.aclose()
+
+        return "ok" if async_to_sync(ping)() else "sin-respuesta"
+
     def get(self, request):
-        return Response({"status": "healthy"}, status=status.HTTP_200_OK)
+        from django.utils.translation import get_language
+
+        checks = {}
+        for nombre, funcion in (("db", self._check_db), ("redis", self._check_redis)):
+            try:
+                checks[nombre] = funcion()
+            except Exception as exc:                        # noqa: BLE001
+                checks[nombre] = f"error: {type(exc).__name__}"
+        todo_ok = all(v in ("ok", "no-configurado") for v in checks.values())
+        return Response(
+            {"status": "healthy" if todo_ok else "degraded", "checks": checks,
+             "lang": get_language()},
+            status=status.HTTP_200_OK if todo_ok else status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
 
 
 @api_view(["GET"])
@@ -125,6 +168,7 @@ urlpatterns = [
     path("api/users/", include("apps.users.urls", namespace="users")),
     path("api/games/", include("apps.games.urls", namespace="games")),
     path("api/chat/", include("apps.chat.urls", namespace="chat")),
+    path("api/poker/", include("apps.poker.urls", namespace="poker")),
     path("api/tournament/", include("apps.tournament.urls", namespace="tournament")),
     # Leaderboard
     path("api/leaderboard/", include("apps.users.leaderboard_urls")),
@@ -137,6 +181,10 @@ urlpatterns = [
     path("game-assets/<path:path>", game_asset_view),
     # Redirect root to game embedding MVP
     path("", RedirectView.as_view(url="/game-embed/", permanent=False)),
+    # Salas del Culo (Presidente)
+    path("api/culo/", include("apps.culo.urls", namespace="culo")),
+    # Salas de los juegos nuevos (genéricas: el juego se pide por su id)
+    path("api/salas/", include("apps.salas.urls", namespace="salas")),
     # Public API (API key authenticated)
     path("api/public/", include("apps.public_api.urls", namespace="public_api")),
     # Swagger/OpenAPI documentation

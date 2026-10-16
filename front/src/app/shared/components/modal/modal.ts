@@ -1,8 +1,10 @@
 import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
+import { TranslatePipe } from '../../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-modal',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './modal.html',
   styleUrl: './modal.scss',
 })

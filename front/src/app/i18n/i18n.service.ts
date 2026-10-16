@@ -1,5 +1,5 @@
 import { Injectable, signal, computed, PLATFORM_ID, inject } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 
 export type Lang = 'en' | 'es' | 'fr';
 
@@ -12,6 +12,7 @@ interface TranslationDict {
 @Injectable({ providedIn: 'root' })
 export class I18nService {
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly doc = inject(DOCUMENT);
   private readonly _currentLang = signal<Lang>('en');
   private _translations: Record<Lang, TranslationDict> = {
     en: {},
@@ -34,7 +35,9 @@ export class I18nService {
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
-      this._currentLang.set(this.getStoredLang());
+      const guardado = this.getStoredLang();
+      this._currentLang.set(guardado);
+      this.aplicarIdiomaAlDocumento(guardado);
     }
   }
 
@@ -56,9 +59,21 @@ export class I18nService {
 
   setLang(lang: Lang): void {
     this._currentLang.set(lang);
+    this.aplicarIdiomaAlDocumento(lang);
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem(STORAGE_KEY, lang);
     }
+  }
+
+  /**
+   * El `<html lang>` tiene que seguir al idioma elegido.
+   *
+   * Es lo que usan los lectores de pantalla para escoger la fonética (WCAG 3.1.1) y lo que
+   * ven los buscadores; sin esto se quedaba siempre en el idioma con el que se sirvió el
+   * HTML, así que en francés se leía con fonética inglesa.
+   */
+  private aplicarIdiomaAlDocumento(lang: Lang): void {
+    this.doc.documentElement.lang = lang;
   }
 
   t(key: string, params?: Record<string, string | number>): string {

@@ -1,0 +1,106 @@
+<section class="sala container">
+  @if (error()) {
+    <p class="sala__error" role="alert">{{ error()! | translate }}</p>
+  } @else if (errorTexto()) {
+    <p class="sala__error" role="alert">{{ errorTexto() }}</p>
+  }
+
+  @if (paso() === 'menu') {
+    <div class="sala__menu">
+      <app-button class="sala__crear" variant="primary" [disabled]="ocupado()" (click)="crear()">
+        {{ 'sala.create' | translate }}
+      </app-button>
+
+      <div class="sala__entrar">
+        <label class="sala__campo">
+          <span>{{ 'sala.code' | translate }}</span>
+          <input
+            type="text"
+            maxlength="6"
+            autocomplete="off"
+            [value]="codigo()"
+            (input)="codigo.set($any($event.target).value.toUpperCase())"
+            (keyup.enter)="entrar()"
+          />
+        </label>
+        <app-button class="sala__unirse" variant="ghost" [disabled]="ocupado()" (click)="entrar()">
+          {{ 'sala.join' | translate }}
+        </app-button>
+      </div>
+
+      <app-button class="sala__volver" variant="ghost" (click)="salir()">
+        ← {{ 'sala.back' | translate }}
+      </app-button>
+    </div>
+  } @else {
+    <h3 class="sala__titulo font-pixel neon-text-cyan">{{ 'sala.lobby' | translate }}</h3>
+    <p class="text-muted text-sm">{{ 'sala.share' | translate }}</p>
+
+    <div class="sala__codigo">
+      <span class="sala__code font-pixel">{{ sala()?.code }}</span>
+      <button type="button" class="sala__copiar" (click)="copiarEnlace()">
+        {{ (copiado() ? 'sala.copied' : 'sala.copy') | translate }}
+      </button>
+    </div>
+
+    <ul class="sala__jugadores">
+      @for (p of sala()?.players ?? []; track $index) {
+        <li class="sala__jugador" [class.sala__jugador--fuera]="!p.connected">
+          <span>{{ p.username }}</span>
+          @if (p.isBot) {
+            <span class="text-muted text-sm">{{ 'sala.bot' | translate }}</span>
+            @if (sala()?.isHost && permiteBots()) {
+              <button
+                type="button"
+                class="sala__quitar"
+                (click)="quitarBot()"
+                [attr.aria-label]="'sala.removeBot' | translate"
+              >
+                ✕
+              </button>
+            }
+          }
+          @if (!p.connected) {
+            <span class="text-muted text-sm">{{ 'sala.gone' | translate }}</span>
+          }
+        </li>
+      }
+      @if (!lleno()) {
+        <li class="sala__hueco text-muted text-sm">{{ 'sala.freeSeat' | translate }}</li>
+      }
+    </ul>
+
+    <div class="sala__acciones">
+      @if (sala()?.isHost) {
+        @if (permiteBots()) {
+          <app-button class="sala__bot" variant="ghost" [disabled]="lleno()" (click)="anadirBot()">
+            {{ 'sala.addBot' | translate }}
+          </app-button>
+        }
+        <app-button
+          class="sala__repartir"
+          variant="primary"
+          [disabled]="!puedeEmpezar()"
+          (click)="repartir()"
+        >
+          {{ 'sala.start' | translate }}
+        </app-button>
+      } @else {
+        <span class="text-muted">{{ 'sala.waitingHost' | translate }}</span>
+      }
+    </div>
+
+    @if (connection() === 'closed' || connection() === 'error') {
+      <div class="sala__reconectar">
+        <p class="text-muted">{{ 'sala.disconnected' | translate }}</p>
+        <app-button class="sala__reconectar-boton" variant="primary" (click)="reconectar()">
+          {{ 'sala.reconnect' | translate }}
+        </app-button>
+      </div>
+    }
+
+    <app-button class="sala__salir" variant="ghost" (click)="salir()">
+      ← {{ 'sala.leave' | translate }}
+    </app-button>
+  }
+</section>

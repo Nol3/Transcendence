@@ -1,0 +1,78 @@
+<div class="games-page animate-fade-in">
+
+  <div class="games-page__header container">
+    <app-pixel-title [level]="2" color="cyan">{{ 'games.title' | translate }}</app-pixel-title>
+    <p class="text-secondary text-sm">{{ 'games.subtitle' | translate }}</p>
+  </div>
+
+  <div class="games-page__body container">
+    <ul class="games-grid">
+      @for (juego of games; track trackById($index, juego)) {
+        <li class="game-card" [class.game-card--cyan]="juego.accent === 'cyan'"
+            [class.game-card--pink]="juego.accent === 'pink'"
+            [class.game-card--yellow]="juego.accent === 'yellow'"
+            [class.game-card--green]="juego.accent === 'green'"
+            [class.game-card--off]="!juego.available">
+
+          <div class="game-card__top">
+            <span class="game-card__icon" aria-hidden="true">{{ juego.icon }}</span>
+            <div>
+              <h3 class="game-card__name font-pixel">{{ 'game.' + juego.id + '.name' | translate }}</h3>
+              <div class="game-card__meta">
+                <app-badge [variant]="badgeFor(juego.mode)">{{ modeKey(juego.mode) | translate }}</app-badge>
+                <span class="game-card__players text-muted text-sm">{{ juego.playersKey | translate }}</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="game-card__desc">{{ 'game.' + juego.id + '.desc' | translate }}</p>
+          <p class="game-card__how text-muted text-sm">{{ 'game.' + juego.id + '.how' | translate }}</p>
+
+          <ul class="game-card__tags">
+            @for (etiqueta of juego.tags; track etiqueta) {
+              <li class="game-card__tag">{{ etiqueta | translate }}</li>
+            }
+          </ul>
+
+          <div class="game-card__pie">
+            @if (juego.available) {
+              <app-button variant="primary" [fullWidth]="true" [routerLink]="juego.route">
+                {{ 'games.play' | translate }}
+              </app-button>
+            } @else {
+              <span class="game-card__pronto font-pixel">{{ 'games.soon' | translate }}</span>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+
+    @if (upcoming.length) {
+      <section class="games-page__proximos">
+        <h3 class="games-page__proximos-title font-pixel neon-text-yellow">
+          {{ 'games.upcoming' | translate }}
+        </h3>
+        <ul class="games-grid">
+          @for (juego of upcoming; track trackById($index, juego)) {
+            <li class="game-card game-card--off">
+              <div class="game-card__top">
+                <span class="game-card__icon" aria-hidden="true">{{ juego.icon }}</span>
+                <div>
+                  <h3 class="game-card__name font-pixel">{{ 'game.' + juego.id + '.name' | translate }}</h3>
+                  <div class="game-card__meta">
+                    <app-badge [variant]="badgeFor(juego.mode)">{{ modeKey(juego.mode) | translate }}</app-badge>
+                    <span class="game-card__players text-muted text-sm">{{ juego.playersKey | translate }}</span>
+                  </div>
+                </div>
+              </div>
+              <p class="game-card__desc">{{ 'game.' + juego.id + '.desc' | translate }}</p>
+              <div class="game-card__pie">
+                <span class="game-card__pronto font-pixel">{{ 'games.soon' | translate }}</span>
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  </div>
+</div>

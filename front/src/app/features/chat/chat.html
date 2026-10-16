@@ -1,0 +1,110 @@
+<div class="chat-page animate-fade-in">
+
+  <div class="chat-page__header container">
+    <app-pixel-title [level]="2" color="cyan">{{ 'chat.title' | translate }}</app-pixel-title>
+    <p class="text-secondary text-sm">{{ 'chat.subtitle' | translate }}</p>
+  </div>
+
+  @if (chat.error()) {
+    <div class="chat-page__error container" role="alert">
+      <span>{{ chat.error()! | translate }}</span>
+      <button type="button" class="chat-page__error-close" (click)="chat.clearError()" [attr.aria-label]="'common.close' | translate">✕</button>
+    </div>
+  }
+
+  <div class="chat-page__body container">
+    <div class="chat-page__grid">
+
+      <!-- ── Izquierda: conversaciones ───────────────────────────── -->
+      <div class="chat-page__sidebar">
+        <app-card [title]="'chat.conversations' | translate">
+          @if (chat.conversations().length === 0) {
+            <p class="text-secondary text-sm">{{ 'chat.noConversations' | translate }}</p>
+          } @else {
+            <ul class="convs">
+              @for (c of chat.conversations(); track trackConversation($index, c)) {
+                <li>
+                  <button type="button"
+                          class="convs__item"
+                          [class.is-active]="chat.activeUserId() === c.user.id"
+                          (click)="open(c.user.id)">
+                    <app-avatar [src]="c.user.avatar ?? undefined" [username]="c.user.username" size="sm"></app-avatar>
+                    <span class="convs__body">
+                      <span class="convs__name font-pixel">{{ c.user.username }}</span>
+                      <span class="convs__last text-secondary text-sm">{{ c.lastMessage.content }}</span>
+                    </span>
+                    @if (c.unread > 0) {
+                      <span class="convs__badge">{{ c.unread }}</span>
+                    }
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+
+          <app-button variant="ghost" [fullWidth]="true" (clicked)="showPicker.set(!showPicker())">
+            {{ 'chat.newConversation' | translate }}
+          </app-button>
+
+          @if (showPicker()) {
+            <div class="picker">
+              <input type="text"
+                     class="picker__search"
+                     [placeholder]="'chat.searchUser' | translate"
+                     [value]="filter()"
+                     (input)="filter.set($any($event.target).value)">
+              @if (candidates().length === 0) {
+                <p class="text-secondary text-sm">{{ 'chat.noUsers' | translate }}</p>
+              } @else {
+                <ul class="picker__list">
+                  @for (u of candidates(); track u.id) {
+                    <li>
+                      <button type="button" class="picker__item" (click)="startWith(u.id)">
+                        <app-avatar [src]="u.avatar ?? undefined" [username]="u.username" size="sm"></app-avatar>
+                        <span class="font-pixel">{{ u.username }}</span>
+                      </button>
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          }
+        </app-card>
+      </div>
+
+      <!-- ── Derecha: conversación ───────────────────────────────── -->
+      <div class="chat-page__thread">
+        <app-card [title]="chat.activeUser()?.username ?? ('chat.pickOne' | translate)">
+          @if (!chat.activeUserId()) {
+            <p class="text-secondary text-sm">{{ 'chat.emptyThread' | translate }}</p>
+          } @else {
+            <div class="thread" aria-live="polite">
+              @for (m of chat.thread(); track m.id) {
+                <div class="thread__row" [class.thread__row--mine]="m.sender.id === myId()">
+                  <div class="thread__bubble" [class.thread__bubble--mine]="m.sender.id === myId()">
+                    <span class="thread__text">{{ m.content }}</span>
+                    <span class="thread__time text-muted text-sm">{{ formatTime(m.created_at) }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="compose">
+              <textarea class="compose__input"
+                        rows="2"
+                        [placeholder]="'chat.placeholder' | translate"
+                        [value]="draft()"
+                        (input)="draft.set($any($event.target).value)"
+                        (keydown)="onKeydown($event)"></textarea>
+              <app-button variant="primary" [loading]="chat.sending()" (clicked)="send()">
+                {{ 'chat.send' | translate }}
+              </app-button>
+            </div>
+            <p class="text-muted text-sm">{{ 'chat.hint' | translate }}</p>
+          }
+        </app-card>
+      </div>
+
+    </div>
+  </div>
+</div>

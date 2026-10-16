@@ -5,12 +5,35 @@
 .claude
 
 # Node modules (Frontend)
+# OJO: la carpeta es `front/`, no `frontend/`. Con la ruta antigua, node_modules,
+# dist y .angular quedaban sin ignorar.
+front/node_modules/
+front/dist/
+front/.angular/
+front/.vscode/
 frontend/node_modules/
 frontend/dist/
 frontend/.angular/
 frontend/.vscode/
 
+# Artefactos de tests del front (se regeneran en cada ejecución de Playwright).
+# Los que estaban versionados por error ya se dejaron de seguir
+# (`git rm -r --cached front/test-results front/playwright-report`), así que estas
+# reglas solo tienen que evitar que vuelvan a entrar.
+front/test-results/
+front/playwright-report/
+front/.playwright/
+
+# Avatares que suben los usuarios: son datos, no código. Se guardan en el volumen
+# `media_data` del servidor y en las copias de seguridad, no en el repositorio.
+# (Los que ya estaban versionados de antes siguen ahí: sacarlos del historial es una
+# decisión aparte, porque entre ellos hay fotos personales en un repositorio público.)
+backend/media/avatars/
+
 # Python (Backend)
+# Los catálogos compilados son artefactos: se generan con `manage.py compilemessages`
+# (lo hace el contenedor al arrancar y el CI antes de los tests). Los .po sí se versionan.
+*.mo
 backend/.venv/
 backend/venv/
 backend/__pycache__/
@@ -73,3 +96,5 @@ docker/ssl/*.pem
 *.pem
 *.key
 *.crt
+# Capturas de revisión visual (front/e2e/capturas.spec.ts)
+front/capturas/

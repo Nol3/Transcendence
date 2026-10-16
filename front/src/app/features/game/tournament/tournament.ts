@@ -13,6 +13,7 @@ import {
 } from '../../../core/services/tournament.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { I18nService } from '../../../i18n/i18n.service';
 
 export type UiTournamentStatus = 'active' | 'upcoming' | 'finished';
 
@@ -54,6 +55,7 @@ export class Tournament implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly api = inject(TournamentService);
   private readonly notif = inject(NotificationService);
+  private readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -139,6 +141,8 @@ export class Tournament implements OnInit, OnDestroy {
           winner: m.winner,
           score: m.score,
           status: m.status,
+          reportedWinnerSlot: m.reportedWinnerSlot,
+          reportedBy: m.reportedBy,
         })),
       })),
       isRegistered: t.isRegistered,
@@ -194,17 +198,18 @@ export class Tournament implements OnInit, OnDestroy {
     this.selectedTournament.set(null);
   }
 
-  /** Launch the actual game for a bracket match (game reports back the result). */
+  /**
+   * Jugar un match del bracket en una mesa de póker real.
+   *
+   * Se abre la mesa del match en el servidor (`/api/tournament/.../table/`) y los
+   * dos jugadores entran por WebSocket. El resultado lo cierra el servidor al
+   * terminar la partida, así que nadie tiene que declararlo ni confirmarlo.
+   */
   handlePlayMatch(match: Match): void {
     const t = this.selectedTournament();
     if (!t) return;
-    this.router.navigate(['/game'], {
-      queryParams: {
-        tournament: t.id,
-        match: match.id,
-        p1: match.player1.username,
-        p2: match.player2.username,
-      },
+    this.router.navigate(['/poker'], {
+      queryParams: { tournament: t.id, match: match.id },
     });
   }
 
@@ -221,16 +226,36 @@ export class Tournament implements OnInit, OnDestroy {
       })
       .subscribe({
         next: (updated) => {
-          this.selectedTournament.set(this.toUi(updated));
-          this.tournaments.update((list) =>
-            list.map((x) => (x.id === updated.id ? this.toUi(updated) : x)),
-          );
+          const ui = this.toUi(updated);
+          this.selectedTournament.set(ui);
+          this.tournaments.update((list) => list.map((x) => (x.id === ui.id ? ui : x)));
           this.isReporting.set(false);
-          this.notif.success('Result reported', t.name);
+          // Si el match queda pendiente, el resultado aún no está confirmado: el
+          // bracket no avanza hasta que el rival lo valide (o el creador decida).
+          const match = ui.rounds
+            .flatMap((r) => r.matches)
+            .find((m) => m.id === event.match.id);
+          if (match?.status === 'awaiting_confirmation') {
+            this.notif.success(
+              this.i18n.t('notify.tournament.declared.title'),
+              this.i18n.t('notify.tournament.declared.body'),
+            );
+          } else {
+            this.notif.success(this.i18n.t('notify.tournament.declared.title'), t.name);
+          }
         },
-        error: () => {
+        error: (err) => {
           this.isReporting.set(false);
-          this.notif.error('Report failed', 'Could not report the match result');
+          const detail = err?.error?.detail ?? err?.error?.error;
+          if (err?.status === 409) {
+            this.notif.error(
+              this.i18n.t('notify.tournament.conflict.title'),
+              detail ?? this.i18n.t('notify.tournament.conflict.body'),
+            );
+          } else {
+            this.notif.error(this.i18n.t('notify.tournament.failed.title'),
+            detail ?? this.i18n.t('notify.tournament.failed.body'));
+          }
         },
       });
   }
@@ -261,13 +286,14 @@ export class Tournament implements OnInit, OnDestroy {
       .subscribe({
         next: (created) => {
           this.tournaments.update((list) => [this.toUi(created), ...list]);
-          this.notif.success('Tournament Created', created.name);
+          this.notif.success(this.i18n.t('notify.tournament.created.title'), created.name);
           this.isCreating.set(false);
           this.showCreateModal.set(false);
         },
         error: () => {
           this.isCreating.set(false);
-          this.notif.error('Create Failed', 'Could not create tournament');
+          this.notif.error(this.i18n.t('notify.tournament.createFailed.title'),
+            this.i18n.t('notify.tournament.createFailed.body'));
         },
       });
   }
@@ -284,12 +310,13 @@ export class Tournament implements OnInit, OnDestroy {
               : t,
           ),
         );
-        this.notif.success('Joined', tournament.name);
+        this.notif.success(this.i18n.t('notify.tournament.joined.title'), tournament.name);
         this.isJoining.set(false);
       },
       error: () => {
         this.isJoining.set(false);
-        this.notif.error('Join Failed', 'Could not join tournament');
+        this.notif.error(this.i18n.t('notify.tournament.joinFailed.title'),
+            this.i18n.t('notify.tournament.joinFailed.body'));
       },
     });
   }

@@ -11,8 +11,8 @@
 
     <!-- Header -->
     <div class="auth-card__header">
-      <app-pixel-title [level]="2" color="magenta">REGISTER</app-pixel-title>
-      <p class="auth-card__subtitle text-secondary text-sm">Create your player profile</p>
+      <app-pixel-title [level]="2" color="magenta">{{ 'auth.register.title' | translate }}</app-pixel-title>
+      <p class="auth-card__subtitle text-secondary text-sm">{{ 'auth.register.subtitle' | translate }}</p>
     </div>
 
     <!-- Form -->
@@ -22,7 +22,7 @@
         formControlName="username"
         label="USERNAME"
         type="text"
-        placeholder="player_one"
+        [placeholder]="'auth.register.usernamePlaceholder' | translate"
         autocomplete="username"
         [error]="fieldError('username')"
         hint="Letters, numbers and _ only"
@@ -32,7 +32,7 @@
         formControlName="email"
         label="EMAIL"
         type="email"
-        placeholder="player@example.com"
+        [placeholder]="'auth.login.emailPlaceholder' | translate"
         autocomplete="email"
         [error]="fieldError('email')"
       />
@@ -76,15 +76,17 @@
 
     <!-- Footer -->
     <div class="auth-card__footer">
-      <app-divider label="OR" color="muted" />
+      <app-divider [label]="'common.or' | translate" color="muted" />
       <p class="auth-card__switch text-secondary text-sm">
-        Already have an account?
-        <a routerLink="/login" class="auth-card__link font-pixel">LOGIN</a>
+        {{ 'auth.register.hasAccountShort' | translate }}
+        <a routerLink="/login" class="auth-card__link font-pixel">
+          {{ 'nav.login' | translate }}
+        </a>
       </p>
     </div>
 
   </div>
 
-  <p class="auth-page__hint font-pixel animate-blink">INSERT COIN ▮</p>
+  <p class="auth-page__hint font-pixel animate-blink">{{ 'common.insertCoin' | translate }} ▮</p>
 
 </div>

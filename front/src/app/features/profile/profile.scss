@@ -266,10 +266,19 @@ app-avatar {
   }
 
   &.locked {
-    opacity: 0.5;
+    // Sin `opacity` en el bloque: atenuarlo todo dejaba el progreso en 2,35:1 de
+    // contraste (lo marcaba axe). El logro bloqueado se distingue por el icono en
+    // gris y el borde, no bajando la opacidad del texto.
+    border-color: var(--color-border);
 
     .achievement-icon {
       filter: grayscale(1);
+      opacity: 0.5;
+    }
+
+    .achievement-name,
+    .achievement-progress {
+      color: var(--color-text-muted);
     }
   }
 }

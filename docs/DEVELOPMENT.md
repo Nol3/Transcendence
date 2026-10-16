@@ -83,10 +83,10 @@ docker compose down -v
 
 ### Services
 
-#### Frontend (Angular 18)
+#### Frontend (Angular 20)
 - **Port:** 4200 (dev), served via Nginx in production
-- **Framework:** Angular 18 with standalone components
-- **Styling:** Bootstrap 5 + SCSS
+- **Framework:** Angular 20 (standalone components + signals, zoneless)
+- **Styling:** SCSS propio (tema retro arcade)
 - **State Management:** RxJS Observables
 - **HTTP Client:** Angular HttpClient
 

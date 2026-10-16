@@ -61,17 +61,15 @@ Juego de cartas estilo Balatro simplificado para 2-4 jugadores en modo hot-seat 
 
 ### Deploy y Embedding
 - [x] Guía de deployment - DEPLOY.md con 5 opciones de hosting gratuito
-- [x] API de embedding - window.PokerRaceAPI + window.PokerRaceGame
+- [ ] API de embedding `window.PokerRaceAPI` — **no existe**: solo hay el bridge
+      postMessage de `minshell.html` (set-username/set-language/set-config)
 - [x] Comunicación postMessage - Eventos: gameover, round-end, player-turn, ready
 - [x] Botón compartir resultado (copiar a clipboard)
 - [x] Pantalla de configuración con controles de volumen
 
-### Fase 5: Comodines (Extensión tipo Balatro)
-- [x] Sistema de tienda entre rondas - Tienda con 3 comodines, reroll por $1
-- [x] Comodín: Emparejador - +10 pts por cada Pareja
-- [x] Comodín: As Dorado - x2 si incluye As
-- [x] Comodín: Corazón Rojo - +5 pts por cada carta roja
-- [x] Comodín: Colorito - x1.5 si todas son del mismo palo
+### Fase 5: Comodines (extensión tipo Balatro) — NO IMPLEMENTADA
+- [ ] Sistema de tienda entre rondas — no existe `joker.c/h` ni tienda en `game.c`
+      (esta sección figuraba como completada y era falsa)
 
 ---
 
@@ -86,8 +84,7 @@ Juego de cartas/
 │   ├── poker_hand.h/c     # Evaluador de manos
 │   ├── card_textures.h/c   # Sistema de texturas (multi-set)
 │   ├── renderer.h/c        # Renderizado y UI
-│   ├── audio.h/c           # Sonidos y música procedural
-│   └── joker.h/c          # Sistema de tienda/comodines
+│   └── audio.h/c           # Sonidos y música procedural
 ├── assets/
 │   ├── cards/              # Sprites de cartas (BASIC/, DEFAULT/, 1.cards/)
 │   └── audio/              # 8 archivos WAV generadas proceduralmente

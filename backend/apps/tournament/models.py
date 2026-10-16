@@ -1,6 +1,6 @@
 """Tournament app models."""
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 
 
 class Tournament(models.Model):
@@ -38,7 +38,9 @@ class Tournament(models.Model):
 
 class TournamentParticipant(models.Model):
     """Tournament participant."""
-    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name='participants')
+    tournament = models.ForeignKey(
+        Tournament, on_delete=models.CASCADE, related_name='participants'
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     is_eliminated = models.BooleanField(default=False)
     joined_at = models.DateTimeField(auto_now_add=True)
@@ -74,6 +76,9 @@ class TournamentMatch(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('live', 'Live'),
+        # Un jugador ha declarado un ganador y falta que lo confirme el rival
+        # (o que decida el creador del torneo). Hasta entonces el bracket no avanza.
+        ('awaiting_confirmation', 'Awaiting confirmation'),
         ('completed', 'Completed'),
     ]
 
@@ -98,7 +103,13 @@ class TournamentMatch(models.Model):
     )
     player1_score = models.IntegerField(default=0)
     player2_score = models.IntegerField(default=0)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=32, choices=STATUS_CHOICES, default='pending')
+    # Resultado declarado por un jugador, a la espera de que el rival lo confirme.
+    result_winner_slot = models.PositiveSmallIntegerField(null=True, blank=True)
+    result_reported_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='tournament_results_reported',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)
 
@@ -106,6 +117,16 @@ class TournamentMatch(models.Model):
         verbose_name = 'Tournament Match'
         verbose_name_plural = 'Tournament Matches'
         ordering = ['round__number', 'position']
+
+    def winner_slot(self) -> int | None:
+        """Asiento (1 o 2) del ganador, o None si aún no hay resultado."""
+        if self.winner_id is None:
+            return None
+        if self.player1_id and self.winner_id == self.player1_id:
+            return 1
+        if self.player2_id and self.winner_id == self.player2_id:
+            return 2
+        return None
 
     def __str__(self):
         p1 = self.player1.username if self.player1 else 'TBD'

@@ -1,6 +1,5 @@
 import { Injectable, signal, computed, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { environment } from '../../../environments/environment';
 
 export type NotificationType = 'success' | 'error' | 'warning' | 'info';
 export type RealTimeNotificationType =
@@ -133,6 +132,7 @@ export class NotificationService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // No cleanup needed after removing SSE
+    // No hay nada que limpiar (no quedan suscripciones SSE).
+    this.clear();
   }
 }

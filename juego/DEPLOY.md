@@ -77,7 +77,19 @@ scp -r web/* user@server:/var/www/poker-race/
 ```
 
 ### Opción B: Embedding con Comunicación (postMessage)
-El juego expone `window.PokerRaceAPI` y envía eventos al parent:
+
+> ⚠️ **Estado real (verificado con el build actual).** El juego **no** expone
+> `window.PokerRaceAPI`. El bridge real, definido en `minshell.html`, es solo:
+>
+> - **Padre → juego:** `{type:'set-username', username}` · `{type:'set-language', lang}` ·
+>   `{type:'set-config', config:{players,targetScore,rounds,theme}}`
+> - **Juego → padre:** `{type:'game-finished', winner, score:'<mia>-<rival>'}` — **el único evento**.
+>   `NOTIFY()`/`NOTIFY_INT()` están definidos como no-op en `game.c`, así que
+>   `player-turn`, `round-end` y `gameover` **nunca se emiten**, y los mensajes no
+>   llevan campo `source: 'poker-race'`.
+>
+> Los ejemplos de las opciones B, C y D describen una API **propuesta, no implementada**:
+> no funcionan tal cual contra este build.
 
 ```html
 <!-- En tu web: -->

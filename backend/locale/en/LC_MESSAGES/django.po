@@ -1,0 +1,53 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: transcendence\n"
+"Report-Msgid-Bugs-To: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+
+msgid "El usuario destinatario no existe."
+msgstr "The recipient does not exist."
+
+msgid "No puedes enviarte mensajes a ti mismo."
+msgstr "You cannot send messages to yourself."
+
+msgid "player1 and player2 must be different users."
+msgstr "player1 and player2 must be different users."
+
+msgid "Username already exists"
+msgstr "Username already exists"
+
+msgid "Email already exists"
+msgstr "Email already exists"
+
+msgid "Not found."
+msgstr "Not found."
+
+msgid "User not found"
+msgstr "User not found"
+
+msgid "Email and password are required"
+msgstr "Email and password are required"
+
+msgid "Invalid credentials"
+msgstr "Invalid credentials"
+
+msgid "User not authenticated"
+msgstr "User not authenticated"
+
+msgid "Refresh token is required"
+msgstr "Refresh token is required"
+
+msgid "Invalid refresh token"
+msgstr "Invalid refresh token"
+
+msgid "Google credential is required"
+msgstr "Google credential is required"
+
+msgid "Google OAuth is not configured on the server"
+msgstr "Google OAuth is not configured on the server"
+
+msgid "Google account email is not verified"
+msgstr "Google account email is not verified"

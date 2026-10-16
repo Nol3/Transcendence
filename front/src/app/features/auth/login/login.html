@@ -11,8 +11,8 @@
 
     <!-- Header -->
     <div class="auth-card__header">
-      <app-pixel-title [level]="2" color="cyan">LOGIN</app-pixel-title>
-      <p class="auth-card__subtitle text-secondary text-sm">Enter your credentials to continue</p>
+      <app-pixel-title [level]="2" color="cyan">{{ 'auth.login.title' | translate }}</app-pixel-title>
+      <p class="auth-card__subtitle text-secondary text-sm">{{ 'auth.login.subtitle' | translate }}</p>
     </div>
 
     <!-- Form -->
@@ -22,7 +22,7 @@
         formControlName="email"
         label="EMAIL"
         type="email"
-        placeholder="player@example.com"
+        [placeholder]="'auth.login.emailPlaceholder' | translate"
         autocomplete="email"
         [error]="fieldError('email')"
       />
@@ -65,14 +65,16 @@
 
       <app-divider color="muted" />
       <p class="auth-card__switch text-secondary text-sm">
-        No account?
-        <a routerLink="/register" class="auth-card__link font-pixel">REGISTER</a>
+        {{ 'auth.login.noAccountShort' | translate }}
+        <a routerLink="/register" class="auth-card__link font-pixel">
+          {{ 'nav.register' | translate }}
+        </a>
       </p>
     </div>
 
   </div>
 
   <!-- Bottom decoration -->
-  <p class="auth-page__hint font-pixel animate-blink">INSERT COIN ▮</p>
+  <p class="auth-page__hint font-pixel animate-blink">{{ 'common.insertCoin' | translate }} ▮</p>
 
 </div>

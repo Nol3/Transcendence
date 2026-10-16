@@ -1,4 +1,5 @@
-import { Component, Input, Output, EventEmitter, HostBinding } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostBinding, inject } from '@angular/core';
+import { GameSound } from '../../../core/audio/game-sound';
 import { SpinnerComponent } from '../spinner/spinner';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'accent';
@@ -12,6 +13,8 @@ export type ButtonSize    = 'sm' | 'md' | 'lg';
   styleUrl: './button.scss',
 })
 export class ButtonComponent {
+  private readonly sonido = inject(GameSound);
+
   @Input() variant: ButtonVariant = 'primary';
   @Input() size: ButtonSize = 'md';
   @Input() disabled = false;
@@ -26,8 +29,8 @@ export class ButtonComponent {
   }
 
   onClick(event: MouseEvent) {
-    if (!this.disabled && !this.loading) {
-      this.clicked.emit(event);
-    }
+    if (this.disabled || this.loading) return;
+    this.sonido.boton();
+    this.clicked.emit(event);
   }
 }

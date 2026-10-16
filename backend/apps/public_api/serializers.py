@@ -1,13 +1,12 @@
 """Public API serializers."""
 from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from apps.games.models import Game
-from apps.tournament.models import Tournament, TournamentParticipant
-from apps.users.models import UserProfile
+from apps.tournament.models import Tournament
 
 from .models import ApiKey
-
 
 # ── API Key management ──────────────────────────────────────────────────────
 
@@ -87,7 +86,7 @@ class PublicGameSerializer(serializers.ModelSerializer):
         p1 = data.get("player1")
         p2 = data.get("player2")
         if p1 and p2 and p1 == p2:
-            raise serializers.ValidationError("player1 and player2 must be different users.")
+            raise serializers.ValidationError(_("player1 and player2 must be different users."))
         return data
 
 

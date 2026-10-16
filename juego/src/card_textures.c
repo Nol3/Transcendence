@@ -37,10 +37,21 @@ bool LoadCardTexturesSet(CardTextures* textures, CardSet set) {
     int failed = 0;
     
     // Cargar las 52 cartas desde BASIC/8BitDeckN.png
-    // Mapeo: suit 0-3 (hearts, diamonds, clubs, spades)
-    // En las imgenes 8BitDeck, el orden de cada palo es 2, 3, 4... K, A.
-    // Es decir, la imagen 1 es el 2, la imagen 12 es la K, y la imagen 13 es el As.
-    // En nuestro cdigo, rank = 0 es As, y rank = 1..12 son 2..K.
+    //
+    // OJO con el orden de los palos en las imgenes: es corazones, TRBOLES,
+    // diamantes, picas (13 cartas cada uno). Durante mucho tiempo se dio por hecho
+    // que era corazones, diamantes, trboles, picas, y no lo es: eso haca que la
+    // carta que se ensea como "Diamantes" llevara dibujado un trbol, y al revs.
+    // El orden real est comprobado mirando los smbolos de cada grupo de 13.
+    //
+    // Dentro de cada palo el orden es 2, 3, 4... K, A: la imagen 1 es el 2, la 12 la
+    // K y la 13 el As. En nuestro cdigo, rank = 0 es el As y rank = 1..12 son 2..K.
+    static const int GRUPO_DE_PALO[4] = {
+        0,   // SUIT_HEARTS   -> mazos 1-13
+        2,   // SUIT_DIAMONDS -> mazos 27-39
+        1,   // SUIT_CLUBS    -> mazos 14-26
+        3,   // SUIT_SPADES   -> mazos 40-52
+    };
     for (int suit = 0; suit < 4; suit++) {
         for (int rank = 0; rank < 13; rank++) {
             int imageRank;
@@ -52,7 +63,7 @@ bool LoadCardTexturesSet(CardTextures* textures, CardSet set) {
                 imageRank = rank;
             }
             
-            int deckNumber = suit * 13 + imageRank;
+            int deckNumber = GRUPO_DE_PALO[suit] * 13 + imageRank;
             char filename[256];
             snprintf(filename, sizeof(filename), ASSETS_PREFIX "/cards/BASIC/8BitDeck%d.png", deckNumber);
             

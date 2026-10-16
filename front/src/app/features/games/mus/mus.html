@@ -1,0 +1,255 @@
+<div class="brisca container mus">
+  <header class="brisca__cabecera">
+    <h2 class="font-pixel neon-text-yellow">{{ 'game.mus.name' | translate }}</h2>
+    <div class="brisca__acciones">
+      <app-button variant="ghost" size="sm" (click)="reglasAbiertas.set(true)">
+        📖 {{ 'mus.rules.title' | translate }}
+      </app-button>
+      <button
+        type="button"
+        class="brisca__sonido"
+        (click)="alternarSonido()"
+        [attr.aria-pressed]="sonidoActivo()"
+        [attr.aria-label]="'culo.sound.toggle' | translate"
+      >
+        {{ sonidoActivo() ? '🔊' : '🔇' }}
+      </button>
+      <a class="brisca__volver" routerLink="/games">← {{ 'games.back' | translate }}</a>
+    </div>
+  </header>
+
+  @if (modo() === 'menu') {
+    <section class="inicio">
+      <p class="inicio__intro">{{ 'mus.intro' | translate }}</p>
+      <div class="inicio__modos">
+        <app-button class="modo__local" variant="primary" size="lg" (click)="modo.set('local')">
+          {{ 'games.mode.bots' | translate }}
+        </app-button>
+        <app-button class="modo__online" variant="ghost" size="lg" (click)="modo.set('online')">
+          {{ 'games.mode.online' | translate }}
+        </app-button>
+      </div>
+    </section>
+  } @else if (modo() === 'online' && (!estado() || salas.connection() === 'closed')) {
+    <app-sala-lobby
+      juego="mus"
+      [minJugadores]="4"
+      [maxJugadores]="4"
+      (volver)="modo.set('menu')"
+    />
+  } @else if (!estado()) {
+    <section class="inicio">
+      <p class="inicio__intro">{{ 'mus.intro' | translate }}</p>
+      <app-button class="inicio__empezar" variant="primary" size="lg" (click)="empezar()">
+        {{ 'mus.start' | translate }}
+      </app-button>
+    </section>
+  } @else {
+    <!-- Marcador: piedras y juegos de cada pareja -->
+    <div class="mus__equipos">
+      @for (t of marcador(); track t.id) {
+        <div class="equipo" [class.equipo--mia]="t.mia">
+          <span class="equipo__nombres">{{ t.nombres }}</span>
+          <span class="equipo__piedras font-mono">{{ t.piedras }} 🪨</span>
+          <span class="text-muted text-sm">
+            {{ 'mus.gamesWon' | translate: { n: t.juegos } }}
+          </span>
+        </div>
+      }
+    </div>
+
+    <p class="fase font-pixel">
+      @if (fase() === 'vaca-end') {
+        {{ 'mus.log.vaca' | translate: { team: (estado()!.winner ?? 0) + 1 } }}
+      } @else if (fase() === 'game-end') {
+        {{ 'mus.gameEnd' | translate }}
+      } @else if (fase() === 'descartar') {
+        {{ 'mus.phase.descartar' | translate }}
+      } @else if (fase() === 'lances') {
+        {{ 'mus.phase.lances' | translate: { lance: nombreLance(lance()!) | translate } }}
+      } @else {
+        {{ 'mus.phase.mus' | translate }}
+      }
+    </p>
+
+    @if (fase() !== 'vaca-end' && fase() !== 'game-end') {
+      <!-- Mi jugada y la de mi compañero (lo que en la mesa real se dicen por señas) -->
+      @if (miJugada(); as j) {
+        <div class="jugada">
+          <span class="jugada__dato">
+            {{ 'mus.grande' | translate }}: <strong>{{ j.grande }}</strong>
+          </span>
+          <span class="jugada__dato">
+            {{ 'mus.chica' | translate }}: <strong>{{ j.chica }}</strong>
+          </span>
+          <span class="jugada__dato">
+            {{ 'mus.paresLabel' | translate }}:
+            <strong>{{ (j.pares.categoria ? 'mus.pares.' + j.pares.categoria : 'mus.pares.none') | translate }}</strong>
+          </span>
+          <span class="jugada__dato">
+            {{ 'mus.juego' | translate }}:
+            <strong>{{ j.juego ?? j.punto }}</strong>
+          </span>
+        </div>
+      }
+      @if (companero(); as c) {
+        <p class="jugada__dato text-center">
+          {{ 'mus.partnerPlay' | translate: { name: c.nombre } }}:
+          {{ 'mus.grande' | translate }} {{ c.jugada.grande }} ·
+          {{ 'mus.paresLabel' | translate }}
+          {{ (c.jugada.pares.categoria ? 'mus.pares.' + c.jugada.pares.categoria : 'mus.pares.none') | translate }} ·
+          {{ 'mus.juego' | translate }} {{ c.jugada.juego ?? c.jugada.punto }}
+        </p>
+      }
+
+      <!-- La fase de mus -->
+      @if (fase() === 'mus') {
+        <div class="envite">
+          <app-button
+            class="envite__mus"
+            variant="primary"
+            [disabled]="!miTurno()"
+            (click)="decirMus()"
+          >
+            {{ 'mus.sayMus' | translate }}
+          </app-button>
+          <app-button
+            class="envite__cortar"
+            variant="ghost"
+            [disabled]="!miTurno()"
+            (click)="cortar()"
+          >
+            {{ 'mus.cut' | translate }}
+          </app-button>
+        </div>
+      }
+
+      <!-- Los envites -->
+      @if (fase() === 'lances') {
+        @if (meTocaResponder() && enviteVivo(); as e) {
+          <div class="envite">
+            <span class="jugada__dato">
+              {{ (e.ordago ? 'mus.ordago' : 'mus.envido') | translate: { n: e.cuantas } }}
+            </span>
+            <app-button class="envite__quiero" variant="primary" (click)="querer()">
+              {{ 'mus.want' | translate }}
+            </app-button>
+            <app-button class="envite__noquiero" variant="ghost" (click)="noQuerer()">
+              {{ 'mus.dontWant' | translate }}
+            </app-button>
+          </div>
+        } @else {
+          <div class="envite">
+            <app-button
+              class="envite__pasar"
+              variant="ghost"
+              [disabled]="!miTurno() || !!enviteVivo()"
+              (click)="pasar()"
+            >
+              {{ 'mus.pass' | translate }}
+            </app-button>
+            <label class="envite__cuantas">
+              <span class="text-muted text-sm">{{ 'mus.betAmount' | translate }}</span>
+              <input
+                type="number"
+                min="2"
+                max="20"
+                [value]="envite()"
+                (input)="envite.set(+$any($event.target).value)"
+              />
+            </label>
+            <app-button
+              class="envite__envidar"
+              variant="primary"
+              [disabled]="!miTurno() || !!enviteVivo()"
+              (click)="envidar()"
+            >
+              {{ 'mus.bet' | translate }}
+            </app-button>
+            <app-button
+              class="envite__ordago"
+              variant="primary"
+              [disabled]="!miTurno() || !!enviteVivo()"
+              (click)="cantarOrdago()"
+            >
+              {{ 'mus.ordagoShort' | translate }}
+            </app-button>
+          </div>
+        }
+      }
+
+      <!-- Mi mano -->
+      <div class="mano" [class.mano--turno]="miTurno()">
+        @for (c of miMano(); track c.id) {
+          <button
+            type="button"
+            class="mano__carta"
+            [class.mano__carta--marcada]="estaMarcada(c)"
+            [disabled]="fase() !== 'descartar' || !miTurno()"
+            (click)="toca(c)"
+            [attr.aria-label]="'culo.card' | translate: { value: ('baraja.rank.' + c.rank | translate), suit: ('baraja.suit.' + c.suit | translate) }"
+          >
+            <app-playing-card [card]="codigo(c)" deck="spanish" [order]="$index" />
+          </button>
+        }
+      </div>
+
+      @if (fase() === 'descartar') {
+        <div class="controles">
+          <div class="controles__botones">
+            <app-button
+              class="controles__descartar"
+              variant="primary"
+              [disabled]="!miTurno() || aDescartar().length === 0"
+              (click)="descartarCartas()"
+            >
+              {{ 'mus.discard' | translate: { n: aDescartar().length } }}
+            </app-button>
+          </div>
+        </div>
+      }
+
+      @if (registro().length > 0) {
+        <ul class="registro">
+          @for (l of registro(); track $index) {
+            <li class="registro__linea" [class]="'registro__linea--' + l.kind">
+              {{ l.key | translate: l.params }}
+            </li>
+          }
+        </ul>
+      }
+    }
+
+    @if (fase() === 'game-end' || fase() === 'vaca-end') {
+      <div class="final" role="alertdialog" aria-modal="true" appFocoDialogo aria-labelledby="mus-final-titulo">
+        <div class="final__caja">
+          @if (fase() === 'vaca-end') {
+            <h3 id="mus-final-titulo" class="font-pixel neon-text-yellow">
+              {{ 'mus.log.vaca' | translate: { team: (estado()!.winner ?? 0) + 1 } }}
+            </h3>
+            <app-button variant="primary" (click)="empezar()">{{ 'mus.newMatch' | translate }}</app-button>
+          } @else {
+            <h3 id="mus-final-titulo" class="font-pixel neon-text-cyan">{{ 'mus.gameEnd' | translate }}</h3>
+            <app-button variant="primary" (click)="repartirMano()">{{ 'mus.nextHand' | translate }}</app-button>
+          }
+          <app-button variant="ghost" (click)="salir()">{{ 'juego.leave' | translate }}</app-button>
+        </div>
+      </div>
+    }
+  }
+
+  @if (reglasAbiertas()) {
+    <div class="reglas" role="dialog" aria-modal="true" appFocoDialogo [attr.aria-label]="'mus.rules.title' | translate">
+      <div class="reglas__caja">
+        <h3 class="font-pixel neon-text-yellow">{{ 'mus.rules.title' | translate }}</h3>
+        <p>{{ 'mus.rules.goal' | translate }}</p>
+        <p>{{ 'mus.rules.order' | translate }}</p>
+        <p>{{ 'mus.rules.mus' | translate }}</p>
+        <p>{{ 'mus.rules.lances' | translate }}</p>
+        <p>{{ 'mus.rules.bets' | translate }}</p>
+        <p>{{ 'mus.rules.pairs' | translate }}</p>
+        <app-button variant="primary" (click)="cerrarReglas()">{{ 'common.close' | translate }}</app-button>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,9 @@
+<span class="pc"
+      [class]="'pc--' + size() + ' pc--' + state() + (faceDown() || !esValida() ? ' pc--dorso' : '')"
+      [style.--pc-orden]="order()"
+      role="img"
+      [attr.aria-label]="faceDown() || !esValida()
+        ? ('poker.card.hidden' | translate)
+        : (('card.rank.' + rango() | translate) + ' ' + ('card.suit.' + palo() | translate))">
+  <img class="pc__cara" [src]="src()" alt="" draggable="false" />
+</span>

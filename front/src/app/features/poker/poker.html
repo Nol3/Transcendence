@@ -1,0 +1,403 @@
+<div class="poker">
+  <!-- ── Cabecera ───────────────────────────────────────────────────── -->
+  <div class="poker__header container">
+    <a class="poker__history-link font-pixel" routerLink="/poker/history">
+      {{ 'poker.history.title' | translate }} →
+    </a>
+    <div class="poker__title-row">
+      <app-pixel-title [level]="2" color="yellow">{{ 'poker.title' | translate }}</app-pixel-title>
+      @switch (poker.status()) {
+        @case ('connecting') { <app-badge variant="warning">{{ 'poker.status.connecting' | translate }}</app-badge> }
+        @case ('searching')  { <app-badge variant="warning">{{ 'poker.status.searching' | translate }}</app-badge> }
+        @case ('matched')    { <app-badge variant="success">{{ 'poker.status.playing' | translate }}</app-badge> }
+        @case ('error')      { <app-badge variant="error">{{ 'poker.status.error' | translate }}</app-badge> }
+      }
+    </div>
+    <p class="text-secondary text-sm">{{ 'poker.subtitle' | translate }}</p>
+  </div>
+
+  @if (poker.error()) {
+    <div class="poker__error container" role="alert">
+      <span>{{ poker.error()! | translate }}</span>
+      <button type="button" class="poker__error-close" (click)="poker.clearError()" [attr.aria-label]="'common.close' | translate">✕</button>
+    </div>
+  }
+
+  <!-- ── Lobby: cola de espera ──────────────────────────────────────── -->
+  @if (!poker.inTable()) {
+    @if (isTournamentMatch()) {
+      <!-- Match de torneo: la mesa ya existe en el servidor, no hay cola. -->
+      <div class="lobby container">
+        <div class="lobby__grid">
+          <app-card [title]="'poker.tournament.title' | translate">
+            <p class="text-secondary text-sm">
+              {{ 'poker.tournament.explain' | translate: { rival: tournamentMatch()!.opponent } }}
+            </p>
+            <div class="searching">
+              <span class="searching__spinner animate-pulse-glow"></span>
+              <span class="font-pixel neon-text-cyan">{{ 'poker.tournament.waiting' | translate }}</span>
+            </div>
+            <p class="text-secondary text-sm">{{ 'poker.tournament.autoResult' | translate }}</p>
+          </app-card>
+
+          <app-card [title]="tournamentMatch()!.tournamentName">
+            <p class="text-secondary text-sm">{{ 'poker.tournament.rules' | translate }}</p>
+            <a class="poker__back font-pixel" routerLink="/tournament">
+              ← {{ 'poker.tournament.back' | translate }}
+            </a>
+          </app-card>
+        </div>
+      </div>
+    } @else {
+    <div class="lobby container">
+      <div class="lobby__grid">
+
+        <app-card [title]="'poker.queue.title' | translate">
+          <p class="text-secondary text-sm">{{ 'poker.queue.explain' | translate }}</p>
+
+          <div class="stakes">
+            <span class="text-muted font-mono text-sm">{{ 'poker.queue.theme' | translate }}</span>
+            <div class="themes">
+              @for (t of poker.themes(); track t) {
+                <button type="button"
+                        class="themes__swatch themes__swatch--{{ t }}"
+                        [class.is-active]="poker.theme() === t"
+                        [attr.aria-label]="t"
+                        (click)="poker.setTheme(t)"></button>
+              }
+            </div>
+          </div>
+
+          <div class="stakes">
+            <span class="text-muted font-mono text-sm">{{ 'poker.queue.tableSize' | translate }}</span>
+            <div class="stakes__options">
+              @for (size of poker.tableSizes; track size) {
+                <button type="button"
+                        class="stakes__btn font-pixel"
+                        [class.is-active]="poker.tableSize() === size"
+                        (click)="poker.chooseTableSize(size)">
+                  {{ size }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div class="stakes">
+            <span class="text-muted font-mono text-sm">{{ 'poker.queue.stake' | translate }}</span>
+            <div class="stakes__options">
+              @for (s of stakes; track s) {
+                <button type="button"
+                        class="stakes__btn font-pixel"
+                        [class.is-active]="poker.stake() === s"
+                        [disabled]="poker.status() === 'searching'"
+                        (click)="chooseStake(s)">
+                  {{ stakeLabel(s) }}
+                </button>
+              }
+            </div>
+          </div>
+
+          @if (poker.status() === 'idle' || poker.status() === 'error') {
+            <app-button variant="primary" [fullWidth]="true" (clicked)="startQueue()">
+              {{ 'poker.queue.find' | translate }}
+            </app-button>
+          } @else {
+            <div class="searching">
+              <span class="searching__spinner animate-pulse-glow"></span>
+              <span class="font-pixel neon-text-cyan">
+                {{ 'poker.queue.waiting' | translate }} {{ poker.secondsWaiting() }}s
+              </span>
+            </div>
+            <p class="text-secondary text-sm">
+              {{ 'poker.queue.botHint' | translate: { seconds: poker.queueTimeout() } }}
+            </p>
+            <app-button variant="ghost" [fullWidth]="true" (clicked)="poker.cancelQueue()">
+              {{ 'poker.queue.cancel' | translate }}
+            </app-button>
+          }
+        </app-card>
+
+        <app-card [title]="'poker.live.title' | translate">
+          <p class="text-secondary text-sm">{{ 'poker.live.explain' | translate }}</p>
+          @if (poker.liveTables().length === 0) {
+            <p class="text-secondary text-sm">{{ 'poker.live.none' | translate }}</p>
+          } @else {
+            <ul class="live">
+              @for (t of poker.liveTables(); track t.table_id) {
+                <li class="live__item">
+                  <span class="live__players font-pixel">
+                    {{ t.players.join(', ') }}
+                  </span>
+                  <span class="text-muted font-mono text-sm">
+                    {{ t.small_blind }}/{{ t.big_blind }} · {{ 'poker.table.hand' | translate }} #{{ t.hand_number }}
+                  </span>
+                  @if (t.finished) {
+                    <app-badge variant="default">{{ 'poker.live.finished' | translate }}</app-badge>
+                  } @else {
+                    <app-badge variant="success">{{ 'poker.live.live' | translate }}</app-badge>
+                  }
+                  <app-button variant="ghost" size="sm" (clicked)="watch(t.table_id)">
+                    {{ 'poker.live.watch' | translate }}
+                  </app-button>
+                </li>
+              }
+            </ul>
+          }
+          <app-button variant="ghost" [fullWidth]="true" (clicked)="refreshLiveTables()">
+            {{ 'poker.live.refresh' | translate }}
+          </app-button>
+        </app-card>
+
+        <app-card [title]="'poker.rules.title' | translate">
+          <ul class="rules">
+            @for (rule of ['poker.rules.1','poker.rules.2','poker.rules.3','poker.rules.4','poker.rules.5']; track rule) {
+              <li class="rules__item">
+                <span class="neon-text-cyan font-mono">›</span>
+                <span class="text-secondary text-sm">{{ rule | translate }}</span>
+              </li>
+            }
+          </ul>
+        </app-card>
+
+      </div>
+    </div>
+    }
+  }
+
+  <!-- ── Mesa ───────────────────────────────────────────────────────── -->
+  @if (poker.inTable() && poker.state(); as table) {
+    <div class="table container">
+      <div class="table__bar">
+        <span class="text-muted font-mono text-sm">
+          {{ 'poker.table.hand' | translate }} #{{ table.table.hand_number }}
+        </span>
+        <span class="text-muted font-mono text-sm">
+          {{ 'poker.table.blinds' | translate }} {{ table.table.small_blind }}/{{ table.table.big_blind }}
+        </span>
+        <span class="text-muted font-mono text-sm">
+          {{ streetLabel() | translate }}
+        </span>
+        @if (isSpectating()) {
+          <app-badge variant="info">{{ 'poker.spectate.badge' | translate }}</app-badge>
+        }
+        @if (poker.turnSeconds() !== null) {
+          <span class="turn-clock font-pixel" [class.turn-clock--low]="poker.turnSeconds()! <= 5">
+            ⏱ {{ poker.turnSeconds() }}s
+          </span>
+        }
+      </div>
+
+      <div class="felt" [class]="'felt felt--' + poker.theme()">
+        <!-- Asientos de arriba: los demás si juego; todos si solo miro -->
+        @if (poker.tableSeats().length > 0) {
+          <div class="seats--rivals">
+            @for (rival of poker.tableSeats(); track rival.index) {
+              <div class="seat seat--rival" [class.seat--folded]="rival.folded" [class.seat--winner]="isWinner(rival.index)">
+                <div class="seat__head">
+                  <span class="seat__name font-pixel">{{ rival.name }}</span>
+                  @if (rival.is_bot) { <app-badge variant="default">{{ 'poker.table.bot' | translate }}</app-badge> }
+                  @if (rival.all_in) { <app-badge variant="error">{{ 'poker.table.allIn' | translate }}</app-badge> }
+                  @if (rival.folded) { <app-badge variant="default">{{ 'poker.table.folded' | translate }}</app-badge> }
+                </div>
+                <div class="seat__cards">
+                  @for (hole of (revealedFor(rival.index) ?? []); track $index) {
+                    <app-playing-card [card]="hole" [order]="$index"
+                                      [state]="rival.folded ? 'folded' : (isWinner(rival.index) ? 'winner' : 'idle')" />
+                  }
+                  @if (!revealedFor(rival.index)) {
+                    @for (i of [1,2]; track i) { <app-playing-card [faceDown]="true" [order]="i" /> }
+                  }
+                </div>
+                <div class="seat__foot">
+                  <span class="seat__stack font-pixel neon-text-yellow">{{ rival.stack }}</span>
+                  @if (rival.committed > 0) {
+                    <span class="seat__bet font-mono">+{{ rival.committed }}</span>
+                  }
+                  @if (handNameFor(rival.index)) {
+                    <span class="seat__hand text-secondary text-sm">{{ handNameFor(rival.index) }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Centro: bote y comunitarias -->
+        <div class="center">
+          <div class="pot">
+            <span class="pot__label font-pixel">{{ 'poker.table.pot' | translate }}</span>
+            <span class="pot__value font-pixel neon-text-yellow">{{ table.game?.pot ?? 0 }}</span>
+          </div>
+          <div class="board">
+            @for (slot of [0,1,2,3,4]; track slot) {
+              @if (table.game && table.game.board[slot]; as boardCard) {
+                <app-playing-card [card]="boardCard" [size]="'lg'" [order]="slot" />
+              } @else {
+                <span class="card card--empty"></span>
+              }
+            }
+          </div>
+        </div>
+
+        <!-- Yo -->
+        @if (poker.me(); as me) {
+          <div class="seat seat--me" [class.seat--folded]="me.folded" [class.seat--winner]="isWinner(me.index)">
+            <div class="seat__head">
+              <span class="seat__name font-pixel">{{ me.name }}</span>
+              @if (me.all_in) { <app-badge variant="error">{{ 'poker.table.allIn' | translate }}</app-badge> }
+              @if (me.folded) { <app-badge variant="default">{{ 'poker.table.folded' | translate }}</app-badge> }
+            </div>
+            <div class="seat__cards">
+              @for (hole of (me.hole ?? []); track $index) {
+                <app-playing-card [card]="hole" [size]="'xl'" [order]="$index"
+                                  [state]="me.folded ? 'folded'
+                                    : (isWinner(me.index) ? 'winner'
+                                    : (table.game?.actor === me.index ? 'turn' : 'idle'))" />
+              }
+            </div>
+            <div class="seat__foot">
+              <span class="seat__stack font-pixel neon-text-green">{{ me.stack }}</span>
+              @if (me.committed > 0) {
+                <span class="seat__bet font-mono">+{{ me.committed }}</span>
+              }
+              @if (handNameFor(me.index)) {
+                <span class="seat__hand text-secondary text-sm">{{ handNameFor(me.index) }}</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Resultado de la mano -->
+      @if (table.game?.result; as result) {
+        <div class="outcome" [class.outcome--won]="myWinnings() > 0">
+          <span class="outcome__title font-pixel">{{ resultTitle() | translate }}</span>
+          <span class="text-secondary text-sm">
+            {{ 'poker.result.pot' | translate }} {{ result.total }}
+            @if (result.showdown) { · {{ 'poker.result.showdown' | translate }} }
+          </span>
+          @if (myWinnings() > 0) {
+            <span class="outcome__amount font-pixel neon-text-green">+{{ myWinnings() }}</span>
+          }
+        </div>
+      }
+
+      <!-- Acciones -->
+      <!-- Chat de mesa: efímero, lo ven jugadores y espectadores -->
+      <app-card [title]="'poker.chat.title' | translate">
+        <div class="table-chat" aria-live="polite">
+          @if (poker.chat().length === 0) {
+            <p class="text-secondary text-sm">{{ 'poker.chat.empty' | translate }}</p>
+          } @else {
+            @for (m of poker.chat(); track $index) {
+              <div class="table-chat__row" [class.table-chat__row--mine]="m.mine">
+                <span class="table-chat__from font-pixel">
+                  {{ m.from }}
+                  @if (m.spectator) { <span class="text-muted">({{ 'poker.spectate.short' | translate }})</span> }
+                </span>
+                <span class="table-chat__text">{{ m.text }}</span>
+                <span class="table-chat__at text-muted text-sm">{{ m.at }}</span>
+              </div>
+            }
+          }
+        </div>
+        <div class="compose">
+          <input type="text"
+                 class="compose__input"
+                 maxlength="200"
+                 [placeholder]="'poker.chat.placeholder' | translate"
+                 [value]="chatDraft()"
+                 (input)="chatDraft.set($any($event.target).value)"
+                 (keydown)="onChatKeydown($event)">
+          <app-button variant="secondary" (clicked)="sendChat()">
+            {{ 'poker.chat.send' | translate }}
+          </app-button>
+        </div>
+      </app-card>
+
+      @if (poker.myTurn()) {
+        <div class="actions">
+          <div class="actions__row">
+            <app-button variant="danger" (clicked)="act('fold')">
+              {{ 'poker.action.fold' | translate }}
+            </app-button>
+
+            @if (poker.canCheck()) {
+              <app-button variant="secondary" (clicked)="act('check')">
+                {{ 'poker.action.check' | translate }}
+              </app-button>
+            }
+            @if (poker.callAction(); as call) {
+              <app-button variant="secondary" (clicked)="act('call', call.amount)">
+                {{ 'poker.action.call' | translate }} {{ call.amount }}
+              </app-button>
+            }
+            @if (poker.canAllIn()) {
+              <app-button variant="accent" (clicked)="act('all_in')">
+                {{ 'poker.action.allIn' | translate }} ({{ poker.allInAmount() }})
+              </app-button>
+            }
+          </div>
+
+          @if (poker.raiseAction(); as raise) {
+            <div class="raise">
+              <div class="raise__row">
+                <input class="raise__slider"
+                       type="range"
+                       [min]="raise.min"
+                       [max]="raise.max"
+                       [value]="raiseAmount()"
+                       (input)="onRaiseSlider($event)"
+                       [attr.aria-label]="'poker.action.raise' | translate" />
+                <span class="raise__value font-pixel neon-text-cyan">{{ raiseAmount() }}</span>
+                <app-button variant="primary" (clicked)="act(raise.action, raiseAmount())">
+                  {{ (raise.action === 'bet' ? 'poker.action.bet' : 'poker.action.raise') | translate }}
+                </app-button>
+              </div>
+              <div class="raise__quick">
+                <button type="button" class="raise__quick-btn font-mono" (click)="quickRaise(0.5)">½ {{ 'poker.table.pot' | translate }}</button>
+                <button type="button" class="raise__quick-btn font-mono" (click)="quickRaise(1)">{{ 'poker.table.pot' | translate }}</button>
+                <button type="button" class="raise__quick-btn font-mono" (click)="quickRaise(2)">2× {{ 'poker.table.pot' | translate }}</button>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (!table.game?.complete) {
+        <div class="waiting-turn">
+          <span class="text-secondary text-sm">
+            {{ 'poker.table.waitingFor' | translate: { name: poker.rival()?.name ?? '' } }}
+          </span>
+        </div>
+      }
+
+      <!-- Fin de partida -->
+      @if (table.table.finished) {
+        <div class="match-over arcade-panel">
+          <p class="font-pixel neon-text-yellow">
+            {{ 'poker.table.matchOver' | translate }}
+            @if (table.table.winner) { — {{ table.table.winner }} }
+          </p>
+          <app-button variant="primary" (clicked)="leave()">{{ 'poker.table.backToLobby' | translate }}</app-button>
+        </div>
+      }
+
+      <!-- Registro -->
+      <div class="log">
+        @for (entry of lastEvents(); track $index) {
+          <span class="log__item font-mono text-sm">
+            @switch (entry['event']) {
+              @case ('timeout') { ⏱ {{ 'poker.log.timeout' | translate }} }
+              @case ('hand_result') { ▸ {{ 'poker.log.handResult' | translate }} }
+              @case ('match_end') { ★ {{ 'poker.log.matchEnd' | translate }} }
+              @default { · {{ entry['event'] }} }
+            }
+          </span>
+        }
+      </div>
+
+      <div class="table__footer">
+        <app-button variant="ghost" (clicked)="leave()">{{ 'poker.table.leave' | translate }}</app-button>
+      </div>
+    </div>
+  }
+</div>

@@ -182,3 +182,10 @@
     background: var(--color-neon-magenta, #e635c5);
   }
 }
+
+/* Resultado declarado y aún sin confirmar: se marca el botón correspondiente. */
+.bracket__btn--reported {
+  background: var(--color-neon-magenta, #e635c5);
+  color: var(--color-bg, #0a0a12);
+  font-weight: 700;
+}

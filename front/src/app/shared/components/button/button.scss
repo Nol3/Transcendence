@@ -8,15 +8,50 @@
   border-radius: var(--radius-md);
   border: 2px solid transparent;
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition:
+    transform 90ms ease,
+    background-color var(--transition-base),
+    color var(--transition-base),
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
   white-space: nowrap;
   position: relative;
   text-decoration: none;
+  // Que el botón no se pegue al borde al pulsarlo con el dedo en el móvil.
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 
   &:disabled {
     opacity: 0.4;
     cursor: not-allowed;
     pointer-events: none;
+  }
+
+  // Al pulsar: el botón se hunde un poco. Es lo que hace que responda.
+  &:active:not(:disabled) {
+    transform: translateY(2px) scale(0.97);
+    box-shadow: none;
+  }
+
+  // Al pasar por encima se levanta, como si lo llamaran.
+  &:hover:not(:disabled):not(:active) {
+    transform: translateY(-1px);
+  }
+
+  // Con el teclado tiene que verse dónde estás: es lo que faltaba para poder jugar sin ratón.
+  &:focus-visible {
+    outline: 3px solid var(--color-neon-magenta, #ff5cc8);
+    outline-offset: 3px;
+  }
+
+  // Quien pida menos movimiento (accesibilidad), que no se mueva nada.
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:hover:not(:disabled):not(:active),
+    &:active:not(:disabled) {
+      transform: none;
+    }
   }
 
   &__label--hidden { opacity: 0; }

@@ -1,0 +1,115 @@
+# Overlay de producción (roadmap 4.3). Se usa SIEMPRE junto al compose base:
+#
+#   docker compose -f compose.yaml -f compose.prod.yaml up -d --build
+#
+# Qué cambia respecto al compose de desarrollo:
+#
+#  1. El backend **no monta el código del host**: se sirve exactamente lo que trae la
+#     imagen (en desarrollo `./backend:/app` permite editar sin reconstruir, que es
+#     cómodo pero deja el contenedor dependiendo de tu carpeta).
+#  2. Se arranca con **Daphne** (ASGI, sirve HTTP y WebSockets) en vez de
+#     `runserver`, que es el servidor de desarrollo de Django.
+#  3. `collectstatic` antes de arrancar, para que los estáticos queden servidos por
+#     nginx desde la imagen.
+#  4. `DJANGO_DEBUG=false` y HTTPS obligatorio (ya viene del compose base).
+#  5. **Solo nginx publica puertos**, y en el 80 y el 443 de verdad. El backend, el
+#     frontend, Postgres y Redis dejan de ser accesibles desde fuera: en desarrollo
+#     se publican para poder trabajar, en un servidor es superficie de ataque que no
+#     hace falta.
+#  6. Los **secretos salen del `.env`** del servidor, no de Vault: el Vault del
+#     compose va en modo desarrollo (`-dev`) y no está pensado para producción. Los
+#     servicios de Vault quedan en el perfil `dev`, así que con este overlay no
+#     arrancan (para volver a usarlos, `--profile dev`).
+#  7. Los **avatares y ficheros subidos** van a un volumen: si no, viven dentro del
+#     contenedor y se pierden en cada reconstrucción.
+#  8. `restart: unless-stopped`: si el servidor se reinicia, el juego vuelve solo.
+#
+# El certificado: nginx lo busca en `/etc/nginx/ssl/cert.pem` y `key.pem`, igual que
+# en desarrollo, así que su configuración no cambia entre entornos. Aquí se monta un
+# directorio del host (`SSL_DIR`) con el certificado **de verdad** (Let's Encrypt) en
+# lugar del volumen autofirmado; `scripts/deploy.sh` los copia con esos nombres.
+
+services:
+  backend:
+    # `!override` sustituye la lista entera de volúmenes: fuera el bind mount del
+    # código, dentro lo que sí es dato (el juego C/WASM, las credenciales de Vault y
+    # los ficheros que suben los usuarios).
+    volumes: !override
+      - ./juego:/juego:ro
+      - vault_creds:/vault_creds:ro
+      - media_data:/app/media
+    # Nada de publicar el 8000: se llega por nginx.
+    ports: !override []
+    # Sin privilegios: el Dockerfile ya crea `appuser` (uid 1000), pero el compose de
+    # desarrollo lo pisa con `user: root` porque los montajes de Windows no dejan escribir
+    # de otra forma. En producción no hay montajes del código, así que se puede (y se debe)
+    # correr como `appuser`.
+    user: "1000:1000"
+    environment:
+      - DJANGO_DEBUG=false
+      - DEBUG=false
+      # Los secretos vienen del .env del servidor (ver backend/.env.production.example).
+      - USE_VAULT=false
+      - DB_ENGINE=django.db.backends.postgresql
+      # Para que el esquema que se publica en /api/docs/ diga la verdad.
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-https://example.com}
+    depends_on: !override
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py compilemessages &&
+             python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             daphne -b 0.0.0.0 -p 8000 config.asgi:application"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+
+  frontend:
+    # El front se sirve por nginx, que es quien tiene el certificado.
+    ports: !override []
+    restart: unless-stopped
+
+  nginx:
+    # Aquí sí: el 80 y el 443 de verdad. El contenedor escucha en 8080/8443 (así no
+    # necesita privilegios); es el puerto del **host** el que tiene que ser el
+    # estándar para que el dominio funcione sin escribir «:8443» en el navegador.
+    ports: !override
+      - "80:8080"
+      - "443:8443"
+    volumes: !override
+      # El WAF de la imagen OWASP: se sobrescribe su plantilla con la nuestra.
+      - ./docker/waf.conf:/etc/nginx/templates/conf.d/default.conf.template:ro
+      - ./docker/modsecurity-override.conf:/etc/nginx/templates/modsecurity.d/modsecurity-override.conf.template:ro
+      # El certificado de verdad, en el mismo sitio donde en desarrollo está el
+      # autofirmado.
+      - ${SSL_DIR:-./docker/ssl}:/etc/nginx/ssl:ro
+    depends_on: !override
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_started
+    restart: unless-stopped
+
+  postgres:
+    restart: unless-stopped
+
+  redis:
+    restart: unless-stopped
+
+  # En producción los secretos salen del .env del servidor, no de un Vault en modo
+  # desarrollo. Se quedan en el perfil `dev` para no arrancarlos por accidente.
+  vault:
+    profiles: ["dev"]
+  vault-init:
+    profiles: ["dev"]
+
+volumes:
+  # Los avatares y cualquier fichero que suban los usuarios.
+  media_data:

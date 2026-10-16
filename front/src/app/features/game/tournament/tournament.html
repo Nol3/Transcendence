@@ -35,7 +35,7 @@
   } @else {
     <div class="tournament-container">
       <div class="tournament-header">
-        <h1 class="font-pixel neon-text-magenta">TOURNAMENTS</h1>
+        <h1 class="font-pixel neon-text-magenta">{{ 'tournament.title' | translate }}</h1>
         <app-button variant="accent" (clicked)="openCreateModal()">
           + {{ 'tournament.create' | translate }}
         </app-button>
@@ -83,13 +83,13 @@
                       </app-badge>
                       <span class="tournament-date text-muted">{{ tournament.startDate }}</span>
                       @if (tournament.isRegistered) {
-                        <app-badge variant="info">Joined</app-badge>
+                        <app-badge variant="info">{{ 'tournament.joined' | translate }}</app-badge>
                       }
                     </div>
                   </div>
                   @if (tournament.prize) {
                     <div class="tournament-prize">
-                      <span class="prize-label text-muted">Prize</span>
+                      <span class="prize-label text-muted">{{ 'tournament.prize' | translate }}</span>
                       <span class="prize-value neon-text-yellow">{{ tournament.prize }}</span>
                     </div>
                   }
@@ -97,7 +97,7 @@
 
                 <div class="tournament-card__players">
                   <div class="players-header">
-                    <span class="text-secondary text-sm">Players</span>
+                    <span class="text-secondary text-sm">{{ 'tournament.players' | translate }}</span>
                     <span class="text-sm">{{ tournament.currentPlayers }}/{{ tournament.maxPlayers }}</span>
                   </div>
                   <div class="players-bar">

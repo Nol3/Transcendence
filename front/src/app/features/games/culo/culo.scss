@@ -1,0 +1,584 @@
+// Mesa del Culo. Todo con las variables del tema para que case con el resto de la app.
+.culo {
+  padding: var(--space-4, 1rem) 0 var(--space-8, 3rem);
+
+  &__cabecera {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4, 1rem);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-4, 1rem);
+  }
+
+  &__acciones {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__btn {
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--accent);
+    }
+  }
+}
+
+// ── Aviso de error (sala que no existe, sin sesión…) ─────────────────────────
+.culo__error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: var(--space-3, 0.9rem);
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--color-neon-magenta, #ff5ea8);
+  border-radius: 6px;
+
+  button {
+    padding: 0.15rem 0.45rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+}
+
+// ── Lobby de la sala ─────────────────────────────────────────────────────────
+.lobby {
+  max-width: 40rem;
+  padding: var(--space-5, 1.5rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  background: rgba(255, 255, 255, 0.02);
+
+  &__titulo {
+    margin: 0 0 0.3rem;
+  }
+
+  &__codigo {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin: var(--space-3, 0.9rem) 0;
+  }
+
+  // El código se dicta por teléfono: grande y con las letras separadas.
+  &__code {
+    padding: 0.3rem 0.8rem;
+    border: 1px dashed var(--color-neon-cyan, #4ad9d9);
+    border-radius: 6px;
+    font-size: 1.6rem;
+    letter-spacing: 0.35rem;
+    color: var(--color-neon-cyan, #4ad9d9);
+  }
+
+  &__copiar {
+    padding: 0.35rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--accent);
+    }
+  }
+
+  &__jugadores {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin: var(--space-3, 0.9rem) 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__jugador,
+  &__hueco {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  &__jugador--fuera {
+    border-style: dashed;
+
+    .font-pixel {
+      color: var(--color-text-muted);
+    }
+  }
+
+  &__hueco {
+    border-style: dashed;
+  }
+
+  &__quitar {
+    margin-left: auto;
+    padding: 0.1rem 0.4rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  &__acciones {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+}
+
+// ── Empezar ──────────────────────────────────────────────────────────────────
+.inicio {
+  max-width: 34rem;
+  padding: var(--space-5, 1.5rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  background: rgba(255, 255, 255, 0.02);
+
+  &__intro {
+    margin-top: 0;
+  }
+
+  &__ajustes {
+    display: flex;
+    gap: var(--space-4, 1rem);
+    flex-wrap: wrap;
+    margin: var(--space-4, 1rem) 0;
+  }
+
+  &__campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.9rem;
+
+    select {
+      padding: 0.35rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--color-bg-surface, #14141f);
+      color: inherit;
+      font: inherit;
+    }
+  }
+
+  &__nota {
+    margin-bottom: var(--space-4, 1rem);
+  }
+
+  // Las tres formas de empezar, una al lado de otra.
+  &__modos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: var(--space-3, 1rem);
+    margin-bottom: var(--space-4, 1rem);
+  }
+}
+
+.modo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: var(--space-3, 0.9rem);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+
+  &__titulo {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  &__texto {
+    margin: 0;
+    flex: 1;
+  }
+
+  &__codigo {
+    display: flex;
+    gap: 0.4rem;
+
+    input {
+      width: 5.5rem;
+      padding: 0.35rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--color-bg-surface, #14141f);
+      color: inherit;
+      font: inherit;
+      font-size: 1.1rem;
+      letter-spacing: 0.25rem;
+      text-transform: uppercase;
+    }
+  }
+}
+
+// ── Mesa ─────────────────────────────────────────────────────────────────────
+.mesa {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 1rem);
+
+  &__rivales {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__centro {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 9rem;
+    padding: var(--space-4, 1rem);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md, 8px);
+  }
+
+  &__libre {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+}
+
+.rival {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 7rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: border-color 160ms ease;
+
+  &--turno {
+    border-color: var(--accent, #4ad9d9);
+    box-shadow: 0 0 10px rgba(74, 217, 217, 0.25);
+  }
+
+  // Quien ya se ha descartado sigue en la mesa, pero apagado: ya no juega.
+  &--fuera {
+    border-style: dashed;
+
+    .rival__nombre {
+      color: var(--color-text-muted);
+    }
+  }
+
+  &__cartas {
+    font-size: 0.9rem;
+  }
+
+  &__rol {
+    color: var(--color-neon-yellow, #ffd447);
+  }
+}
+
+.jugada {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+
+  &__quien {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+  }
+
+  &__cartas {
+    display: flex;
+    gap: 0.4rem;
+  }
+}
+
+// ── Mi mano ──────────────────────────────────────────────────────────────────
+.mano {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  padding: var(--space-3, 0.9rem) 0;
+  min-height: 7rem;
+  flex-wrap: wrap;
+
+  &__carta {
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    // Un poco solapadas, como se sostiene una mano de verdad; al pasar por encima, la
+    // carta se levanta y deja de tapar a la siguiente.
+    margin-left: -14px;
+    transition: transform 140ms ease;
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+      z-index: 5;
+      transform: translateY(-10px);
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+
+    // Carta elegida: se queda levantada y con un aro de color.
+    &--sel {
+      z-index: 4;
+      transform: translateY(-14px);
+
+      app-playing-card {
+        filter: drop-shadow(0 0 6px var(--accent, #4ad9d9));
+      }
+    }
+  }
+
+  // Cuando es tu turno, la mano se ilumina un poco para que se vea que te toca.
+  &--turno {
+    background: radial-gradient(ellipse at bottom, rgba(74, 217, 217, 0.09), transparent 70%);
+  }
+}
+
+// ── Controles ────────────────────────────────────────────────────────────────
+.controles {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3, 1rem);
+  flex-wrap: wrap;
+
+  &__botones {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+}
+
+// ── Registro ─────────────────────────────────────────────────────────────────
+.registro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  max-height: 10rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  font-size: 0.9rem;
+
+  &__linea {
+    color: var(--color-text-muted);
+
+    &--play { color: inherit; }
+    &--trick { color: var(--color-neon-cyan, #4ad9d9); }
+    &--out { color: var(--color-neon-yellow, #ffd447); }
+  }
+}
+
+// ── Fin de ronda ─────────────────────────────────────────────────────────────
+.fin {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(6, 6, 12, 0.82);
+
+  &__caja {
+    width: min(32rem, 100%);
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: var(--space-5, 1.5rem);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md, 8px);
+    background: var(--color-bg-surface, #14141f);
+    text-align: center;
+  }
+
+  &__lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin: var(--space-4, 1rem) 0;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+  }
+
+  &__puesto {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+
+    &--presidente { border-color: var(--color-neon-green, #4ade80); }
+    &--vicepresidente { border-color: var(--color-neon-cyan, #4ad9d9); }
+    &--viceculo { border-color: var(--color-neon-yellow, #ffd447); }
+    &--culo { border-color: var(--color-neon-magenta, #ff5ea8); }
+  }
+
+  &__puesto-num {
+    min-width: 1.2rem;
+    color: var(--color-text-muted);
+  }
+
+  &__puesto-nombre {
+    flex: 1;
+  }
+
+  &__intercambio {
+    margin: var(--space-4, 1rem) 0;
+    padding: var(--space-3, 0.9rem);
+    border: 1px dashed var(--border);
+    border-radius: 6px;
+    text-align: left;
+
+    ul {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin: 0.5rem 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+  }
+}
+
+// ── Reglas ───────────────────────────────────────────────────────────────────
+.reglas {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(6, 6, 12, 0.86);
+
+  &__caja {
+    width: min(44rem, 100%);
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: var(--space-5, 1.5rem);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md, 8px);
+    background: var(--color-bg-surface, #14141f);
+  }
+
+  &__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: var(--space-3, 0.9rem);
+
+    h3 {
+      margin: 0;
+    }
+  }
+
+  &__cerrar {
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  &__cuerpo {
+    section {
+      margin-bottom: var(--space-4, 1rem);
+    }
+
+    h4 {
+      margin: 0 0 0.3rem;
+      color: var(--color-neon-cyan, #4ad9d9);
+    }
+
+    p,
+    ol,
+    ul {
+      margin: 0;
+      padding-left: 1.2rem;
+    }
+
+    p {
+      padding-left: 0;
+    }
+
+    li {
+      margin-bottom: 0.2rem;
+    }
+  }
+
+  // Los valores, de menor a mayor, con el 5 de oros aparte porque es el más alto.
+  &__valores {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
+
+  &__valor {
+    padding: 0.15rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.8rem;
+
+    &--top {
+      border-color: var(--color-neon-yellow, #ffd447);
+      color: var(--color-neon-yellow, #ffd447);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mano__carta,
+  .rival {
+    transition: none;
+  }
+
+  .mano__carta:hover:not(:disabled),
+  .mano__carta--sel {
+    transform: none;
+  }
+}

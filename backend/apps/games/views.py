@@ -1,16 +1,27 @@
 """Games app views."""
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from rest_framework.decorators import action
 from django.contrib.auth.models import User
 from django.db.models import Q
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from .models import Game
-from .serializers import GameSerializer, GameFinishSerializer
+from .serializers import GameFinishSerializer, GameSerializer
 from .services import finish_game, get_ai_opponent
 
 
 class GameViewSet(viewsets.ModelViewSet):
+    """Partidas: cada uno ve y toca las suyas.
+
+    Era un ModelViewSet sobre `Game.objects.all()` sin comprobación de propiedad, así que
+    cualquiera podía leer, modificar o borrar partidas de otros.
+    """
+
+    def get_queryset(self):
+        return Game.objects.filter(
+            Q(player1=self.request.user) | Q(player2=self.request.user)
+        ).select_related("player1", "player2", "winner").order_by("-played_at")
+
     """ViewSet for Game management."""
     queryset = Game.objects.all()
     serializer_class = GameSerializer
@@ -42,10 +53,14 @@ class GameViewSet(viewsets.ModelViewSet):
         else:
             player2 = get_ai_opponent()
 
+        # rated=False: el resultado de esta partida lo reporta el navegador
+        # (modo local), así que no puede ser puntuable. Las partidas del póker
+        # online las crea el servidor con rated=True.
         game = Game.objects.create(
             player1=request.user,
             player2=player2,
             status='in_progress',
+            rated=False,
         )
         serializer = self.get_serializer(game)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -75,15 +90,13 @@ class GameViewSet(viewsets.ModelViewSet):
             # player1 is the logged-in user. In a local 2–4 player (hotseat)
             # match the winner may be another local player ("Jugador 2"), which
             # maps to the opponent slot from this account's perspective.
-            if winner_username == game.player1.username:
-                winner = game.player1
-            else:
-                winner = game.player2
+            winner = game.player1 if winner_username == game.player1.username else game.player2
 
         game = finish_game(
             game,
             winner=winner,
             player1_score=data['player1_score'],
             player2_score=data['player2_score'],
+            rated=game.rated,      # solo puntúan las partidas verificadas por el servidor
         )
         return Response(self.get_serializer(game).data, status=status.HTTP_200_OK)
