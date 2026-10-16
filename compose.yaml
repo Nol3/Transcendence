@@ -86,6 +86,9 @@ services:
       # Serve config mounted at runtime so the image build context (./front)
       # doesn't need to reach ../docker. Static prod build comes from the image.
       - ./docker/nginx-app.conf:/etc/nginx/conf.d/default.conf:ro
+      # Los avatares: se sirven desde el propio nginx (ver `nginx-app.conf`). En desarrollo
+      # son los ficheros del repositorio; en producción, el volumen compartido con el backend.
+      - ./backend/media:/srv/media:ro
     networks:
       - transcendence-network
     depends_on:

@@ -26,11 +26,15 @@ from apps.poker.consumers import (  # noqa: E402
     TableConsumer,
 )
 from apps.salas.consumers import SalaConsumer  # noqa: E402
+from apps.tournament.consumers import TournamentConsumer  # noqa: E402
 
-# Los restos del lobby antiguo (`ws/rooms/`, `ws/matchmaking`, `ws/tournaments`) se han
-# quitado: no los usaba nadie (ni el front ni un test) y los dos primeros aceptaban la
-# conexión sin autenticar. Un endpoint muerto no es solo ruido: es superficie de ataque.
+# Los restos del lobby antiguo (`ws/rooms/`, `ws/matchmaking`) se han quitado: no los usaba
+# nadie (ni el front ni un test, y los registros del servidor no muestran ni una petición) y
+# aceptaban la conexión sin autenticar. Un endpoint muerto no es solo ruido: es superficie de
+# ataque. El del torneo **sí** se queda: lo usa la pantalla del bracket (la URL se construye
+# en `tournament.service.ts`, así que un grep por la ruta entera no lo encuentra).
 websocket_urlpatterns = [
+    re_path(r"ws/tournaments/(?P<tournament_id>[^/?]+)/?$", TournamentConsumer.as_asgi()),
     # Póker online autoritativo (Texas Hold'em)
     re_path(r"ws/poker/matchmaking/?$", PokerMatchmakingConsumer.as_asgi()),
     re_path(r"ws/poker/table/(?P<table_id>[^/?]+)/?$", TableConsumer.as_asgi()),

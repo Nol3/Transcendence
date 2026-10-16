@@ -25,8 +25,11 @@ SECRET_KEY = _vault.get("DJANGO_SECRET_KEY") or config(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DJANGO_DEBUG", default=True, cast=bool)
 
+# `backend` es el nombre del servicio dentro de la red de Docker. El nginx del borde reescribe
+# el `Host` con el del upstream, así que hay peticiones que llegan a Django con ese nombre; sin
+# él responde 400 y, entre otras cosas, **los avatares de `/media/` no cargaban**.
 ALLOWED_HOSTS = config(
-    "DJANGO_ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv()
+    "DJANGO_ALLOWED_HOSTS", default="localhost,127.0.0.1,backend", cast=Csv()
 )
 
 # Application definition
