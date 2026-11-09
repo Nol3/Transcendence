@@ -58,7 +58,17 @@ no cuadra, no instala y avisa: una clave que no encaja deja nginx sin arrancar y
 
 ## 3. El `.env` del servidor
 
-Estas cinco líneas son las que cambian (el resto, como en `.env.example`):
+Un **solo** fichero, en la raíz del repositorio:
+
+```bash
+cp backend/.env.production.example .env
+# rellena los CAMBIA_ESTO: dos claves distintas, la contraseña de Postgres y el correo
+```
+
+Lo leen las dos mitades: `docker compose` para sustituir `${...}` (incluida la contraseña de
+Postgres) y el contenedor del backend para todo lo demás. No hace falta tocar `backend/.env`.
+
+Estas cinco líneas son las que cambian (el resto, como en el ejemplo):
 
 ```ini
 DJANGO_ALLOWED_HOSTS=tudominio.com,www.tudominio.com,localhost,127.0.0.1,backend

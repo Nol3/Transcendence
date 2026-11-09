@@ -14,8 +14,19 @@
 # Con `--certificado` además saca (o renueva) el certificado. Para eso nginx tiene
 # que estar parado un momento, porque certbot necesita el puerto 80 para
 # comprobar que el dominio es tuyo. Es lo normal la primera vez.
+#
+# **Con Cloudflare delante** lo normal es no usar `--certificado`: se instala el certificado de
+# origen (15 años, gratis) con `scripts/instalar-certificado.sh`. Ver
+# docs/DESPLIEGUE_CLOUDFLARE.md.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+
+# Sin `.env` el stack arranca con los valores por defecto (clave de desarrollo, hosts locales) y
+# el sitio «funciona» de una forma que no es la que crees. Mejor pararlo aquí.
+if [ ! -f .env ]; then
+  echo "Falta el .env del servidor: cp backend/.env.production.example .env y rellénalo." >&2
+  exit 1
+fi
 
 DOMINIO="${DOMINIO:-}"
 EMAIL="${EMAIL:-}"
