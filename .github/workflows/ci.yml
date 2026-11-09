@@ -149,7 +149,7 @@ jobs:
           done
           echo "El stack no arrancó a tiempo"; docker compose ps; docker compose logs --tail=80 backend nginx; exit 1
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '20'
           cache: npm
@@ -188,7 +188,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '20'
           cache: npm
