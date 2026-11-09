@@ -118,6 +118,31 @@ services:
   vault-init:
     profiles: ["dev"]
 
+  # ── Túnel de Cloudflare (opcional) ────────────────────────────────────────────────────────
+  # Para un servidor **sin IP pública** o detrás de CGNAT (habitual con según qué operador):
+  # no hay que abrir puertos en el router, la conexión la inicia el contenedor hacia Cloudflare.
+  #
+  #   1. Zero Trust → Networks → Tunnels → Create a tunnel (Cloudflared).
+  #   2. El token, en el `.env` del servidor: `TUNNEL_TOKEN=...`
+  #   3. Public hostname: `tudominio.com` → servicio `https://nginx:8443`, con «No TLS Verify»
+  #      activado (dentro de la red de Docker el certificado es el autofirmado).
+  #   4. Arrancar con el perfil: `docker compose -f compose.yaml -f compose.prod.yaml
+  #      --profile tunnel up -d`
+  #
+  # Por el túnel el tráfico llega a nginx por HTTP aunque el usuario vaya por HTTPS; por eso
+  # `waf.conf` reconstruye el esquema real a partir de `CF-Visitor`.
+  cloudflared:
+    image: cloudflare/cloudflared@sha256:4955524aeaa379e154023d5a027c250f7b35041a2e7e950cf13f144bc9b9c5ba
+    profiles: ["tunnel"]
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      # Sin `:?` a propósito: `docker compose config` evalúa todos los servicios aunque el perfil
+      # esté apagado, y un `:?` aquí rompería cualquier `deploy.sh` que no use el túnel.
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN:-}
+    depends_on:
+      - nginx
+
 volumes:
   # Los avatares y cualquier fichero que suban los usuarios.
   media_data:

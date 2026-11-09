@@ -1755,7 +1755,47 @@ número de tests.
 **Semana 2 (dejarlo defendible y desplegable):** 2.3 → 2.4 → 3.2 → 3.4 → 4.2 → 4.3 → (4.1 si hay réplicas) → 4.4.
 **Después (producto):** 5.1 → 5.3 → 5.2 → 5.4 → 5.5 → Bloque 6 → Bloque 7.
 **Juegos nuevos (decidido 14-10-2026):** Bloque 8 — 8.1 Mentiroso → 8.2 Brisca → 8.3 Tute → 8.4 Mus.
-**Antes de dar la URL (auditoría del 30-10-2026):** ✅ M1 · ✅ M3 · ✅ M4 · ✅ M12 · ✅ M14 · ✅ M15 ·
-🟡 M9 (hecho el middleware, queda el esquema OpenAPI). Siguen: **M16** (Django 5.2, lo que cierra los
-últimos avisos) → M2 (cobertura crítica) → M5 (contraseña) → M8 (teclado) → M10 (móvil). Después,
-arquitectura y limpieza: M6 → M7 → M11 → M13.
+**Antes de dar la URL (auditoría del 30-10-2026):** ✅ M1 · ✅ M2 · ✅ M3 · ✅ M4 · ✅ M5 · ✅ M8 · ✅ M12 ·
+✅ M14 · ✅ M15 · 🟡 M9 (queda el esquema OpenAPI). Siguen: **M10** (móvil) → M16 (Django 5.2) →
+M6 (Culo a `salas`) → M7 (fixtures TS/Python) → M11 (tamaño del repo) → M13 (observabilidad).
+
+---
+
+## Cloudflare + dominio · ✅ el código está listo (09-11-2026)
+
+Lo que depende de mí, hecho y probado. Lo que depende de tus cuentas, en la lista de abajo.
+
+**Cambios**
+
+- **IP real detrás del proxy** (`docker/waf.conf`): `set_real_ip_from` con los rangos oficiales de
+  Cloudflare + `real_ip_header CF-Connecting-IP`. Sin esto, con Cloudflare delante **todos** los
+  visitantes llegan como la IP del borde y comparten un único cubo del limitador (10 r/s y 1000/h):
+  con cuatro personas se cae el sitio para todos. Verificado que una cabecera `CF-Connecting-IP`
+  falsa enviada desde fuera **se ignora** (el log del borde sigue viendo la IP real).
+- **Esquema real** (`docker/waf.conf`): `map` sobre `CF-Visitor` → `$esquema_real`, usado en los
+  seis `proxy_set_header X-Forwarded-Proto`. Por túnel el origen recibe HTTP aunque el usuario vaya
+  por HTTPS, y sin esto Django redirige en bucle.
+- **Certificado de origen** (`scripts/instalar-certificado.sh`): valida que la clave corresponde al
+  certificado **antes** de tocar nada, lo copia a `./docker/ssl` (producción) y al volumen
+  (desarrollo) y recarga nginx. Probado: instala, `--ver` lo enseña y **rechaza** un par que no
+  cuadra.
+- **Túnel opcional** (`compose.prod.yaml`, perfil `tunnel`): `cloudflared` con el digest fijado,
+  para servidores sin IP pública o con CGNAT.
+- **`.env.example`**: bloque del dominio con las cinco variables (`ALLOWED_HOSTS`,
+  `CSRF_TRUSTED_ORIGINS`, `CORS_ALLOWED_ORIGINS`, `FRONTEND_URL`, `PUBLIC_BASE_URL`) y por qué
+  `CSRF_TRUSTED_ORIGINS` tiene que llevar `https://`.
+- **`docs/DESPLIEGUE_CLOUDFLARE.md`**: el manual completo (DNS, Full strict, ajustes que hay que
+  apagar, caché, WebSockets, verificación y los fallos típicos: 526, 522, 502, 403 CSRF, bucles…).
+
+**Verificado**: `nginx -t` correcto, sitio y API a 200 por el borde, cabecera falsa ignorada,
+`compose config` válido y **67/67 e2e** con la configuración nueva.
+
+**Te toca a ti en el servidor** (necesita tus cuentas, no puedo hacerlo yo):
+
+1. DNS: dos `A` (`@` y `www`) apuntando al servidor, **con proxy** (nube naranja).
+2. SSL/TLS → **Full (strict)** + Create Certificate, y aquí:
+   `./scripts/instalar-certificado.sh origen.pem origen-key.pem`.
+3. El `.env` con el dominio (las cinco líneas del manual).
+4. Apagar en Cloudflare: Rocket Loader, Auto Minify, Email Obfuscation y Bot Fight Mode (o una
+   excepción para `/api/*` y `/ws/*`).
+5. Probar: registro → partida con otra persona → terminar.

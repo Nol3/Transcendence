@@ -3,6 +3,11 @@
 Guía para dejar el proyecto funcionando en un servidor con un dominio de verdad y HTTPS.
 Está escrita para seguirse de arriba abajo, en la máquina que va a hacer de servidor.
 
+> **¿Vas a poner Cloudflare delante del servidor?** Entonces la guía que toca es
+> [DESPLIEGUE_CLOUDFLARE.md](DESPLIEGUE_CLOUDFLARE.md): cubre el modo *Full (strict)*, el
+> certificado de origen, la IP real detrás del proxy (sin eso el limitador bloquea a todos) y los
+> ajustes de Cloudflare que hay que apagar para que Angular y el WebSocket funcionen.
+
 ---
 
 ## 0. Lo que hace falta antes de empezar
