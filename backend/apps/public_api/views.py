@@ -10,11 +10,11 @@ from rest_framework.decorators import (
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from apps.games.models import Game
 from apps.tournament.models import Tournament
+from config.vistas import VistaAPI
 
 from .authentication import ApiKeyAuthentication
 from .models import ApiKey
@@ -130,7 +130,7 @@ def api_docs(request):
 # ── API Key management (JWT-protected) ──────────────────────────────────────
 
 
-class ApiKeyListCreateView(APIView):
+class ApiKeyListCreateView(VistaAPI):
     """List and create API keys for the authenticated user (JWT required)."""
 
     authentication_classes = JWT_AUTH
@@ -151,7 +151,7 @@ class ApiKeyListCreateView(APIView):
         )
 
 
-class ApiKeyDetailView(APIView):
+class ApiKeyDetailView(VistaAPI):
     """Revoke (delete) an API key — only the owner can do this."""
 
     authentication_classes = JWT_AUTH
@@ -169,7 +169,7 @@ class ApiKeyDetailView(APIView):
 # ── Users (API key required) ─────────────────────────────────────────────────
 
 
-class PublicUserListView(APIView):
+class PublicUserListView(VistaAPI):
     authentication_classes = API_KEY_AUTH
     permission_classes = [IsAuthenticated]
     throttle_classes = API_KEY_THROTTLES
@@ -179,7 +179,7 @@ class PublicUserListView(APIView):
         return _paginate(users, request, PublicUserSerializer)
 
 
-class PublicUserDetailView(APIView):
+class PublicUserDetailView(VistaAPI):
     authentication_classes = API_KEY_AUTH
     permission_classes = [IsAuthenticated]
     throttle_classes = API_KEY_THROTTLES
@@ -195,7 +195,7 @@ class PublicUserDetailView(APIView):
 # ── Games (API key required) ─────────────────────────────────────────────────
 
 
-class PublicGameListView(APIView):
+class PublicGameListView(VistaAPI):
     authentication_classes = API_KEY_AUTH
     permission_classes = [IsAuthenticated]
     throttle_classes = API_KEY_THROTTLES
@@ -214,7 +214,7 @@ class PublicGameListView(APIView):
         return Response({"data": PublicGameSerializer(game).data}, status=status.HTTP_201_CREATED)
 
 
-class PublicGameDetailView(APIView):
+class PublicGameDetailView(VistaAPI):
     authentication_classes = API_KEY_AUTH
     permission_classes = [IsAuthenticated]
     throttle_classes = API_KEY_THROTTLES
@@ -285,7 +285,7 @@ class PublicGameDetailView(APIView):
 # ── Tournaments (API key required) ───────────────────────────────────────────
 
 
-class PublicTournamentListView(APIView):
+class PublicTournamentListView(VistaAPI):
     authentication_classes = API_KEY_AUTH
     permission_classes = [IsAuthenticated]
     throttle_classes = API_KEY_THROTTLES
@@ -307,7 +307,7 @@ class PublicTournamentListView(APIView):
         )
 
 
-class PublicTournamentDetailView(APIView):
+class PublicTournamentDetailView(VistaAPI):
     authentication_classes = API_KEY_AUTH
     permission_classes = [IsAuthenticated]
     throttle_classes = API_KEY_THROTTLES
@@ -381,7 +381,7 @@ class PublicTournamentDetailView(APIView):
 # ── Leaderboard (API key required) ───────────────────────────────────────────
 
 
-class PublicLeaderboardView(APIView):
+class PublicLeaderboardView(VistaAPI):
     authentication_classes = API_KEY_AUTH
     permission_classes = [IsAuthenticated]
     throttle_classes = API_KEY_THROTTLES

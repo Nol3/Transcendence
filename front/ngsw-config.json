@@ -21,7 +21,9 @@
       "installMode": "prefetch",
       "updateMode": "prefetch",
       "resources": {
-        "files": ["/i18n/*.json"]
+        "files": [
+          "/i18n/*.json"
+        ]
       }
     },
     {
@@ -38,21 +40,14 @@
   "dataGroups": [
     {
       "name": "juego-local",
-      "urls": ["/game-embed/**", "/game-assets/**"],
+      "urls": [
+        "/game-embed/**",
+        "/game-assets/**"
+      ],
       "cacheConfig": {
         "strategy": "performance",
         "maxSize": 40,
         "maxAge": "7d"
-      }
-    },
-    {
-      "name": "api",
-      "urls": ["/api/**"],
-      "cacheConfig": {
-        "strategy": "freshness",
-        "maxSize": 60,
-        "maxAge": "1h",
-        "timeout": "3s"
       }
     }
   ]

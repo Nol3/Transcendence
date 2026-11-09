@@ -9,9 +9,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from apps.games.models import Game
+from config.vistas import VistaAPI
 
 from .models import PokerHandPlayer, PokerHandRecord, PokerPreference
 from .serializers import PokerHandReplaySerializer, PokerHandSerializer
@@ -78,7 +78,7 @@ def _resumen_partida(game, user) -> dict:
     }
 
 
-class PokerHistoryView(APIView):
+class PokerHistoryView(VistaAPI):
     """`GET /api/poker/history/` — mis últimas partidas de póker."""
 
     permission_classes = [IsAuthenticated]
@@ -92,7 +92,7 @@ class PokerHistoryView(APIView):
         })
 
 
-class PokerMatchDetailView(APIView):
+class PokerMatchDetailView(VistaAPI):
     """`GET /api/poker/history/<game_id>/` — las manos de una partida mía."""
 
     permission_classes = [IsAuthenticated]
@@ -114,7 +114,7 @@ class PokerMatchDetailView(APIView):
         })
 
 
-class PokerHandReplayView(APIView):
+class PokerHandReplayView(VistaAPI):
     """`GET /api/poker/history/hand/<hand_id>/` — una mano mía, con sus acciones.
 
     El registro de acciones es lo que permite reproducirla paso a paso. Se sirve
@@ -137,7 +137,7 @@ class PokerHandReplayView(APIView):
         return Response(PokerHandReplaySerializer(mano).data)
 
 
-class PokerPreferencesView(APIView):
+class PokerPreferencesView(VistaAPI):
     """`GET`/`PUT /api/poker/preferences/` — tema, ciegas y tamaño de mesa del jugador."""
 
     permission_classes = [IsAuthenticated]
@@ -188,7 +188,7 @@ class PokerPreferencesView(APIView):
         return Response(self._respuesta(pref))
 
 
-class PokerLiveTablesView(APIView):
+class PokerLiveTablesView(VistaAPI):
     """`GET /api/poker/tables/` — mesas vivas, para poder entrar a mirarlas.
 
     Nota de escalado: el registro de mesas vive en memoria del proceso (una sola
@@ -218,7 +218,7 @@ class PokerLiveTablesView(APIView):
         return Response({'count': len(mesas), 'results': mesas})
 
 
-class PokerStatsView(APIView):
+class PokerStatsView(VistaAPI):
     """`GET /api/poker/stats/` — estadísticas agregadas de mi póker."""
 
     permission_classes = [IsAuthenticated]
@@ -244,7 +244,7 @@ class PokerStatsView(APIView):
         })
 
 
-class PokerAchievementsView(APIView):
+class PokerAchievementsView(VistaAPI):
     """`GET /api/poker/achievements/` — logros del jugador (roadmap 7.1)."""
 
     permission_classes = [IsAuthenticated]

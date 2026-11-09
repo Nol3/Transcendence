@@ -10,6 +10,12 @@ services:
     user: root
     ports:
       - "${BACKEND_PORT:-8000}:8000"
+    # El `.env` entra por aquí, no dentro de la imagen: así el fichero del host manda en tiempo
+    # de ejecución (en el servidor será el de producción) y la imagen no lleva secretos.
+    # `required: false` para que un stack sin ese fichero arranque igual con lo de `environment:`.
+    env_file:
+      - path: backend/.env
+        required: false
     environment:
       # OJO: settings.py lee DJANGO_DEBUG (no DEBUG). Al pasar solo DEBUG, el
       # contenedor caía al fichero .env y podía arrancar con DEBUG=True.

@@ -13,14 +13,14 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle, ScopedRateThrottle
-from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.users.password_reset import enviar_correo, revocar_sesiones, usuario_del_token
 from apps.users.serializers import RegisterSerializer, UserSerializer
+from config.vistas import VistaAPI
 
 
-class LoginView(APIView):
+class LoginView(VistaAPI):
     """Custom login view compatible with frontend."""
 
     permission_classes = [AllowAny]
@@ -82,7 +82,7 @@ class LoginView(APIView):
         )
 
 
-class RegisterView(APIView):
+class RegisterView(VistaAPI):
     """Custom register view compatible with frontend."""
 
     permission_classes = [AllowAny]
@@ -121,7 +121,7 @@ class RegisterView(APIView):
         )
 
 
-class MeView(APIView):
+class MeView(VistaAPI):
     """Get current user. Requires authentication."""
 
     def get(self, request):
@@ -134,7 +134,7 @@ class MeView(APIView):
         return Response({"data": {"user": user_data}})
 
 
-class RefreshTokenView(APIView):
+class RefreshTokenView(VistaAPI):
     """Refresca el acceso **y rota** el refresh.
 
     Antes devolvía `str(refresh)`, es decir el **mismo** token de siempre: como la rotación de
@@ -177,7 +177,7 @@ class RefreshTokenView(APIView):
             )
 
 
-class LogoutView(APIView):
+class LogoutView(VistaAPI):
     """Cierra la sesión de verdad: el refresh que se manda queda revocado.
 
     Antes devolvía 200 y no hacía nada (el comentario lo admitía), así que «cerrar sesión»
@@ -196,7 +196,7 @@ class LogoutView(APIView):
         return Response({"message": "Logged out successfully"})
 
 
-class PasswordResetRequestView(APIView):
+class PasswordResetRequestView(VistaAPI):
     """Pide el correo de recuperación.
 
     Responde **siempre** lo mismo, exista o no la cuenta: si no, cualquiera podría usar este
@@ -234,7 +234,7 @@ class PasswordResetRequestView(APIView):
         )
 
 
-class PasswordResetConfirmView(APIView):
+class PasswordResetConfirmView(VistaAPI):
     """Cambia la contraseña con el enlace del correo y cierra las sesiones abiertas."""
 
     permission_classes = [AllowAny]
@@ -269,7 +269,7 @@ class PasswordResetConfirmView(APIView):
         return Response({"message": _("Password changed. You can sign in now.")})
 
 
-class GoogleLoginView(APIView):
+class GoogleLoginView(VistaAPI):
     """
     Verify a Google Identity Services credential (ID token) and return app JWT.
 

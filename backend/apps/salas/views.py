@@ -7,14 +7,15 @@ socket). Es genérico: el juego se pide por su id.
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
+
+from config.vistas import VistaAPI
 
 from .juegos import JUEGOS
 from .juegos import get as get_juego
 from .rooms import SalaError, registry
 
 
-class SalaCreateView(APIView):
+class SalaCreateView(VistaAPI):
     """`POST /api/salas/` — crea una sala del juego pedido y devuelve su código."""
 
     permission_classes = [IsAuthenticated]
@@ -49,7 +50,7 @@ class SalaCreateView(APIView):
         )
 
 
-class SalaDetailView(APIView):
+class SalaDetailView(VistaAPI):
     """`GET /api/salas/<code>/` — cómo está una sala, por su código."""
 
     permission_classes = [IsAuthenticated]
@@ -62,7 +63,7 @@ class SalaDetailView(APIView):
         return Response(sala.to_dict(viewer_id=request.user.id))
 
 
-class SalaJoinView(APIView):
+class SalaJoinView(VistaAPI):
     """`POST /api/salas/<code>/join/` — entrar en una sala antes de conectar.
 
     Se puede entrar directamente por WebSocket, pero pasar por aquí permite comprobar el código y
@@ -84,7 +85,7 @@ class SalaJoinView(APIView):
         return Response(sala.to_dict(viewer_id=request.user.id))
 
 
-class SalaGamesView(APIView):
+class SalaGamesView(VistaAPI):
     """`GET /api/salas/juegos/` — qué juegos se pueden jugar online ahora mismo."""
 
     permission_classes = [IsAuthenticated]

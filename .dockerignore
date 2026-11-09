@@ -2,9 +2,13 @@
 .git
 .gitignore
 .dockerignore
-.env
-.env.local
-.env.*.local
+# OJO con la profundidad: `.env` a secas solo ignora el de la raíz. `COPY backend/ /app/` metía
+# `backend/.env` —con DJANGO_SECRET_KEY, la clave JWT y la contraseña de la base— **dentro de la
+# imagen**, que es justo lo que se copia al servidor. Los `**/` lo cubren a cualquier nivel.
+**/.env
+**/.env.local
+**/.env.*.local
+**/.env.production
 *.md
 LICENSE
 !docker/

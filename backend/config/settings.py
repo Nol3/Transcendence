@@ -184,6 +184,10 @@ if DB_ENGINE.endswith("postgresql"):
         "HOST": config("DB_HOST", default="postgres"),
         "PORT": config("DB_PORT", default="5432"),
         "CONN_MAX_AGE": config("DB_CONN_MAX_AGE", default=60, cast=int),
+        # Con conexiones reutilizadas, si Postgres se reinicia (o el backup lo toca) la primera
+        # petición siguiente fallaría con «connection already closed». Esto la comprueba antes
+        # de usarla y abre otra si hace falta (Django ≥ 4.1).
+        "CONN_HEALTH_CHECKS": True,
     })
 
 # If using PostgreSQL, uncomment and configure:

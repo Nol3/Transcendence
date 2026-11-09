@@ -7,12 +7,13 @@ antes de abrir el socket).
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
+
+from config.vistas import VistaAPI
 
 from .rooms import MAX_JUGADORES, RoomError, registry
 
 
-class CuloRoomCreateView(APIView):
+class CuloRoomCreateView(VistaAPI):
     """`POST /api/culo/rooms/` — crea una sala y devuelve su código para compartirlo."""
 
     permission_classes = [IsAuthenticated]
@@ -31,7 +32,7 @@ class CuloRoomCreateView(APIView):
         )
 
 
-class CuloRoomDetailView(APIView):
+class CuloRoomDetailView(VistaAPI):
     """`GET /api/culo/rooms/<code>/` — cómo está una sala, por su código."""
 
     permission_classes = [IsAuthenticated]
@@ -44,7 +45,7 @@ class CuloRoomDetailView(APIView):
         return Response(sala.to_dict(viewer_id=request.user.id))
 
 
-class CuloRoomJoinView(APIView):
+class CuloRoomJoinView(VistaAPI):
     """`POST /api/culo/rooms/<code>/join/` — entrar en una sala antes de conectar.
 
     Se puede entrar directamente por WebSocket, pero pasar por aquí permite comprobar el
