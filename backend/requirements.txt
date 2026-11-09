@@ -11,7 +11,7 @@ gunicorn==23.0.0
 Pillow>=10.3.0
 requests==2.33.0
 daphne==4.2.2
-channels==4.1.0
+channels==4.3.2
 # Django 5.2 exige asgiref >= 3.8.1. A partir de 3.8, `ThreadSensitiveContext` guarda un
 # `asyncio.Lock` por hilo, así que los tests de WebSocket que abrían **un bucle por llamada**
 # (`async_to_sync` dos veces en el mismo test) fallaban con «is bound to a different event loop».
