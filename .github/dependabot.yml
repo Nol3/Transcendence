@@ -37,7 +37,20 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 5
+    # Tres, no cinco: cada PR abierto es una pasada de CI y un correo.
+    open-pull-requests-limit: 3
+    groups:
+      # Todo lo de patch/minor en **un** PR. Sin esto llegaron cinco a la vez (channels,
+      # channels-redis, redis, asgiref y Pillow), cada uno con su CI y su notificación, para
+      # cambios que se prueban juntos de todas formas.
+      python-menor:
+        patterns: ["*"]
+        update-types: [minor, patch]
+    ignore:
+      # `redis` está clavado a la 5.x a propósito: channels-redis 4.2.1 no entiende RESP3 y
+      # revienta con la 8 (está explicado en requirements.txt). Subirlo es un cambio de fondo.
+      - dependency-name: "redis"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: docker
     directory: /docker

@@ -28,7 +28,9 @@ jobs:
           cache-dependency-path: backend/requirements.txt
 
       - name: Instalar dependencias
-        run: pip install -r requirements.txt
+        # `tblib` deja que el runner paralelo serialice la excepción real; sin él, cualquier
+        # fallo sale como «cannot pickle 'traceback'» y no hay forma de saber qué pasó.
+        run: pip install -r requirements.txt tblib
 
       - name: Catálogos de traducción
         # `msgfmt` (paquete gettext) compila los .po de locale/; sin esto los tests
@@ -109,7 +111,9 @@ jobs:
           cache-dependency-path: backend/requirements.txt
 
       - name: Instalar dependencias
-        run: pip install -r requirements.txt
+        # `tblib` deja que el runner paralelo serialice la excepción real; sin él, cualquier
+        # fallo sale como «cannot pickle 'traceback'» y no hay forma de saber qué pasó.
+        run: pip install -r requirements.txt tblib
 
       - name: Catálogos de traducción
         run: |
