@@ -50,7 +50,11 @@ export default defineConfig({
   webServer: {
     command: 'npm run start',
     url: 'http://localhost:4200',
-    reuseExistingServer: !process.env['CI'],
+    // En CI normalmente **no** se reutiliza nada (se levanta `ng serve` limpio). La excepción es
+    // el job «Stack completo»: allí el docker compose ya sirve la app en :4200 y Playwright
+    // intentaba arrancar otro, fallando con «is already used». Se pide con esta variable.
+    reuseExistingServer:
+      process.env['PLAYWRIGHT_REUSE_SERVER'] === 'true' || !process.env['CI'],
     timeout: 120_000,
   },
 });

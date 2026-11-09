@@ -169,6 +169,9 @@ jobs:
 
       - name: e2e contra el stack (multijugador)
         working-directory: front
+        # El stack ya sirve la app en :4200 (con la API real): Playwright no debe arrancar otro.
+        env:
+          PLAYWRIGHT_REUSE_SERVER: 'true'
         run: npx playwright test e2e/culo-online.spec.ts e2e/juegos-online.spec.ts --project=chromium
 
       - name: Logs si algo falla
