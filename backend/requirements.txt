@@ -17,7 +17,7 @@ channels==4.1.0
 # (`async_to_sync` dos veces en el mismo test) fallaban con «is bound to a different event loop».
 # Los tests usan ahora un único bucle por test (`tests/bucle.py`), que es lo que corresponde.
 asgiref==3.9.2
-channels-redis==4.2.1
+channels-redis==4.3.0
 # redis-py 8 usa RESP3 por defecto y channels-redis 4.2.1 revienta al parsearlo
 # ("int is not allowed for map key when strict_map_key=True" y timeouts de lectura
 # en el bucle del consumer). Se fija la 5.x, que es la que channels-redis espera.
