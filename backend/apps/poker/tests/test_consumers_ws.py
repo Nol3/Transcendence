@@ -418,7 +418,6 @@ class ReglasDelChatTests(TestCase):
             self.enviados.append((grupo, mensaje))
 
     def _consumidor(self):
-        from apps.poker.consumers import TableConsumer
 
         consumidor = TableConsumer()
         consumidor.username = "ana"
