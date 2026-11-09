@@ -20,19 +20,31 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      // El spec móvil necesita pantalla pequeña y dedo: corre solo en el proyecto `movil`.
+      testIgnore: /movil\.spec\.ts/,
     },
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
+      testIgnore: /movil\.spec\.ts/,
     },
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
+      testIgnore: /movil\.spec\.ts/,
     },
     {
       // Edge no lo puede instalar Playwright: usa el del sistema (Windows).
       name: 'msedge',
       use: { ...devices['Desktop Edge'], channel: 'msedge' },
+      testIgnore: /movil\.spec\.ts/,
+    },
+    {
+      // Móvil de verdad: pantalla pequeña, dedo inalámbrico. Solo corre lo marcado con @movil,
+      // para no duplicar la suite entera en cada pasada (`npx playwright test --project=movil`).
+      name: 'movil',
+      use: { ...devices['Pixel 7'] },
+      grep: /@movil/,
     },
   ],
   webServer: {

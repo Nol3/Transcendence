@@ -1392,7 +1392,7 @@ Todo lo que sigue está medido contra el árbol de hoy, no supuesto.
 | M7 | Corpus compartido de estados TS/Python | P1 | 4–6 h | 2.362 líneas de motor en TS y 1.794 en Python con las mismas reglas, **sin fixtures comunes** |
 | M8 | Jugar con teclado | P1 | 2–3 h | ✅ **falsa alarma**: las cinco mesas ya envuelven cada carta en un `<button>`; verificado con un e2e nuevo que juega con Intro |
 | M9 | Cerrar flecos de endurecimiento | P1 | 3–4 h | 🟡 **a medias**: middleware y `DENY` puestos (`check --deploy` sin avisos); queda el OpenAPI |
-| M10 | Móvil de verdad | P1 | 3–4 h | sin proyecto Playwright móvil; 4 de las 5 mesas sin una sola regla `@media` |
+| M10 | Móvil de verdad | P1 | 3–4 h | ✅ **no era lo que decía**: medido a 390 px, nada se sale de ancho; lo que faltaba era el proyecto móvil y tres controles (`✕`, ojo) de 10×16 |
 | M11 | Adelgazar el repositorio | P2 | 3–5 h | **140 MB** versionados: raylib 97 MB, WASM 14 MB, avatares personales 2,6 MB |
 | M12 | Dependencias vigiladas | P2 | 1–2 h | ✅ **hecho**: `dependabot.yml` + `pip-audit`/`npm audit` en el CI |
 | M13 | Observabilidad | P2 | 3–4 h | 5 llamadas a `logger.` en todo el backend, sin id de petición ni captura de errores |
@@ -1489,6 +1489,46 @@ Todo lo que sigue está medido contra el árbol de hoy, no supuesto.
   `APIView` con `extend_schema`.
 - **Hecho cuando**: `check --deploy` sin avisos, HSTS corto de salida y el esquema sin errores.
   Bonus: con el esquema limpio se pueden **generar los tipos TS** y matar la deriva front/back.
+
+### M10 · Móvil de verdad · ✅ cerrado (09-11-2026) — y salió un P0 por el camino
+
+El informe decía «4 de las 5 mesas sin una sola regla `@media`». Se midió antes de tocar nada, con
+una sonda que recorre todas las rutas a **390×844** buscando lo que se sale del ancho y los botones
+por debajo del mínimo táctil:
+
+- **Cero desbordes horizontales** en las 16 rutas. Ni las mesas ni el catálogo ni el perfil.
+- La mesa del Culo en 390 px: carta de **64×88**, mano de 200 px, controles a 717 px de alto. Se
+  juega.
+- **Tres** controles eran un carácter suelto sin caja: el `✕` de los avisos y del error del chat
+  (10×16) y el ojo de «ver contraseña» (22×16). WCAG 2.2 AA (2.5.8) pide 24×24. Ahora son
+  24×24 como mínimo y **44×44** con puntero grueso, en `styles.scss`.
+
+Lo que sí faltaba de verdad era una **puerta móvil**: el proyecto `movil` de Playwright
+(Pixel 7) y `e2e/movil.spec.ts` con cuatro pruebas —la portada y el login caben, las pantallas con
+sesión no se salen, ningún botón baja de 24 px y **la mesa del Culo se juega con el dedo**
+(`tap()` en la carta y en jugar). `npx playwright test --project=movil` → 4/4.
+
+#### El P0 que apareció al mirar por qué el botón seguía a 22×16
+
+Con la CSP puesta, la regla nueva **no se aplicaba**. La causa no era la regla:
+
+1. Angular publica el CSS como `<link rel="stylesheet" href="styles-xxx.css" media="print"
+   onload="this.media='all'">` (la optimización `inlineCritical`), e incrusta en el HTML solo el
+   CSS crítico.
+2. La CSP del proyecto es `script-src 'self' …` **sin `'unsafe-inline'`**, así que el navegador
+   **bloquea ese `onload`**.
+3. Resultado: la hoja se queda en `media="print"` para siempre y el sitio real se ve **solo con el
+   CSS crítico**. Todo lo demás (colores de las mesas, tarjetas, animaciones, media queries) no
+   llegaba a aplicarse.
+
+Y los e2e no lo veían porque `quitarCspDeLosDocumentos()` **quita la CSP** en las pruebas: con la
+cabecera fuera, el `onload` corre y todo parece bien. Un test que desactiva la protección que
+rompe la página esconde el fallo.
+
+**Arreglo**: `optimization.styles.inlineCritical: false` en `angular.json` (producción). El CSS
+sale como `<link>` normal y bloqueante; medido después: la hoja entra con `media: all` y el ojo
+mide 30×24. **Regresión**: `e2e/estilos.spec.ts` comprueba, **sin tocar la CSP**, que ninguna hoja
+queda en `print` y que el ojo mide ≥24.
 
 ### M10 · Móvil de verdad · P1
 - **Por qué**: Playwright solo tiene proyectos de escritorio (chromium, firefox, webkit, edge) y
@@ -1756,7 +1796,7 @@ número de tests.
 **Después (producto):** 5.1 → 5.3 → 5.2 → 5.4 → 5.5 → Bloque 6 → Bloque 7.
 **Juegos nuevos (decidido 14-10-2026):** Bloque 8 — 8.1 Mentiroso → 8.2 Brisca → 8.3 Tute → 8.4 Mus.
 **Antes de dar la URL (auditoría del 30-10-2026):** ✅ M1 · ✅ M2 · ✅ M3 · ✅ M4 · ✅ M5 · ✅ M8 · ✅ M12 ·
-✅ M14 · ✅ M15 · 🟡 M9 (queda el esquema OpenAPI). Siguen: **M10** (móvil) → M16 (Django 5.2) →
+✅ M14 · ✅ M15 · ✅ M10 (móvil) · 🟡 M9 (queda el esquema OpenAPI). Siguen: **M16** (Django 5.2) →
 M6 (Culo a `salas`) → M7 (fixtures TS/Python) → M11 (tamaño del repo) → M13 (observabilidad).
 
 ---
