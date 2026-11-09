@@ -76,15 +76,21 @@ class BaseWebSocket(TransactionTestCase):
         salida revienta dentro de asgiref («Lock bound to a different event loop»), que es el
         mismo artefacto de la 3.7.2 que obligó a fijar esa versión. Vaciando primero, no pasa.
         """
+        # `asyncio.CancelledError` **no** es una `Exception` (es `BaseException` desde Python
+        # 3.8), así que `suppress(Exception)` no lo atrapaba: cuando el propio servidor ya cerró
+        # la conexión —el freno del chat, por ejemplo— el `receive_nothing` de dentro se cancela
+        # y el test reventaba al limpiar. Pasaba solo en serie; con `--parallel` el orden lo tapaba.
+        silencio = contextlib.suppress(Exception, asyncio.CancelledError)
         for com in comunicadores:
-            with contextlib.suppress(Exception):
-                # Tope de 10: si la mesa sigue emitiendo estados, vaciar «hasta el infinito»
-                # colgaría el test; con unos pocos basta para que el cierre sea limpio.
-                for _ in range(10):
-                    if await com.receive_nothing(timeout=0.05):
-                        break
-                    await com.receive_json_from()
-            with contextlib.suppress(Exception):
+            if not com.future.done():
+                with silencio:
+                    # Tope de 10: si la mesa sigue emitiendo estados, vaciar «hasta el infinito»
+                    # colgaría el test; con unos pocos basta para que el cierre sea limpio.
+                    for _ in range(10):
+                        if await com.receive_nothing(timeout=0.05):
+                            break
+                        await com.receive_json_from()
+            with silencio:
                 await com.disconnect()
 
     async def _drenar(self, com) -> None:

@@ -158,9 +158,12 @@ class SalaMentirosoTests(TestCase):
             )
         seat = juego.turno_de_bot(estado)
         self.assertIsNotNone(seat, "el bot debería tener el turno en algún momento")
-        antes = len(estado.pile)
+        # No vale mirar solo el montón: el bot también puede **retirarse** con cuatro iguales,
+        # que es una jugada legal y no lo toca. Se comprueba que el estado cambió, mire donde mire.
+        antes = (len(estado.pile), len(estado.players[seat].hand), estado.turn)
         juego.jugar_bot(estado, seat)
-        self.assertNotEqual(len(estado.pile), antes)  # ha jugado o ha hecho que alguien recoja
+        despues = (len(estado.pile), len(estado.players[seat].hand), estado.turn)
+        self.assertNotEqual(despues, antes, "el bot tenía el turno y no movió ficha")
 
     def test_la_mano_siguiente_la_puede_pedir_cualquiera(self):
         juego = MentirosoJuego()
