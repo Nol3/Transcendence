@@ -21,12 +21,13 @@ import asyncio
 import contextlib
 from unittest.mock import patch
 
+from asgiref.sync import async_to_sync
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth.models import User
-from django.test import TransactionTestCase
+from django.test import TestCase, TransactionTestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.poker.consumers import QUEUE_TIMEOUT
+from apps.poker.consumers import QUEUE_TIMEOUT, TableConsumer
 from apps.poker.queue import InMemoryMatchQueue
 from apps.poker.tables import TableSeat, registry
 from config.asgi import application
@@ -87,16 +88,27 @@ class BaseWebSocket(TransactionTestCase):
                     # Tope de 10: si la mesa sigue emitiendo estados, vaciar «hasta el infinito»
                     # colgaría el test; con unos pocos basta para que el cierre sea limpio.
                     for _ in range(10):
-                        if await com.receive_nothing(timeout=0.05):
+                        if com.output_queue.empty():
                             break
-                        await com.receive_json_from()
+                        await com.receive_output()
             with silencio:
                 await com.disconnect()
 
     async def _drenar(self, com) -> None:
-        """Vacía lo que quede pendiente (estados de la mesa) antes de afirmar «no llega nada»."""
-        while not await com.receive_nothing(timeout=0.15):
-            await com.receive_json_from()
+        """Vacía lo que quede pendiente (estados de la mesa) antes de afirmar «no llega nada».
+
+        Se mira la cola en vez de usar `receive_nothing`: en Python 3.11 cancelar el `get()` de
+        la cola deja un waiter cancelado dentro, y la **siguiente** lectura del mismo
+        comunicador revienta con `CancelledError` (el fallo que solo salía en el CI). En 3.12 lo
+        limpian; aquí se evita el problema de raíz.
+        """
+        while not com.output_queue.empty():
+            await com.receive_output()
+
+    async def _nada(self, com, timeout: float = 0.2) -> bool:
+        """`True` si en `timeout` segundos no ha llegado nada. Sin cancelar la cola."""
+        await asyncio.sleep(timeout)
+        return com.output_queue.empty()
 
 
 class MesaWebSocketTests(BaseWebSocket):
@@ -215,7 +227,7 @@ class MesaWebSocketTests(BaseWebSocket):
             # Tras la acción la mesa reparte estado nuevo; lo que no puede es llegar un error.
             estado = await self._recibir(com, "table_state")
             self.assertIn("game", estado)
-            self.assertFalse(await com.receive_nothing(timeout=0.2))
+            self.assertFalse(await self._nada(com, 0.2))
         finally:
             await self._cerrar(com)
 
@@ -234,29 +246,9 @@ class MesaWebSocketTests(BaseWebSocket):
         finally:
             await self._cerrar(c1, c2)
 
-    async def test_el_chat_se_recorta_y_el_vacio_no_se_manda(self):
-        com = await self._conectar(f"/ws/poker/table/{self.mesa.id}/?token={token_de(self.ana)}")
-        try:
-            await self._drenar(com)
-            await com.send_json_to({"type": "chat", "text": "   "})
-            self.assertTrue(await com.receive_nothing(timeout=0.2), "un chat vacío no debe salir")
-
-            await com.send_json_to({"type": "chat", "text": "x" * 500})
-            mensaje = await self._recibir(com, "chat")
-            self.assertEqual(len(mensaje["text"]), 200)
-        finally:
-            await self._cerrar(com)
-
-    async def test_dos_mensajes_seguidos_chocan_con_el_freno(self):
-        com = await self._conectar(f"/ws/poker/table/{self.mesa.id}/?token={token_de(self.ana)}")
-        try:
-            await self._drenar(com)
-            await com.send_json_to({"type": "chat", "text": "uno"})
-            await com.send_json_to({"type": "chat", "text": "dos"})
-            self.assertEqual((await self._recibir(com, "chat"))["text"], "uno")
-            self.assertIn("demasiado rápido", (await self._recibir(com, "error"))["error"])
-        finally:
-            await self._cerrar(com)
+    # El recorte y el freno del chat se prueban en `ReglasDelChatTests`, sin socket ni reloj:
+    # por WebSocket dependían de que el segundo mensaje llegara dentro de la ventana de 0,5 s, y
+    # en el CI (Python 3.11 bajo `coverage`) no llegaba. Aquí queda lo que sí es del transporte.
 
     async def test_al_desconectar_se_libera_la_silla(self):
         com = await self._conectar(f"/ws/poker/table/{self.mesa.id}/?token={token_de(self.ana)}")
@@ -308,7 +300,7 @@ class EmparejamientoWebSocketTests(BaseWebSocket):
             self.assertEqual((await self._recibir(com, "stake_set"))["stake"], "mid")
             # Un nivel inventado se ignora en silencio (no cambia nada).
             await com.send_json_to({"type": "stake", "stake": "gratis"})
-            self.assertTrue(await com.receive_nothing(timeout=0.2))
+            self.assertTrue(await self._nada(com, 0.2))
         finally:
             await self._cerrar(com)
 
@@ -365,7 +357,7 @@ class EmparejamientoWebSocketTests(BaseWebSocket):
             c2 = await self._conectar(f"/ws/poker/matchmaking?token={token_de(self.luis)}&size=6")
             try:
                 await self._recibir(c2, "searching")
-                self.assertTrue(await c2.receive_nothing(timeout=0.3),
+                self.assertTrue(await self._nada(c2, 0.3),
                                 "uno que quiere mesa de 6 no puede caer en una de 2")
                 self.assertEqual(len(await self.cola.entries()), 2)
             finally:
@@ -404,3 +396,63 @@ class EmparejamientoWebSocketTests(BaseWebSocket):
             self.assertEqual([e["size"] for e in entradas], [4])
         finally:
             await self._cerrar(com)
+
+
+class ReglasDelChatTests(TestCase):
+    """El freno y el recorte del chat, **sin** socket ni reloj.
+
+    Antes se probaban con dos mensajes seguidos por WebSocket, y eso depende de que el segundo
+    llegue dentro de la ventana (0,5 s). En el CI —Python 3.11 bajo `coverage`— el segundo se
+    procesaba más tarde, no se rechazaba (que es lo correcto) y además asgiref cerraba el
+    comunicador antes de entregar la respuesta. La regla se prueba aquí, donde es determinista;
+    el transporte sigue probado en `MesaWebSocketTests`.
+    """
+
+    class Capa:
+        """Capa de canales de mentira: apunta lo que se manda a cada grupo."""
+
+        def __init__(self) -> None:
+            self.enviados: list[tuple[str, dict]] = []
+
+        async def group_send(self, grupo: str, mensaje: dict) -> None:
+            self.enviados.append((grupo, mensaje))
+
+    def _consumidor(self):
+        from apps.poker.consumers import TableConsumer
+
+        consumidor = TableConsumer()
+        consumidor.username = "ana"
+        consumidor.spectator = False
+        consumidor.group_name = "mesa-1"
+        consumidor.spectators_group = "mesa-1-espectadores"
+        consumidor.channel_layer = self.Capa()
+        consumidor.last_chat = 0.0
+        consumidor.errores = []
+
+        async def send_error(mensaje: str) -> None:
+            consumidor.errores.append(mensaje)
+
+        consumidor.send_error = send_error
+        return consumidor
+
+    def test_el_vacio_no_sale_el_largo_se_recorta_y_el_segundo_se_frena(self):
+        consumidor = self._consumidor()
+
+        async def escenario():
+            await consumidor.on_chat({"text": "   "})
+            vacio = list(consumidor.channel_layer.enviados)
+            await consumidor.on_chat({"text": "x" * 500})
+            await consumidor.on_chat({"text": "otra"})
+            return vacio
+
+        vacio = async_to_sync(escenario)()
+
+        self.assertEqual(vacio, [], "un chat vacío no debe salir")
+        self.assertEqual(len(consumidor.errores), 1, "el segundo mensaje seguido debe frenarse")
+        self.assertIn("demasiado rápido", consumidor.errores[0])
+
+        grupos = [grupo for grupo, _ in consumidor.channel_layer.enviados]
+        self.assertEqual(grupos, ["mesa-1", "mesa-1-espectadores"])
+        enviado = consumidor.channel_layer.enviados[0][1]["payload"]
+        self.assertEqual(len(enviado["text"]), 200, "el mensaje largo se recorta")
+        self.assertEqual(enviado["from"], "ana")
