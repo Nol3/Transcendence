@@ -34,7 +34,9 @@
       "minlength": "Min {{n}} characters",
       "maxlength": "Max {{n}} characters",
       "loginFailed": "Login failed. Check your credentials.",
-      "registerFailed": "Registration failed. Try again."
+      "registerFailed": "Registration failed. Try again.",
+      "email": "That email doesn't look right",
+      "generic": "Something went wrong. Try again."
     },
     "login": {
       "title": "Login",
@@ -44,7 +46,8 @@
       "noAccount": "No account? Register",
       "subtitle": "Enter your credentials to continue",
       "emailPlaceholder": "player@example.com",
-      "noAccountShort": "No account?"
+      "noAccountShort": "No account?",
+      "forgot": "Forgot your password?"
     },
     "register": {
       "title": "Register",
@@ -56,6 +59,24 @@
       "subtitle": "Create your player profile",
       "usernamePlaceholder": "player_one",
       "hasAccountShort": "Already have an account?"
+    },
+    "forgot": {
+      "title": "Recover access",
+      "subtitle": "We'll email you a link to set a new password.",
+      "submit": "Send link",
+      "sent": "If that email is registered, we've sent you a link. It expires in 15 minutes.",
+      "back": "Back to sign in"
+    },
+    "reset": {
+      "title": "New password",
+      "subtitle": "Pick a password you don't use anywhere else.",
+      "repeat": "Repeat password",
+      "submit": "Change password",
+      "ok": "Password changed. You can sign in now.",
+      "invalid": "This link is no longer valid: it has expired or already been used.",
+      "askNew": "Request another link",
+      "goLogin": "Go to sign in",
+      "mismatch": "Passwords don't match"
     }
   },
   "game": {

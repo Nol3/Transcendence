@@ -1,6 +1,6 @@
-// Cartas con el arte del proyecto (el mazo 8-bit del juego) y el acabado de Balatro:
-// pixel art nítido, entran repartidas una tras otra, se levantan al pasar por encima y
-// se hunden al pulsarlas.
+// Cartas de la baraja. Dos mazos con acabados distintos: el póker usa el arte de Balatro
+// (suave, con sombra difuminada) y el resto, la baraja española en pixel art. Los dos entran
+// repartidos uno tras otro, se levantan al pasar por encima y se hunden al pulsarlos.
 .pc {
   position: relative;
   display: inline-block;
@@ -18,12 +18,24 @@
     display: block;
     width: 100%;
     height: 100%;
-    // Pixel art de verdad: píxeles cuadrados, no un borrón al escalar.
+    // Pixel art de verdad: píxeles cuadrados, no un borrón al escalar. (El mazo de Balatro
+    // lo desactiva más abajo: su arte es suave y `pixelated` lo sacaría a bloques.)
     image-rendering: pixelated;
     user-select: none;
     -webkit-user-drag: none;
     filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.55));
     transition: filter 140ms ease;
+  }
+
+  // El mazo de Balatro: arte suave, así que se interpola al escalar y la sombra se difumina
+  // (una sombra dura de 2 px es de pixel art y aquí cantaría).
+  &--baraja-poker .pc__cara {
+    image-rendering: auto;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
+  }
+
+  &--baraja-poker:hover .pc__cara {
+    filter: drop-shadow(0 6px 7px rgba(0, 0, 0, 0.45)) brightness(1.08);
   }
 
   &--sm { width: 34px; height: 45px; }

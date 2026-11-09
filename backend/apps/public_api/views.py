@@ -7,6 +7,7 @@ from rest_framework.decorators import (
     authentication_classes,
     permission_classes,
 )
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -34,9 +35,24 @@ API_KEY_THROTTLES = [ApiKeyThrottle, ApiKeyBurstThrottle]
 JWT_AUTH = [JWTAuthentication]
 
 
+def _entero(valor: str) -> int:
+    """Convierte un parámetro de la URL a entero, o responde 400.
+
+    Sin esto, `?page=abc` llegaba a `int()` y devolvía un 500 en una API pública.
+    """
+    try:
+        return int(valor)
+    except (TypeError, ValueError):
+        raise ValidationError({"detail": _("Page and limit must be whole numbers.")}) from None
+
+
+def _pagina_y_limite(request) -> tuple[int, int]:
+    page = max(1, _entero(request.query_params.get("page", 1)))
+    return page, min(100, max(1, _entero(request.query_params.get("limit", 20))))
+
+
 def _paginate(queryset, request, serializer_class):
-    page = max(1, int(request.query_params.get("page", 1)))
-    limit = min(100, max(1, int(request.query_params.get("limit", 20))))
+    page, limit = _pagina_y_limite(request)
     total = queryset.count()
     start = (page - 1) * limit
     data = serializer_class(queryset[start : start + limit], many=True).data
@@ -371,8 +387,7 @@ class PublicLeaderboardView(APIView):
     throttle_classes = API_KEY_THROTTLES
 
     def get(self, request):
-        page = max(1, int(request.query_params.get("page", 1)))
-        limit = min(100, max(1, int(request.query_params.get("limit", 20))))
+        page, limit = _pagina_y_limite(request)
 
         users = (
             User.objects.select_related("profile")

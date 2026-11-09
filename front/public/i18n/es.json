@@ -34,7 +34,9 @@
       "minlength": "Mínimo {{n}} caracteres",
       "maxlength": "Máximo {{n}} caracteres",
       "loginFailed": "No se pudo entrar. Revisa tus datos.",
-      "registerFailed": "No se pudo crear la cuenta. Inténtalo otra vez."
+      "registerFailed": "No se pudo crear la cuenta. Inténtalo otra vez.",
+      "email": "Ese correo no parece válido",
+      "generic": "Algo ha ido mal. Inténtalo otra vez."
     },
     "login": {
       "title": "Iniciar sesión",
@@ -44,7 +46,8 @@
       "noAccount": "¿Sin cuenta? Regístrate",
       "subtitle": "Introduce tus datos para continuar",
       "emailPlaceholder": "jugador@ejemplo.com",
-      "noAccountShort": "¿Sin cuenta?"
+      "noAccountShort": "¿Sin cuenta?",
+      "forgot": "¿Olvidaste tu contraseña?"
     },
     "register": {
       "title": "Registrarse",
@@ -56,6 +59,24 @@
       "subtitle": "Crea tu perfil de jugador",
       "usernamePlaceholder": "jugador_uno",
       "hasAccountShort": "¿Ya tienes cuenta?"
+    },
+    "forgot": {
+      "title": "Recuperar acceso",
+      "subtitle": "Te mandamos un enlace para poner una contraseña nueva.",
+      "submit": "Enviar enlace",
+      "sent": "Si ese correo está registrado, te hemos mandado un enlace. Caduca en 15 minutos.",
+      "back": "Volver a entrar"
+    },
+    "reset": {
+      "title": "Nueva contraseña",
+      "subtitle": "Elige una contraseña que no uses en otro sitio.",
+      "repeat": "Repite la contraseña",
+      "submit": "Cambiar contraseña",
+      "ok": "Contraseña cambiada. Ya puedes entrar con la nueva.",
+      "invalid": "Este enlace no vale: o ha caducado, o ya se ha usado.",
+      "askNew": "Pedir otro enlace",
+      "goLogin": "Ir a entrar",
+      "mismatch": "Las contraseñas no coinciden"
     }
   },
   "game": {

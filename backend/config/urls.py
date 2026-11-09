@@ -8,6 +8,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import RedirectView
 from django.views.static import serve as static_serve
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
@@ -21,6 +22,8 @@ from apps.users.auth_views import (
     LoginView,
     LogoutView,
     MeView,
+    PasswordResetConfirmView,
+    PasswordResetRequestView,
     RefreshTokenView,
     RegisterView,
 )
@@ -47,6 +50,7 @@ def _apply_game_cache(response, path):
     return response
 
 
+@xframe_options_exempt
 def game_view(request, path=""):
     """Serve the Raylib/WASM card game. CSP frame-ancestors lets Angular embed
     it in an iframe. COOP/COEP headers enable SharedArrayBuffer."""
@@ -161,6 +165,27 @@ urlpatterns = [
     path("api/auth/refresh/", RefreshTokenView.as_view(), name="auth-refresh"),
     path("api/auth/refresh", RefreshTokenView.as_view(), name="auth-refresh-no-slash"),
     path("api/auth/logout/", LogoutView.as_view(), name="auth-logout"),
+    # Recuperar la contraseña (M5 del roadmap): pedir el enlace y canjearlo.
+    path(
+        "api/auth/password-reset/",
+        PasswordResetRequestView.as_view(),
+        name="auth-password-reset",
+    ),
+    path(
+        "api/auth/password-reset",
+        PasswordResetRequestView.as_view(),
+        name="auth-password-reset-no-slash",
+    ),
+    path(
+        "api/auth/password-reset/confirm/",
+        PasswordResetConfirmView.as_view(),
+        name="auth-password-reset-confirm",
+    ),
+    path(
+        "api/auth/password-reset/confirm",
+        PasswordResetConfirmView.as_view(),
+        name="auth-password-reset-confirm-no-slash",
+    ),
     path("api/auth/logout", LogoutView.as_view(), name="auth-logout-no-slash"),
     path("api/auth/google/", GoogleLoginView.as_view(), name="auth-google"),
     path("api/auth/google", GoogleLoginView.as_view(), name="auth-google-no-slash"),

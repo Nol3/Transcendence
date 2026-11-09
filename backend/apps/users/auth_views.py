@@ -4,6 +4,8 @@ import contextlib
 
 from django.conf import settings
 from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.utils.translation import gettext_lazy as _
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token as google_id_token
@@ -14,6 +16,7 @@ from rest_framework.throttling import AnonRateThrottle, ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from apps.users.password_reset import enviar_correo, revocar_sesiones, usuario_del_token
 from apps.users.serializers import RegisterSerializer, UserSerializer
 
 
@@ -191,6 +194,79 @@ class LogoutView(APIView):
             with contextlib.suppress(Exception):
                 RefreshToken(refresh_token).blacklist()
         return Response({"message": "Logged out successfully"})
+
+
+class PasswordResetRequestView(APIView):
+    """Pide el correo de recuperación.
+
+    Responde **siempre** lo mismo, exista o no la cuenta: si no, cualquiera podría usar este
+    endpoint para averiguar qué correos están registrados.
+    """
+
+    permission_classes = [AllowAny]
+    # Un enlace por correo y por petición: sin límite es una forma barata de inundar un buzón.
+    throttle_classes = [AnonRateThrottle, ScopedRateThrottle]
+    throttle_scope = "password_reset"
+
+    def post(self, request):
+        from django.contrib.auth.models import User
+
+        email = (request.data.get("email") or "").strip()
+        if not email:
+            return Response(
+                {"error": _("Email is required")}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user = User.objects.filter(email__iexact=email).order_by("id").first()
+        if user and user.email:
+            try:
+                enviar_correo(user)
+            except Exception:
+                # Que falle el SMTP no puede delatar que la cuenta existe: se apunta y se sigue.
+                import logging
+
+                logging.getLogger(__name__).exception(
+                    "no se pudo enviar el correo de recuperación a %s", user.pk
+                )
+
+        return Response(
+            {"message": _("If that email exists, we have sent a link to reset the password.")}
+        )
+
+
+class PasswordResetConfirmView(APIView):
+    """Cambia la contraseña con el enlace del correo y cierra las sesiones abiertas."""
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        uid = request.data.get("uid") or ""
+        token = request.data.get("token") or ""
+        password = request.data.get("password") or ""
+
+        user = usuario_del_token(uid, token)
+        if user is None:
+            return Response(
+                {"error": _("The link is not valid or has expired. Ask for a new one.")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not password:
+            return Response(
+                {"error": _("Password is required")}, status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            validate_password(password, user)
+        except DjangoValidationError as exc:
+            return Response(
+                {"error": exc.messages[0] if exc.messages else _("Invalid password")},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user.set_password(password)
+        user.save(update_fields=["password"])
+        revocar_sesiones(user)
+        return Response({"message": _("Password changed. You can sign in now.")})
 
 
 class GoogleLoginView(APIView):

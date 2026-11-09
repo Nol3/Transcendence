@@ -24,6 +24,9 @@ front/test-results/
 front/playwright-report/
 front/.playwright/
 
+# Copias de seguridad (volcados y tar de media): son datos y pueden ser grandes.
+backups/
+
 # Avatares que suben los usuarios: son datos, no código. Se guardan en el volumen
 # `media_data` del servidor y en las copias de seguridad, no en el repositorio.
 # (Los que ya estaban versionados de antes siguen ahí: sacarlos del historial es una

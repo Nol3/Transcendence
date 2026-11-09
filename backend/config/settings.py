@@ -83,10 +83,16 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    # XFrameOptions removed globally — clickjacking protection now per-view via
-    # @xframe_options_deny / CSP frame-ancestors. The /game/ iframe needs cross-origin
-    # framing from Angular dev (:4200), which blanket DENY blocks.
+    # Clickjacking: SAMEORIGIN en todas las respuestas (el `check --deploy` lo exige). El
+    # iframe del juego es la única excepción y va exento por vista (`game_view`), porque su
+    # protección es la CSP `frame-ancestors` que él mismo envía: en desarrollo el padre vive
+    # en :4200 y es otro origen.
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# DENY: nada debe poder meter la app en un iframe. El juego va exento (abajo), que es el único
+# que se embebe, y siempre desde el mismo origen.
+X_FRAME_OPTIONS = "DENY"
 
 ROOT_URLCONF = "config.urls"
 
@@ -135,13 +141,19 @@ else:
 MATCH_QUEUE_BACKEND = config("MATCH_QUEUE_BACKEND", default="redis" if REDIS_URL else "memory")
 
 # Database
+# `DB_NAME` es el nombre de la base de datos **de PostgreSQL**; SQLite guarda un fichero y usa
+# `SQLITE_PATH`. Antes era la misma variable para las dos cosas y el `.env` de desarrollo
+# (`DB_NAME=/app/db.sqlite3`) rompía el despliegue: `compose.prod.yaml` cambia el motor a
+# PostgreSQL y se quedaba pidiendo una base llamada `/app/db.sqlite3`.
 DB_ENGINE = config("DB_ENGINE", default="django.db.backends.sqlite3")
-DB_NAME = config("DB_NAME", default=BASE_DIR / "db.sqlite3")
+SQLITE_PATH = config("SQLITE_PATH", default=str(BASE_DIR / "db.sqlite3"))
+DB_NAME = config("DB_NAME", default="transcendence")
 
 DATABASES = {
     "default": {
         "ENGINE": DB_ENGINE,
-        "NAME": DB_NAME,
+        # SQLite: ruta del fichero. PostgreSQL: nombre de la base.
+        "NAME": SQLITE_PATH if DB_ENGINE.endswith("sqlite3") else DB_NAME,
     }
 }
 
@@ -265,6 +277,8 @@ REST_FRAMEWORK = {
         "api_key_burst": "20/minute",
         # El login es donde se prueban contraseñas: límite propio y más estricto que el general.
         "login": config("THROTTLE_LOGIN", default="10/minute"),
+        # Pedir el enlace de recuperación manda un correo: cinco por hora y dirección basta.
+        "password_reset": config("THROTTLE_PASSWORD_RESET", default="5/hour"),
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
@@ -323,6 +337,15 @@ EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+DEFAULT_FROM_EMAIL = config(
+    "DEFAULT_FROM_EMAIL", default="Transcendence <no-reply@transcendence.local>"
+)
+
+# Recuperar la contraseña (M5 del roadmap). Django caduca el enlace a los 3 días por defecto;
+# para un restablecimiento, 15 minutos es lo razonable. `FRONTEND_URL` es a donde apunta el
+# enlace del correo (en desarrollo, el servidor de Angular).
+PASSWORD_RESET_TIMEOUT = config("PASSWORD_RESET_TIMEOUT", default=900, cast=int)
+FRONTEND_URL = config("FRONTEND_URL", default="http://localhost:4200")
 
 # Google OAuth2 — provisioned via env, but Vault may override it if stored there.
 GOOGLE_CLIENT_ID = _vault.get("GOOGLE_CLIENT_ID") or config("GOOGLE_CLIENT_ID", default="")

@@ -17,6 +17,21 @@ export const routes: Routes = [
     canActivate: [guestGuard],
   },
   {
+    // Recuperar la contraseña (M5 del roadmap). Públicas: quien no puede entrar es justo
+    // quien las necesita.
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./features/auth/forgot-password/forgot-password').then((m) => m.ForgotPassword),
+    canActivate: [guestGuard],
+  },
+  {
+    // El enlace del correo llega aquí con `?uid=…&token=…`.
+    path: 'reset-password',
+    loadComponent: () =>
+      import('./features/auth/reset-password/reset-password').then((m) => m.ResetPassword),
+    canActivate: [guestGuard],
+  },
+  {
     // Apartado «Juegos»: la parrilla con todo lo que se puede jugar. Lo que sale ahí
     // se declara en `core/games/game-catalog.ts`, no en esta pantalla.
     path: 'games',

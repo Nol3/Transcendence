@@ -1,0 +1,51 @@
+# Dependabot (roadmap M12): que las dependencias se muevan solas y el CI lo vigile.
+#
+# - `npm`  : el front (Angular, Playwright, ESLint). Los paquetes de Angular se agrupan en un
+#            solo PR porque se declaran versiones exactas entre sí: subirlos por separado rompe
+#            la instalación (ERESOLVE), así que un PR por paquete sería ruido que no compila.
+# - `pip`  : el backend (Django, DRF, Channels, Faster-Whisper…).
+# - `docker` + `github-actions`: las imágenes (fijadas por digest) y las acciones del CI.
+#
+# Los PRs de Dependabot pasan por el CI igual que cualquier otro: si rompen algo, se ven ahí.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /front
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      angular:
+        patterns:
+          - "@angular/*"
+          - "@angular-devkit/*"
+      testing:
+        patterns:
+          - "@playwright/*"
+          - "vitest"
+          - "@vitest/*"
+    ignore:
+      # Los saltos de major de Angular son un proyecto en sí (guía de actualización, migraciones
+      # y volver a pasar los e2e): se hacen a mano, no los abre un bot.
+      - dependency-name: "@angular/*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: pip
+    directory: /backend
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: docker
+    directory: /docker
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

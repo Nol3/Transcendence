@@ -70,6 +70,11 @@ actualizar_codigo() {
 levantar() {
   echo "[3/4] Reconstruyendo y levantando…"
   "${COMPOSE[@]}" up -d --build
+  # nginx resuelve `backend` al arrancar y se queda con esa IP: si el despliegue recrea el
+  # backend y no el borde, el sitio entero responde 502 hasta que alguien recarga. Pasó de
+  # verdad. La recarga es barata y no corta las conexiones vivas.
+  "${COMPOSE[@]}" exec -T nginx nginx -s reload >/dev/null 2>&1 \
+    || echo "Aviso: no se pudo recargar nginx (¿está levantado?)."
   echo "[4/4] Esperando a que el stack esté sano…"
   for _ in $(seq 1 60); do
     local sanos

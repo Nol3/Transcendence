@@ -12,7 +12,9 @@ const BARAJA = {
   poker: {
     rangos: ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'],
     palos: ['c', 'd', 'h', 's'],
-    carpeta: 'cards',
+    // El mazo de Balatro, recompuesto a partir de la tinta que trae el juego
+    // (`scripts/generar_cartas_balatro.py`). El 8-bit sigue en `cards/` por si se quiere volver.
+    carpeta: 'cards/balatro',
   },
   spanish: {
     rangos: ['1', '2', '3', '4', '5', '6', '7', '10', '11', '12'],
@@ -27,9 +29,10 @@ export type CardSize = 'sm' | 'md' | 'lg' | 'xl';
 export type CardState = 'idle' | 'turn' | 'winner' | 'folded' | 'dim';
 
 /**
- * Una carta de la baraja, con el arte del proyecto (los PNG del mazo 8-bit que usa el
- * juego) y el acabado de Balatro: pixel art nítido, entrada escalonada, se levanta al
- * pasar por encima y se hunde al pulsarla.
+ * Una carta de la baraja. El póker usa el **mazo de Balatro** (recompuesto en
+ * `scripts/generar_cartas_balatro.py`) y el resto de juegos, la baraja española en pixel art.
+ * En los dos casos la carta entra escalonada, se levanta al pasar por encima y se hunde al
+ * pulsarla.
  *
  * El dibujo lo pone el PNG, así que aquí no hay texto de rango ni de palo: solo la
  * carta. El nombre accesible sí se compone (rango + palo traducidos), porque una
@@ -57,7 +60,8 @@ export class PlayingCard {
   readonly esValida = computed(() => this.partes() !== null);
   readonly src = computed(() => {
     const p = this.partes();
-    if (this.faceDown() || !p) return 'cards/back.png';
+    // El dorso sale de la carpeta del mazo: el de Balatro y el de la española no se parecen.
+    if (this.faceDown() || !p) return `${BARAJA[this.deck()].carpeta}/back.png`;
     return `${BARAJA[this.deck()].carpeta}/${this.card()}.png`;
   });
 

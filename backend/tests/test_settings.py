@@ -35,6 +35,14 @@ class SqliteConfigTests(SimpleTestCase):
                            "PORT": "5432", "CONN_MAX_AGE": 60})
         self.assertEqual(config["CONN_MAX_AGE"], 60)
         self.assertEqual(config["HOST"], "postgres")
-        # SQLite se queda con el valor por defecto de Django para esa clave.
+
+    def test_sqlite_no_hereda_los_ajustes_de_postgresql(self):
+        """Con SQLite no se cuelan `USER` ni `CONN_MAX_AGE` del bloque de PostgreSQL.
+
+        Va aparte de la anterior porque esta sí mira la configuración **viva**: con el motor
+        PostgreSQL (el job `backend-postgres` del CI, y producción) no aplica.
+        """
+        if not settings.DB_ENGINE.endswith("sqlite3"):
+            self.skipTest("la configuración viva no es SQLite")
         self.assertEqual(settings.DATABASES["default"].get("CONN_MAX_AGE", 0), 0)
         self.assertEqual(settings.DATABASES["default"].get("USER", ""), "")

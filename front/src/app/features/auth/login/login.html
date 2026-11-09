@@ -36,6 +36,12 @@
         [error]="fieldError('password')"
       />
 
+      <p class="auth-card__forgot text-sm">
+        <a routerLink="/forgot-password" class="auth-card__link font-pixel">
+          {{ 'auth.login.forgot' | translate }}
+        </a>
+      </p>
+
       @if (error()) {
         <div class="auth-card__error">
           <span class="font-mono">✕</span>

@@ -45,6 +45,14 @@ volver a investigar nada.
 > señas** del Mus (botones que solo ve el compañero y que el servidor verifica) y los modos de 4 por
 > parejas de brisca y tute. Los detalles, en el **Bloque 8**.
 >
+> **Sesión 11** (16–30-10-2026): **auditoría completa P0** cerrada (ver «Auditoría completa del
+> 16-10-2026»), despliegue endurecido (CSP, JWT con revocación, limitador por IP, contenedor sin
+> root, imágenes por digest) y el póker con **la baraja de Balatro** (ver «La baraja de Balatro»).
+> Y una **auditoría nueva** con 16 mejoras medidas para el despliegue público, de las que ya están
+> **cerradas siete** (ver «Auditoría del 30-10-2026»): Angular sin vulnerabilidades, copias probadas,
+> CI que levanta el stack, endurecimiento, dependencias vigiladas y el despliegue a PostgreSQL —que
+> estaba **roto** y también se arregló—.
+>
 > Las reglas de los cuatro están en [docs/REGLAS_JUEGOS.md](REGLAS_JUEGOS.md) y la investigación que
 > llevó a ese orden, en [docs/INVESTIGACION_JUEGOS.md](INVESTIGACION_JUEGOS.md).
 >
@@ -899,6 +907,33 @@ en pantalla («Diamantes»), enseñaba un trébol llamado diamante y al revés. 
 `card_textures.c` con una tabla de grupos; recompilado el WASM y verificado que arranca igual
 (canvas 1280×720, WebGL, `glGetError: 0`, sin excepciones).
 
+## La baraja de Balatro (30-10-2026)
+
+El póker lleva ahora **el arte de Balatro** que ya estaba en el repo
+(`juego/assets/cards/1.cards/`), compuesto por `scripts/generar_cartas_balatro.py` en
+`front/public/cards/balatro/` (52 cartas + dorso a 142×190, el doble de su tamaño nativo).
+
+- **Lo que hay en local no son cartas: es la tinta.** Los PNG del set son los pips, las figuras y
+  los índices de las esquinas, sobre fondo transparente (el 2 de tréboles tiene un 4,8 % de píxeles
+  opacos): el papel y el borde los dibuja el juego aparte. Usarlos tal cual habría dejado cartas
+  flotando en la mesa. El generador recompone el papel (`244,240,230`, **el mismo de la baraja
+  española**) y el borde (`42,42,58`), y pone la capa del juego encima.
+- **El set trae dos mapeos mal, detectados leyendo píxeles y no nombres.** Primero, los palos están
+  cruzados: `clubs_*` son **diamantes** y `diamonds_*` son **tréboles** — la misma confusión de
+  orden de palos que ya salió en el juego C (ver la sección anterior). Segundo, los **rangos van
+  desplazados uno**: el fichero `ace` es el 2, el `2` es el 3, … el `9` es el 10, el `10` es la J,
+  la `jack` la Q, la `queen` el K y el `king` el **as**. Se comprobó contando pips (2, 3, 4 … 10,
+  creciente) y comparando el color dominante de cada carta con el palo de su nombre de destino:
+  las 52 correctas. Sin esa comprobación, medio mazo habría salido con el palo y el número de otra
+  carta.
+- **En el componente**: `BARAJA.poker.carpeta` pasa a `cards/balatro` y el **dorso sale de la carpeta
+  del mazo** (cada baraja tiene el suyo). El `image-rendering: pixelated` queda solo para la baraja
+  española —el arte de Balatro es suave y `pixelated` lo sacaba a bloques— y el póker estrena una
+  sombra difuminada en vez de la dura de 2 px del pixel art.
+- El mazo 8-bit sigue en `cards/` (y el `BASIC` del juego en C): volver atrás es cambiar una línea.
+- **Verificado**: 184 unitarios, 61/61 e2e, y la captura de la mesa con el papel nuevo (el crema
+  `244,239,229` domina las cartas, donde el mazo viejo era blanco puro).
+
 ## Juego nuevo: el Culo / Presidente (14-10-2026)
 
 El primer juego que entra por el apartado «Juegos», con las normas que dio el usuario.
@@ -1336,6 +1371,349 @@ los lee. Tres tests que esperaban **403** donde ahora se responde
 
 ---
 
+## Auditoría del 30-10-2026 · mejoras para el despliegue público
+
+Auditoría nueva, con el proyecto ya desplegable: **lo que falta**. No repite nada de la auditoría
+del 16-10 (esa está cerrada); lo que se comprobó y está sano no aparece aquí: **82 % de cobertura**
+(el CI exige 70 %), **393 tests**, **61/61 e2e**, **sin migraciones pendientes**, `SECURE_SSL_REDIRECT`
+y cookies seguras puestas, `CONN_MAX_AGE`, rutas **100 % diferidas** (18 `loadComponent`, ninguna
+eager), app **zoneless**, `ruff` y ESLint limpios.
+
+Todo lo que sigue está medido contra el árbol de hoy, no supuesto.
+
+| # | Mejora | Pri | Esfuerzo | Evidencia |
+|---|---|---|---|---|
+| M1 | Actualizar Angular (20.3.24 → 20.3.35) | **P0** | 1–2 h | ✅ **hecho**: 20.3.35 / CLI 20.3.42 y `npm audit` en **0** |
+| M2 | Cobertura de los módulos críticos | **P0** | 6–8 h | ✅ **hecho**: `public_api` 43→**89 %**, `poker/consumers` 41→**96 %**, `users/views` 54→**88 %**, `auth_views` 57→**99 %** (97 tests nuevos) |
+| M3 | Probar la restauración de las copias | **P0** | 2–3 h | ✅ **hecho**: `scripts/restaurar.sh`, 23 tablas restauradas y recuentos comparados |
+| M4 | CI que prueba lo que se despliega | P1 | 4–6 h | ✅ **hecho**: jobs `backend-postgres` y `stack` + migraciones y auditorías en el CI |
+| M5 | Recuperar contraseña | P1 | 4–6 h | ✅ **hecho**: enlace de un solo uso (15 min), dos pantallas y 12 tests + 5 e2e |
+| M6 | Migrar el Culo a la capa `salas` | P1 | 3–4 h | `culo/consumers.py` 241 + `culo/rooms.py` 252 duplican `salas/` (202 + 265) |
+| M7 | Corpus compartido de estados TS/Python | P1 | 4–6 h | 2.362 líneas de motor en TS y 1.794 en Python con las mismas reglas, **sin fixtures comunes** |
+| M8 | Jugar con teclado | P1 | 2–3 h | ✅ **falsa alarma**: las cinco mesas ya envuelven cada carta en un `<button>`; verificado con un e2e nuevo que juega con Intro |
+| M9 | Cerrar flecos de endurecimiento | P1 | 3–4 h | 🟡 **a medias**: middleware y `DENY` puestos (`check --deploy` sin avisos); queda el OpenAPI |
+| M10 | Móvil de verdad | P1 | 3–4 h | sin proyecto Playwright móvil; 4 de las 5 mesas sin una sola regla `@media` |
+| M11 | Adelgazar el repositorio | P2 | 3–5 h | **140 MB** versionados: raylib 97 MB, WASM 14 MB, avatares personales 2,6 MB |
+| M12 | Dependencias vigiladas | P2 | 1–2 h | ✅ **hecho**: `dependabot.yml` + `pip-audit`/`npm audit` en el CI |
+| M13 | Observabilidad | P2 | 3–4 h | 5 llamadas a `logger.` en todo el backend, sin id de petición ni captura de errores |
+| M14 | Higiene de `dist/` y del árbol | P3 | 1 h | ✅ **hecho**: `dist/` en 4,1 MB y los restos fuera del árbol |
+| M15 | Refrescar la tabla de riesgos | P3 | 30 min | ✅ **hecho**: D1, D2 y D3 cerradas con su evidencia |
+| M16 | Django 5.2 + DRF 3.18 | P1 | 6–10 h | quedan **14 avisos (5 únicos)** que no se cierran sin salir de la LTS 4.2 |
+
+### M1 · Actualizar Angular · P0
+- **Por qué**: `npm audit --omit=dev` da **12 avisos en dependencias de producción**: XSS por
+  *bypass* de saneado en *two-way binding* (`@angular/compiler`), *DOM clobbering* y envenenamiento
+  de la caché de respuestas en hidratación (`@angular/core`), DoS por OOM al formatear fechas
+  (`@angular/common`), fuga de cabeceras en redirecciones de otro origen (`@angular/service-worker`)
+  y *path traversal* de `@angular/ssr` en Windows. Hay SSR e hidratación en producción, así que no
+  son teóricos.
+- **Cómo**: subir a la 20.3.35 (la instalada es 20.3.24). Si algún aviso exigiera la 21, tratarlo
+  como bloque aparte, no colarlo aquí.
+- **Hecho cuando**: `npm audit --omit=dev` → **0** y 61/61 e2e con el build nuevo.
+
+### M2 · Cobertura de los módulos críticos · P0
+- **Por qué**: el 82 % global esconde que lo peor cubierto es justo lo más delicado:
+  `apps/public_api/views.py` **43 %** (204 sentencias), `apps/poker/consumers.py` **41 %** (229),
+  `apps/users/views.py` 54 %, `apps/users/auth_views.py` 57 %, `apps/tournament/consumers.py` 29 %,
+  `apps/brisca/bots.py` 29 %. Son los módulos que recibieron los parches de seguridad del 16-10.
+- **Cómo**: umbral por módulo (≥ 80 % en `users/auth_*`, `public_api/` y `poker/consumers.py`), no
+  solo el global; para los consumidores, tests con `WebsocketCommunicator` (ya hay precedente en
+  `apps/culo/tests/test_consumer.py`).
+- **Hecho cuando**: `coverage report` con esos cuatro ficheros ≥ 80 % y el CI falla si bajan.
+
+### M3 · Probar la restauración de las copias · P0
+- **Por qué**: `scripts/backup.sh` existe y está documentado, pero el cron solo aparece **como
+  sugerencia en un comentario** y nunca se ha probado una restauración. Una copia que no se ha
+  restaurado no es una copia.
+- **Cómo**: `scripts/restaurar.sh` + un job de CI (o tarea semanal) que levante Postgres
+  desechable, restaure el último `.sql.gz` y compare recuentos de tablas y número de avatares.
+- **Hecho cuando**: restaurar en limpio reproduce los mismos recuentos y el job avisa si falla.
+
+### M4 · CI que prueba lo que se despliega · P1
+- **Por qué**: el CI actual (backend + frontend) está bien, pero **no construye las imágenes
+  Docker**, no usa **PostgreSQL** (todo corre sobre SQLite, y producción va sobre Postgres por
+  `compose.prod.yaml`), no comprueba migraciones pendientes y los **2 únicos specs e2e que hablan
+  con el servidor real** (`culo-online`, `juegos-online`) hacen `test.skip` sin stack, así que en
+  CI **siempre** se saltan: el multijugador online no se prueba nunca allí.
+- **Cómo**: job `docker` (build + `up -d` + healthchecks + suite e2e completa), `makemigrations
+  --check --dry-run`, `manage.py check --deploy` y matrix de base de datos para el job de tests.
+- **Hecho cuando**: un PR que rompa el Dockerfile, la CSP o el multijugador se pone rojo.
+
+### M5 · Recuperar contraseña · P1
+- **Por qué**: no existe. No hay ni un `send_mail` en el backend, `EMAIL_BACKEND` apunta a consola
+  y el front no tiene pantalla de «he olvidado mi contraseña». Quien se registra con email y la
+  olvida no tiene salida (solo entrar con Google).
+- **Cómo**: token de un solo uso y 15 minutos, envío por SMTP (Brevo/Resend tienen plan gratuito),
+  respuesta **siempre 200** para no revelar qué correos existen, `ScopedRateThrottle` encima,
+  plantilla traducida y tests de «token caducado / usado / de otro».
+- **Hecho cuando**: ciclo completo contra un buzón real y el test de enumeración de correos pasa.
+
+### M6 · Migrar el Culo a la capa `salas` · P1
+- **Por qué**: el Culo se quedó con **su propio consumidor y sus propias salas** (241 + 252 líneas)
+  de antes de que existiera `apps/salas/` (202 + 265), que es por donde ya pasan los otros cuatro
+  juegos. Dos caminos para lo mismo es donde se cuelan las diferencias (reconexión, expulsión,
+  reconteo de conectados).
+- **Cómo**: sustituir `apps/culo/{consumers,rooms}.py` por el adaptador de `salas/juegos.py`, como
+  brisca/tute/mus/mentiroso; el motor no se toca.
+- **Hecho cuando**: el e2e de dos navegadores del Culo pasa igual y desaparecen los dos ficheros.
+
+### M7 · Corpus compartido de estados TS/Python · P1
+- **Por qué**: las reglas están escritas **dos veces** (2.362 líneas de motor en TS, 1.794 en
+  Python, más 1.539 y 2.110 de tests portados a mano). Los tests son «los mismos casos» por
+  convención, no por contrato: un arreglo de reglas en un lado no obliga a tocar el otro, y el
+  modo local contra bots puede divergir del servidor sin que nada avise.
+- **Cómo**: `games-fixtures/<juego>.json` con vectores `{estado, acción} → estado esperado`,
+  generados por un script desde el motor de Python y verificados por **las dos** suites. Empezar
+  por Brisca (295 líneas, reglas cerradas).
+- **Hecho cuando**: cambiar una regla sin actualizar los vectores pone rojos ambos tests.
+
+### M8 · Jugar con teclado · P1
+- **Por qué**: la carta es un `<span role="img">` sin `tabindex` y en `features/poker` +
+  `features/games` hay **un solo** `keydown` (el del chat). Los tests de axe pasan porque miran
+  semántica y contraste, no si se puede jugar: hoy hace falta ratón para todo.
+- **Cómo**: carta seleccionable = `<button>` (o `role="button"` + `tabindex="0"` + Enter/Espacio)
+  solo cuando es jugable, `aria-pressed` en las seleccionadas y anillo de foco visible; las mesas,
+  con atajos (1-9 para elegir, Enter para jugar).
+- **Hecho cuando**: una partida entera del Culo y una mano de póker se completan sin ratón, con e2e
+  que lo demuestre.
+
+### M9 · Cerrar flecos de endurecimiento · P1
+- **Por qué**: `check --deploy` deja un aviso real (**falta `XFrameOptionsMiddleware`**, hoy tapado
+  por la cabecera de nginx) y `manage.py spectacular` saca el esquema OpenAPI con **201 errores y
+  106 avisos** (33 y 53 únicos) por vistas sin serializer. Y un detalle al revés: el comentario de
+  `settings.py` dice «empezar con un `max-age` corto hasta comprobar que todo va por HTTPS», pero
+  el **valor por defecto es un año** con `includeSubDomains`: si el primer día el certificado falla,
+  los navegadores se quedan sin poder entrar durante un año. El código contradice a su comentario.
+- **Cómo**: añadir el middleware (`SAMEORIGIN`, que no rompe el iframe del juego, que es del mismo
+  origen), bajar el default de HSTS a 300 s y subirlo cuando HTTPS esté confirmado, y anotar las
+  `APIView` con `extend_schema`.
+- **Hecho cuando**: `check --deploy` sin avisos, HSTS corto de salida y el esquema sin errores.
+  Bonus: con el esquema limpio se pueden **generar los tipos TS** y matar la deriva front/back.
+
+### M10 · Móvil de verdad · P1
+- **Por qué**: Playwright solo tiene proyectos de escritorio (chromium, firefox, webkit, edge) y
+  **cuatro de las cinco mesas no tienen ni una regla `@media`** (brisca, mentiroso, mus y tute;
+  solo el Culo, el hub de juegos, el póker y su historial son responsivos). El enlace se va a abrir
+  desde el móvil.
+- **Cómo**: dos proyectos `iPhone 13` / `Pixel 7` en Playwright con una partida corta cada uno, y
+  maquetación de mesa con `clamp()` en tamaños de carta y la mano en abanico.
+- **Hecho cuando**: las seis mesas se juegan en 390 px de ancho sin scroll horizontal y el e2e
+  móvil pasa.
+
+### M11 · Adelgazar el repositorio · P2
+- **Por qué**: **140 MB versionados**, de los que `juego/raylib-6.0` son **97 MB** (el SDK entero),
+  `juego/web` 14 MB (el WASM compilado, que se sirve en `/game-embed/`), `backend/media` 2,6 MB
+  **con fotos de usuarios** (`WhatsApp_Image_…jpeg`, `shrek.jpg`) y 1,2 MB de `front/pw_game.png`
+  más un `pw_game_check.cjs` sueltos en la raíz del front.
+- **Cómo**: raylib como submódulo o descarga en el build; el WASM, compilado en la imagen (emcc)
+  en vez de versionado; purga del historial de los avatares con `git filter-repo` (es una decisión:
+  los avatares son fotos personales en un repo público, así que también es RGPD); borrar los restos
+  de depuración del front.
+- **Hecho cuando**: `git clone` baja de ~40 MB y el `docker compose up` sigue sirviendo el juego.
+
+### M12 · Dependencias vigiladas · P2
+- **Por qué**: no hay `dependabot.yml` ni Renovate, y el CI no corre `npm audit` ni `pip-audit`:
+  los 12 avisos de M1 llevaban tiempo ahí sin que nada avisara.
+- **Cómo**: Dependabot para npm, pip y las acciones de GitHub (agrupado, semanal) + `npm audit
+  --omit=dev --audit-level=high` y `pip-audit` como paso del CI.
+- **Hecho cuando**: una dependencia vulnerable abre PR sola y el CI se pone rojo.
+
+### M13 · Observabilidad · P2
+- **Por qué**: 5 llamadas a `logger.` en todo el backend, sin id de petición y sin captura de
+  errores. Sentry estaba como «opcional» en el Bloque 4 y con una demo en `localhost` era
+  defendible; con dominio propio y usuarios reales, enterarse de un 500 por un mensaje de Telegram
+  no es un plan.
+- **Cómo**: GlitchTip self-hosted (o Sentry free) con `send_default_pii=False`, id de petición en
+  el log y en la respuesta, y una alerta de «5xx en 5 minutos».
+- **Hecho cuando**: provocar un 500 a propósito deja traza con contexto y dispara la alerta.
+
+### M14 · Higiene de `dist/` y del árbol · P3
+- **Por qué**: `front/dist` pesa **574 MB en 47 carpetas `test-out`** (los tests escriben dentro de
+  `dist/`, al lado del build desplegable, que pesa 4,1 MB). Un `tar` de `dist/` para desplegar se
+  lleva 570 MB de basura.
+- **Cómo**: mover la salida de los tests a `.angular/` o `tmp/`, limpiar `test-out` antes del build
+  y borrar `front/pw_game.png` y `front/pw_game_check.cjs`.
+- **Hecho cuando**: `dist/` solo contiene lo que se publica.
+
+### M15 · Refrescar la tabla de riesgos · P3
+- **Por qué**: la tabla de «Riesgos y decisiones abiertas» ya no refleja el código: **D3** (SQLite
+  vs PostgreSQL) está decidido de facto —`compose.prod.yaml` fuerza Postgres y el `.env` solo
+  mantiene SQLite en desarrollo— y **D1** (el chat) también, porque el chat está arreglado, con
+  tests y con UI. Una tabla de decisiones desactualizada es peor que no tenerla.
+- **Cómo**: cerrar D1 y D3 con la decisión tomada, y dejar abiertas solo D2, D4 y D5.
+- **Hecho cuando**: cada fila de la tabla se puede responder mirando el código.
+
+### Ejecutado y verificado (30-10-2026, misma sesión)
+
+Todo probado con ejecución real, no supuesto.
+
+- **M1 · Angular 20.3.35** (CLI 20.3.42, `ssr` 20.3.42). `npm audit --omit=dev` → **0
+  vulnerabilidades** (antes 12: 7 altas y 1 crítica). Lock regenerado con el npm 10 de la imagen.
+  Build sin avisos, **184 unitarios**, **61/61 e2e**.
+- **M3 · Copias probadas.** `scripts/restaurar.sh` levanta un Postgres desechable, restaura el
+  volcado, comprueba que trae esquema (**23 tablas**) y compara recuentos con la base viva. Probado
+  con la copia de hoy, sin errores y con los recuentos cuadrando.
+- **M4 · CI que prueba lo que se despliega.** Job `backend-postgres` (suite completa contra
+  PostgreSQL: **394 tests OK**, 6 saltados), job `stack` (construye las imágenes y corre los dos e2e
+  de multijugador contra nginx y el WebSocket), `makemigrations --check` y auditorías de
+  dependencias en los dos jobs.
+- **M9 · Endurecimiento.** `XFrameOptionsMiddleware` de vuelta con `DENY`; la vista del juego queda
+  exenta (su protección es la CSP `frame-ancestors`) y el borde nginx oculta la cabecera duplicada
+  en `/api/`. `check --deploy` ya no da **ningún** aviso de seguridad.
+- **M12 · Dependencias vigiladas.** `.github/dependabot.yml` (npm agrupado por Angular, pip, docker y
+  actions) y `pip-audit` / `npm audit --audit-level=high` como pasos del CI.
+- **M14 · Higiene.** `dist/` pasa de **574 MB a 4,1 MB** (un `posttest` limpia `test-out`),
+  `front/pw_game.png` borrado y `pw_game_check.cjs` movido a `scripts/verificar_juego.cjs`.
+- **M15 · Tabla de riesgos** al día.
+
+**Dos hallazgos que no estaban en el informe y también se arreglaron:**
+
+1. **El backend tenía 115 vulnerabilidades conocidas en 5 paquetes**, incluida **PyJWT** (la
+   librería de los JWT) y Django 4.2.13. Subidos a Django 4.2.30, DRF 3.15.2, PyJWT 2.15.0,
+   requests 2.33.0 y daphne 4.2.2: **quedan 14 coincidencias (5 avisos únicos)**. Salen del árbol con
+   la M16. Por el camino apareció que **asgiref ≥3.8** rompe los tests de WebSocket (ata un
+   `asyncio.Lock` al bucle de eventos): fijada la 3.7.2 con la explicación en `requirements.txt`.
+2. **El despliegue a PostgreSQL estaba roto.** `DB_NAME` significaba dos cosas (el fichero de SQLite
+   y el nombre de la base de PostgreSQL) y el `.env` traía `DB_NAME=/app/db.sqlite3`: como
+   `compose.prod.yaml` solo cambiaba el motor, producción habría intentado abrir una base llamada
+   `/app/db.sqlite3` y no arrancaba. Separado en `SQLITE_PATH` (SQLite) y `DB_NAME` (PostgreSQL), con
+   el compose de producción fijando el nombre.
+
+### M2 (a medias) · `public_api` cubierto · 30-10-2026
+
+`apps/public_api` era el módulo peor cubierto y justo el que recibió el arreglo de permisos del
+16-10. Ahora tiene **31 tests** en `apps/public_api/tests/test_views.py` y la cobertura del módulo
+pasa del **43 % al 89 %** (`views.py`), **92 %** contando todo el paquete:
+
+- Autenticación: sin clave, clave inventada, clave revocada, y que solo se guarde el **hash**
+  (la clave en claro se ve una vez y no se puede releer).
+- Gestión de claves: crear (devuelve el texto una vez), listar solo las propias, borrar solo las
+  propias (404 en las ajenas) y que gestionarlas exija JWT, no una clave de API.
+- **Permisos por recurso** (la regresión del 16-10): editar o borrar una partida o un torneo
+  ajeno devuelve **403** y no toca nada; el listado de usuarios no lleva emails.
+- Paginación, filtros por estado y clasificación (orden por ELO y porcentaje de victorias).
+
+**Un fallo real encontrado al escribir los tests**: `?page=abc` (o `limit=abc`) llegaba a `int()`
+sin capturar y devolvía **500** en una API pública. Ahora responde **400** con un mensaje
+traducible.
+
+Sigue pendiente de M2: `apps/poker/consumers.py` (41 %), `apps/users/views.py` (54 %) y
+`auth_views.py` (57 %).
+
+### M2 (más) · `poker/consumers` por el WebSocket real · 30-10-2026
+
+Los tests que había del consumidor usaban dobles (`FakeConsumer`, `FakeChannelLayer`), así que
+`connect`, `receive` y todo el emparejamiento **no se ejecutaban nunca**. Ahora hay **26 tests**
+en `apps/poker/tests/test_consumers_ws.py` que hablan WebSocket de verdad con
+`WebsocketCommunicator` contra la app ASGI, y el módulo pasa del **41 % al 96 %**:
+
+- Cierres de autenticación: sin token → 4401, token basura → 4401, mesa inexistente → 4404.
+- La vista de cada asiento: el jugador ve sus dos cartas y del rival solo sabe cuántas tiene
+  (`hole: None`, `hole_count: 2`); el **espectador** entra con `you: null` y sin ver ninguna.
+- Validación en el servidor: acción sin nombre, importe no numérico y **jugar fuera de turno**.
+- Chat: llega a los dos, se recorta a 200, el vacío no se envía y dos seguidos chocan con el freno.
+- Emparejamiento: `ready` con niveles y tamaños, `?size=` (y lo raro cae al valor por defecto),
+  cambio de nivel, `cancel`, **dos que piden lo mismo acaban en la misma mesa**, **tamaños
+  distintos no se mezclan** y, si nadie aparece, la mesa se completa **con bots**.
+
+**Segundo fallo real encontrado**: al emparejar se mandaba a todos la misma lista de rivales
+(`nombres`), así que a quien ya estaba esperando le llegaba **su propio nombre** como oponente.
+Ahora cada uno recibe el nombre del otro (y «los bots» cuando no hay humano).
+
+Sigue pendiente de M2: `apps/users/views.py` (54 %) y `apps/users/auth_views.py` (57 %).
+
+### M2 (cerrado) · `users`: perfil, avatares y autenticación · 30-10-2026
+
+Los dos módulos de `apps/users` tenían sin cubrir justo lo delicado: la validación del avatar
+(que se añadió el 16-10 porque se podía subir un `.txt` o un `.html` al directorio público) y la
+rotación del refresh. Ahora hay **40 tests** en `apps/users/tests_perfil_y_auth.py` y quedan al
+**88 %** (`views.py`) y **99 %** (`auth_views.py`).
+
+- **Avatares**: un PNG válido se guarda; un `.html` con `content-type: image/png` se rechaza
+  (se mira el contenido con PIL, no la cabecera); más de 2 MB se rechaza con su mensaje; sin
+  fichero, 400; y el mismo filtro vale en `update_profile`.
+- **Perfil**: cambiar de nombre a uno cogido da 400, ponerte el tuyo no es error, tu email no
+  viaja en la ficha de otro, escribir o borrar la cuenta ajena da **404** (el IDOR del 16-10) y
+  borrar la propia funciona.
+- **Estadísticas**: racha de victorias **consecutivas y solo puntuables**, balance y porcentaje
+  desde el perfil, clasificación por ELO y el 404 de un usuario que no existe.
+- **Historial**: resultado y marcador **desde el lado del jugador** (la misma partida se ve 3-1 o
+  1-3 según quién pregunte), empates, paginación y 404.
+- **Autenticación**: entrar con email o con nombre de usuario, contraseña mal y usuario
+  inexistente dan el mismo 401, registro con perfil y tokens, contraseña débil contra los
+  validadores, **rotación real del refresh** (reutilizar el anterior es 401), logout que revoca,
+  y Google: sin credencial, sin configurar (503), token rechazado (401), correo sin verificar
+  (400), usuario nuevo sin contraseña usable y nombre único cuando ya está cogido.
+
+Sigue fuera de esta lista, aunque también esté bajo: `apps/users/leaderboard_views.py` (32 %,
+22 sentencias, el `/api/leaderboard/` público).
+
+### M5 · Recuperar la contraseña · ✅ hecho (30-10-2026)
+
+No existía: quien se registraba con email y la olvidaba se quedaba fuera de su cuenta para
+siempre. Ahora el ciclo completo funciona, verificado contra el stack de verdad.
+
+- **Token**: el de Django (`default_token_generator`), con `PASSWORD_RESET_TIMEOUT=900` (15
+  minutos). Deja de valer en cuanto cambia la contraseña, así que el «un solo uso» sale gratis y
+  no hay tabla que limpiar.
+- **Pedir el enlace** (`POST /api/auth/password-reset/`): responde **siempre** lo mismo, exista o
+  no la cuenta, y si el SMTP falla se apunta en el log y se contesta igual. Sin eso, el endpoint
+  servía para averiguar qué correos están registrados. Límite propio: 5 por hora.
+- **Canjear** (`POST /api/auth/password-reset/confirm/`): valida el enlace, pasa la contraseña por
+  los validadores de Django y **cierra todas las sesiones abiertas** (marca en la lista negra los
+  refresh emitidos). Cambiar la contraseña tiene que echar también a quien estuviera dentro.
+- **Front**: `/forgot-password` (formulario + mensaje neutro) y `/reset-password?uid=…&token=…`
+  (contraseña y repetición, aviso si no coinciden, y si el enlace no trae los parámetros lo dice en
+  vez de enseñar un formulario inútil). Enlace «¿Olvidaste tu contraseña?» en el login.
+- **Traducciones**: 17 claves nuevas en es/en/fr y, de paso, los **6 mensajes de la API que nunca se
+  habían traducido** (los de la auditoría del 16-10 y los del avatar): `makemessages` los sacó y
+  ahora los tres idiomas están al 100 %.
+- **Verificado**: 12 tests del backend (incluye caducidad, token inventado, `uid` manipulado,
+  contraseña débil, límite de peticiones y revocación de sesiones), 5 e2e nuevos (11/11 en
+  `auth.spec.ts`) y el ciclo real contra el stack: pedir → leer el enlace del correo de consola →
+  canjear (200) → entrar con la nueva (200) → la vieja ya no vale (401) → reutilizar el enlace (400).
+
+**Hallazgo de despliegue que salió por el camino**: al recrear el contenedor del backend, **nginx
+se queda con la IP vieja** (resuelve `backend` al arrancar) y el sitio entero empieza a dar **502**
+hasta que alguien recarga el borde. Pasó de verdad al probar esto. `scripts/deploy.sh` ahora
+recarga nginx justo después de `up -d --build`.
+
+**Para el servidor**: `EMAIL_BACKEND` de SMTP (Brevo/Resend/SES), `DEFAULT_FROM_EMAIL` y
+`FRONTEND_URL` con el dominio público — sin cambiar `FRONTEND_URL`, el enlace del correo apunta a
+`localhost:4200`. Está documentado en `.env.example`.
+
+### M8 · Jugar con teclado · ✅ cerrado (30-10-2026) — y era una falsa alarma
+
+El informe decía «la carta es `role="img"` sin `tabindex`, no se puede jugar sin ratón». **Era
+mentira**, y la culpa fue de mirar el componente aislado en vez de las mesas: `app-playing-card`
+es la **cara** de la carta (una imagen con su `aria-label`), y la selección la hace el botón que la
+envuelve. En las cinco mesas, cada carta de la mano va dentro de un `<button type="button">` con
+`aria-label` traducido, `aria-pressed` donde toca y `disabled` cuando no es tu turno. El foco,
+además, ya tenía un aro:
+
+```scss
+:focus-visible { outline: 2px solid var(--color-neon-cyan); outline-offset: 2px; }
+```
+
+Lo que faltaba era **probarlo**, no arreglarlo. `e2e/culo.spec.ts` tiene ahora «se juega una carta
+con el teclado, sin ratón»: enfoca una carta, la marca con **Intro** (comprueba `aria-pressed`),
+lleva el foco al botón de jugar y **juega** con Intro, y verifica que la mesa cambió. Pasa.
+
+Lo único que queda como extra opcional (P3, no estaba en la lista): **atajos** 1-9 para elegir
+carta y Intro para jugar, que en una partida rápida se agradecen aunque no hagan falta para ser
+accesible.
+
+### M16 · Django 5.2 + DRF 3.18 · P1
+- **Por qué**: los 14 avisos que quedan en el backend no se pueden cerrar dentro de la LTS 4.2. El de
+  Django pide 5.2.17 o 6.0.8, y **DRF 3.18 exige `django>=5.2`** (comprobado en su metadata: al
+  intentar instalarlo, pip desinstala Django 4.2 y deja el contenedor sin `django.utils`).
+- **Qué hay que tocar**: `django-csp` 4.0 (pensado para 4.2/5.0), `drf-spectacular` 0.27 (su
+  integración con DRF 3.17+ cambia), `simplejwt` 5.5.1 y el `DEFAULT_AUTO_FIELD`/`STORAGES` del
+  settings. No es un `pip install`: es una migración con su propio pase de tests.
+- **Cómo**: rama aparte; subir Django y DRF juntos; pasar **394 tests** en SQLite y en PostgreSQL,
+  los 61 e2e y `check --deploy`; revisar a mano el esquema OpenAPI (que ya viene incompleto, ver M9).
+- **Hecho cuando**: `pip-audit -r requirements.txt` → **0**, y las dos suites y el e2e en verde.
+
 ## Trazabilidad con la evaluación
 
 | Módulo declarado | Qué lo refuerza |
@@ -1363,13 +1741,13 @@ número de tests.
 
 ## Riesgos y decisiones abiertas
 
-| ID | Decisión | Opciones | Impacto |
+| ID | Decisión | Estado | Detalle |
 |---|---|---|---|
-| D1 | ¿Se queda el chat? | (a) arreglar + UI, (b) retirarlo | Bloque 1: 2 h vs 10–14 h |
-| D2 | Resultados de torneo | (a) doble confirmación (rápido), (b) mesa de póker autoritativa (5.1) | 3–5 h vs 6–8 h |
-| D3 | Base de datos | (a) seguir con SQLite (simple), (b) PostgreSQL | 4.2: 3–4 h; con SQLite, evitar varias réplicas |
-| D4 | ¿Cuántas réplicas? | si es 1, Redis (4.1) puede esperar | 6–8 h |
-| D5 | ¿Se retira el modo local? | mantenerlo como «modo local» es defendible y ya funciona | 0 h |
+| D1 | ¿Se queda el chat? | **cerrada: se queda** | Arreglado y con UI (buscador, enlace en cabecera), `send_message` como único camino de escritura y 11 tests del servicio en el front |
+| D2 | Resultados de torneo | **cerrada: (a)** | Doble confirmación implementada: un resultado declarado por el rival no avanza solo (e2e `tournaments.spec.ts`) |
+| D3 | Base de datos | **cerrada: PostgreSQL** | `compose.prod.yaml` fuerza `DB_ENGINE=django.db.backends.postgresql`; SQLite queda solo para desarrollo y tests. Falta correr la suite contra Postgres en el CI (M4) |
+| D4 | ¿Cuántas réplicas? | **abierta** | Si es 1, Redis (4.1) puede esperar |
+| D5 | ¿Se retira el modo local? | **abierta** | Mantenerlo como «modo local» es defendible y ya funciona |
 
 ## Orden recomendado
 
@@ -1377,3 +1755,7 @@ número de tests.
 **Semana 2 (dejarlo defendible y desplegable):** 2.3 → 2.4 → 3.2 → 3.4 → 4.2 → 4.3 → (4.1 si hay réplicas) → 4.4.
 **Después (producto):** 5.1 → 5.3 → 5.2 → 5.4 → 5.5 → Bloque 6 → Bloque 7.
 **Juegos nuevos (decidido 14-10-2026):** Bloque 8 — 8.1 Mentiroso → 8.2 Brisca → 8.3 Tute → 8.4 Mus.
+**Antes de dar la URL (auditoría del 30-10-2026):** ✅ M1 · ✅ M3 · ✅ M4 · ✅ M12 · ✅ M14 · ✅ M15 ·
+🟡 M9 (hecho el middleware, queda el esquema OpenAPI). Siguen: **M16** (Django 5.2, lo que cierra los
+últimos avisos) → M2 (cobertura crítica) → M5 (contraseña) → M8 (teclado) → M10 (móvil). Después,
+arquitectura y limpieza: M6 → M7 → M11 → M13.

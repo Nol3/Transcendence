@@ -151,4 +151,42 @@ test.describe('Culo', () => {
       .map((v) => `${v.id} x${v.nodes.length}`);
     expect(graves, `violaciones en la mesa del Culo: ${graves.join(', ')}`).toEqual([]);
   });
+
+  test('se juega una carta con el teclado, sin ratón', async ({ page }) => {
+    await spaNavigate(page, '/culo');
+    await page.locator('.modo__local button').click();
+    await expect(page.locator('.mesa')).toBeVisible();
+
+    // Se espera a que sea mi turno (es cuando las cartas se activan).
+    const pasar = page.locator('.controles__botones button').nth(1);
+    await expect(pasar).toBeEnabled({ timeout: 30000 });
+
+    // El foco entra en la carta como lo haría el tabulador, y se marca con Intro.
+    const carta = page.locator('.mano__carta:not([disabled])').first();
+    await carta.focus();
+    expect(
+      await page.evaluate(() => document.activeElement?.classList.contains('mano__carta')),
+    ).toBe(true);
+    await page.keyboard.press('Enter');
+    // `aria-pressed` ya se anunciaba al lector de pantalla; ahora se llega sin clic.
+    await expect(carta).toHaveAttribute('aria-pressed', 'true');
+
+    // Y la jugada entera: foco en el botón de jugar (o pasar) e Intro.
+    const antes = await page.locator('.mano__carta').count();
+    const jugar = page.locator('.controles__botones button').nth(0);
+    const boton = (await jugar.isEnabled()) ? jugar : pasar;
+    await boton.focus();
+    await page.keyboard.press('Enter');
+
+    await expect
+      .poll(
+        async () => {
+          const enMesa = await page.locator('.jugada__cartas app-playing-card').count();
+          const enMano = await page.locator('.mano__carta').count();
+          return enMesa > 0 || enMano < antes;
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
+  });
 });

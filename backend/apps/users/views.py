@@ -28,11 +28,11 @@ def _revisar_avatar(fichero) -> str | None:
     """
     if fichero.size > AVATAR_MAX_BYTES:
         megas = AVATAR_MAX_BYTES // (1024 * 1024)
-        return _("El avatar no puede pasar de %(mb)s MB") % {"mb": megas}
+        return _("The avatar cannot be larger than %(mb)s MB") % {"mb": megas}
     try:
         Image.open(fichero).verify()
     except Exception:
-        return _("El avatar tiene que ser una imagen (JPEG, PNG, WebP o GIF)")
+        return _("The avatar must be an image (JPEG, PNG, WebP or GIF)")
     finally:
         fichero.seek(0)
     return None

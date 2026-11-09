@@ -72,6 +72,20 @@ export class AuthService {
     }
   }
 
+  /** Pide el enlace de recuperación. El servidor responde igual exista o no la cuenta. */
+  requestPasswordReset(email: string) {
+    return this.api.post<{ message: string }>('/auth/password-reset', { email });
+  }
+
+  /** Canjea el enlace del correo por una contraseña nueva. */
+  resetPassword(uid: string, token: string, password: string) {
+    return this.api.post<{ message: string }>('/auth/password-reset/confirm', {
+      uid,
+      token,
+      password,
+    });
+  }
+
   login(email: string, password: string) {
     this._loading.set(true);
     return this.api

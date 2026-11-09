@@ -34,7 +34,9 @@
       "minlength": "Minimum {{n}} caractères",
       "maxlength": "Maximum {{n}} caractères",
       "loginFailed": "Connexion impossible. Vérifie tes identifiants.",
-      "registerFailed": "La création du compte a échoué. Réessaie."
+      "registerFailed": "La création du compte a échoué. Réessaie.",
+      "email": "Cet e-mail ne semble pas valide",
+      "generic": "Quelque chose s'est mal passé. Réessayez."
     },
     "login": {
       "title": "Connexion",
@@ -44,7 +46,8 @@
       "noAccount": "Pas de compte ? S'inscrire",
       "subtitle": "Saisis tes identifiants pour continuer",
       "emailPlaceholder": "joueur@exemple.com",
-      "noAccountShort": "Pas de compte ?"
+      "noAccountShort": "Pas de compte ?",
+      "forgot": "Mot de passe oublié ?"
     },
     "register": {
       "title": "Inscription",
@@ -56,6 +59,24 @@
       "subtitle": "Crée ton profil de joueur",
       "usernamePlaceholder": "joueur_un",
       "hasAccountShort": "Déjà un compte ?"
+    },
+    "forgot": {
+      "title": "Récupérer l'accès",
+      "subtitle": "Nous vous envoyons un lien pour définir un nouveau mot de passe.",
+      "submit": "Envoyer le lien",
+      "sent": "Si cet e-mail est enregistré, nous vous avons envoyé un lien. Il expire dans 15 minutes.",
+      "back": "Retour à la connexion"
+    },
+    "reset": {
+      "title": "Nouveau mot de passe",
+      "subtitle": "Choisissez un mot de passe que vous n'utilisez nulle part ailleurs.",
+      "repeat": "Répétez le mot de passe",
+      "submit": "Changer le mot de passe",
+      "ok": "Mot de passe modifié. Vous pouvez maintenant vous connecter.",
+      "invalid": "Ce lien n'est plus valide : il a expiré ou a déjà été utilisé.",
+      "askNew": "Demander un autre lien",
+      "goLogin": "Aller à la connexion",
+      "mismatch": "Les mots de passe ne correspondent pas"
     }
   },
   "game": {

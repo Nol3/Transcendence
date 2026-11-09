@@ -393,6 +393,11 @@ class TableRegistry:
     def all(self) -> list[PokerTable]:
         return list(self._tables.values())
 
+    def clear(self) -> None:
+        """Vacía el registro (tests y apagado). Cancela los temporizadores de cada mesa."""
+        for table_id in list(self._tables):
+            self.drop(table_id)
+
 
 registry = TableRegistry()
 

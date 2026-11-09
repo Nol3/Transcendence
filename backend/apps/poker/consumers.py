@@ -254,10 +254,11 @@ class PokerMatchmakingConsumer(AuthedConsumer):
                 (e["user_id"], e["username"], e["channel"]) for e in grupo
             ]
             table = self._create_table(stake=self.stake, humanos=humanos, bots=0)
-            nombres = ", ".join(n for _, n, _ in humanos[1:])
+            # El nombre del rival es **distinto para cada uno**: antes se mandaba la misma
+            # lista a todos y a quien ya estaba esperando le llegaba su propio nombre.
             for _, _, canal in humanos:
-                await self._notify_match(canal, table, nombres,
-                                         f"Emparejado con {nombres}")
+                rival = ", ".join(n for _, n, c in humanos if c != canal)
+                await self._notify_match(canal, table, rival, f"Emparejado con {rival}")
             self.table_id = table.id
         else:
             await self.queue.join({
@@ -306,9 +307,9 @@ class PokerMatchmakingConsumer(AuthedConsumer):
         ]
         bots = self.size - len(humanos)
         table = self._create_table(stake=self.stake, humanos=humanos, bots=bots)
-        nombres = ", ".join(n for _, n, _ in humanos[1:]) or "los bots"
         for _, _, canal in humanos:
-            await self._notify_match(canal, table, nombres,
+            rival = ", ".join(n for _, n, c in humanos if c != canal) or "los bots"
+            await self._notify_match(canal, table, rival,
                                      "Nadie apareció: completamos la mesa con bots")
 
     def _create_table(self, stake: str, humanos: list[tuple], bots: int) -> PokerTable:

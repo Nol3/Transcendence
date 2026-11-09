@@ -1,17 +1,22 @@
-Django==4.2.13
-djangorestframework==3.14.0
+Django==4.2.30
+djangorestframework==3.15.2
 djangorestframework-simplejwt==5.5.1
 drf-spectacular==0.27.0
 django-cors-headers==4.9.0
 # Cabeceras de seguridad: el middleware de `csp` envía la Content-Security-Policy.
 django-csp==4.0
 python-decouple==3.8
-PyJWT==2.12.1
+PyJWT==2.15.0
 gunicorn==23.0.0
 Pillow>=10.3.0
-requests==2.32.3
-daphne==4.2.1
+requests==2.33.0
+daphne==4.2.2
 channels==4.1.0
+# asgiref 3.8+ ata un `asyncio.Lock` al bucle de eventos en su ThreadSensitiveContext, y los
+# tests de WebSocket de los juegos (que abren un bucle por test con WebsocketCommunicator)
+# fallan con «is bound to a different event loop». Se fija la última 3.7, que es la que traía
+# la imagen que funcionaba, hasta migrar esos tests a un solo bucle.
+asgiref==3.7.2
 channels-redis==4.2.1
 # redis-py 8 usa RESP3 por defecto y channels-redis 4.2.1 revienta al parsearlo
 # ("int is not allowed for map key when strict_map_key=True" y timeouts de lectura

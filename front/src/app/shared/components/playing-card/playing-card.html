@@ -1,5 +1,6 @@
 <span class="pc"
-      [class]="'pc--' + size() + ' pc--' + state() + (faceDown() || !esValida() ? ' pc--dorso' : '')"
+      [class]="'pc--' + size() + ' pc--' + state() + ' pc--baraja-' + deck()
+        + (faceDown() || !esValida() ? ' pc--dorso' : '')"
       [style.--pc-orden]="order()"
       role="img"
       [attr.aria-label]="faceDown() || !esValida()

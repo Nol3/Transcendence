@@ -51,6 +51,9 @@ services:
       # Los secretos vienen del .env del servidor (ver backend/.env.production.example).
       - USE_VAULT=false
       - DB_ENGINE=django.db.backends.postgresql
+      # También el nombre: el `.env` de desarrollo lo apunta al fichero de SQLite y, sin esto,
+      # producción intentaba abrir una base llamada `/app/db.sqlite3`.
+      - DB_NAME=${DB_NAME_POSTGRES:-transcendence}
       # Para que el esquema que se publica en /api/docs/ diga la verdad.
       - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-https://example.com}
     depends_on: !override
