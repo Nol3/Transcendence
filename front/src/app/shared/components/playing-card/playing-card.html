@@ -2,6 +2,11 @@
       [class]="'pc--' + size() + ' pc--' + state() + ' pc--baraja-' + deck()
         + (faceDown() || !esValida() ? ' pc--dorso' : '')"
       [style.--pc-orden]="order()"
+      (pointermove)="alMover($event)"
+      (pointerdown)="alPulsar($event)"
+      (pointerup)="alSalir()"
+      (pointercancel)="alSalir()"
+      (pointerleave)="alSalir()"
       role="img"
       [attr.aria-label]="faceDown() || !esValida()
         ? ('poker.card.hidden' | translate)

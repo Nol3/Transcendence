@@ -343,7 +343,10 @@ export class PokerService {
     this.http.get<{ count: number; results: LiveTable[] }>(`${environment.apiUrl}/poker/tables/`)
       .subscribe({
         next: (res) => this.liveTables.set(res.results ?? []),
-        error: () => this.liveTables.set([]),
+        // Si falla un **refresco** no se vacía la lista: se queda lo último que se supo. Vaciarla
+        // hacía que el lobby dijera «no hay mesas» por un parpadeo de red y que la lista se
+        // rehiciera entera cada pocos segundos (los botones se desmontaban a media pulsación).
+        error: () => undefined,
       });
   }
 

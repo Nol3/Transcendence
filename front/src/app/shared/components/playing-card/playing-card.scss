@@ -1,6 +1,15 @@
 // Cartas de la baraja. Dos mazos con acabados distintos: el póker usa el arte de Balatro
 // (suave, con sombra difuminada) y el resto, la baraja española en pixel art. Los dos entran
 // repartidos uno tras otro, se levantan al pasar por encima y se hunden al pulsarlos.
+// Los valores que maneja el componente (inclinación y posición del brillo) viven en el **host**:
+// si se declararan en `.pc`, taparían lo que el componente escribe al mover el puntero.
+:host {
+  --pc-rx: 0deg;
+  --pc-ry: 0deg;
+  --pc-luz-x: 50%;
+  --pc-luz-y: 50%;
+}
+
 .pc {
   position: relative;
   display: inline-block;
@@ -8,11 +17,30 @@
   height: 61px;
   border-radius: 4px;
   transform-origin: 50% 90%;
+
+  // ── Movilidad ────────────────────────────────────────────────────────────────────────────
+  // La carta se inclina hacia el dedo (`--pc-rx/ry`, los pone el componente **en el host**) y se
+  // levanta al pasar por encima. Todo va en variables para que un solo `transform` componga las
+  // tres cosas: si se declarara por separado, la última pisaría a las demás.
+  --pc-alza: 0px;
+  --pc-escala: 1;
+  --pc-brillo: 0;
+
+  transform:
+    perspective(700px)
+    translateY(var(--pc-alza))
+    rotateX(var(--pc-rx))
+    rotateY(var(--pc-ry))
+    scale(var(--pc-escala));
+  // Muelle corto: responde al momento pero no da tirones. El mod usa algo parecido y, con el dedo,
+  // una transición larga se siente como si la carta fuese con retraso.
+  transition: transform 120ms cubic-bezier(0.2, 0.9, 0.25, 1.15);
+  will-change: transform;
+
   // Cada carta entra un poco después que la anterior: eso es lo que hace que el reparto
   // se sienta como un reparto y no como un parpadeo.
   animation: pc-repartir 260ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
   animation-delay: calc(var(--pc-orden, 0) * 70ms);
-  transition: transform 140ms ease;
 
   &__cara {
     display: block;
@@ -43,10 +71,13 @@
   &--lg { width: 64px; height: 85px; }
   &--xl { width: 89px; height: 118px; }
 
-  // Se levanta al pasar por encima, con un pelín de giro: la carta «pesa».
+  // Se levanta al pasar por encima. El levantamiento grande lo hace el botón que la envuelve en
+  // las mesas (10 px); aquí solo se añade un pelín, para no sumar dos saltos.
   &:hover {
+    --pc-alza: -2px;
+    --pc-escala: 1.04;
+    --pc-brillo: 0.45;
     z-index: 3;
-    transform: translateY(-7px) rotate(-1.5deg) scale(1.05);
 
     .pc__cara {
       filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.55)) brightness(1.08);
@@ -55,7 +86,26 @@
 
   // Y se hunde al pulsarla.
   &:active {
-    transform: translateY(-2px) scale(0.97);
+    --pc-alza: -1px;
+    --pc-escala: 0.97;
+  }
+
+  // Brillo que sigue al dedo. Solo en el mazo de Balatro: su arte es suave y aguanta el reflejo;
+  // en la baraja española (pixel art) un degradado encima la enturbia.
+  &--baraja-poker::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      circle at var(--pc-luz-x) var(--pc-luz-y),
+      rgba(255, 255, 255, 0.55),
+      rgba(255, 255, 255, 0) 58%
+    );
+    opacity: var(--pc-brillo);
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+    transition: opacity 160ms ease;
   }
 
   // Le toca hablar a este jugador.
@@ -112,5 +162,7 @@
     &:active { transform: none; }
   }
 
+  // Sin movimiento no hay inclinación ni brillo que persiga al dedo.
+  .pc::after { display: none; }
   .pc--winner { animation: none; }
 }

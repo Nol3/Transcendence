@@ -31,6 +31,11 @@
 
 services:
   backend:
+    # El `.env` del **servidor** es uno solo, el de la raíz: compose ya lo lee para sustituir
+    # `${...}` (contraseña de Postgres incluida) y con `env_file` llega también al contenedor.
+    env_file: !override
+      - path: .env
+        required: false
     # `!override` sustituye la lista entera de volúmenes: fuera el bind mount del
     # código, dentro lo que sí es dato (el juego C/WASM, las credenciales de Vault y
     # los ficheros que suben los usuarios).

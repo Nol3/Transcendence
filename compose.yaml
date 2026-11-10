@@ -13,19 +13,17 @@ services:
     # El `.env` entra por aquí, no dentro de la imagen: así el fichero del host manda en tiempo
     # de ejecución (en el servidor será el de producción) y la imagen no lleva secretos.
     # `required: false` para que un stack sin ese fichero arranque igual con lo de `environment:`.
-    # El `.env` del servidor es **uno solo**, el de la raíz: compose ya lo lee para sustituir
-    # `${...}` (contraseña de Postgres incluida), y con esto llega también al contenedor. El de
-    # `backend/.env` se queda como atajo de desarrollo: si existe, manda sobre el de la raíz.
+    # En desarrollo manda `backend/.env`. El `.env` de la raíz lo añade el overlay de producción
+    # (`compose.prod.yaml`): es otro fichero, con otros valores (DEBUG=false, Postgres…), y meterlo
+    # también aquí hacía que el contenedor de desarrollo arrancase como si fuese producción.
     env_file:
-      - path: .env
-        required: false
       - path: backend/.env
         required: false
     environment:
-      # OJO: settings.py lee DJANGO_DEBUG (no DEBUG). Al pasar solo DEBUG, el
-      # contenedor caía al fichero .env y podía arrancar con DEBUG=True.
-      - DJANGO_DEBUG=${DJANGO_DEBUG:-false}
-      - DEBUG=${DJANGO_DEBUG:-false}
+      # `DJANGO_DEBUG` **no** se fija aquí: lo pone el fichero `.env` de cada entorno (en
+      # desarrollo `backend/.env` dice true; el overlay de producción lo fuerza a false). Si se
+      # fijara aquí con `${DJANGO_DEBUG}`, se leería el `.env` de la raíz —que es el de
+      # producción— y el stack de desarrollo arrancaría redirigiendo a HTTPS.
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - DB_ENGINE=${DB_ENGINE}

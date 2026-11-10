@@ -76,9 +76,18 @@ rondas, móvil para cada jugador— sobre el acabado de las cartas.
 - **En contra:** sin el trabajo de A/B las cartas siguen pareciendo una web.
 - **Coste:** medio (3-4 tandas), pero **no se pisa** con A/B: se puede hacer en paralelo.
 
-**Recomendación:** **B + C a la vez**, y luego subir a A por partes (la inclinación y el abanico son
-lo que más se nota; las partículas y el CRT son lo último). Con B+C el juego ya se siente móvil y se
-juega en grupo; A se añade encima sin rehacer nada.
+**Recomendación adoptada (10-11-2026): B + C a la vez**, y luego subir a A por partes (la
+inclinación y el abanico son lo que más se nota; las partículas y el CRT son lo último). Con B+C el
+juego ya se siente móvil y se juega en grupo; A se añade encima sin rehacer nada.
+
+### Decisiones tomadas (10-11-2026)
+
+| Pregunta | Decisión |
+|---|---|
+| ¿A, B o C? | **B + C**, y después A por partes |
+| ¿Dónde se juega? | **Cada uno en su móvil** (Kahoot). No hay pantalla común |
+| Jugadores por sala | **2 a 6** |
+| Baraja | **Se mantiene la de Balatro** (pixel art de la baraja francesa) |
 
 ---
 
@@ -160,10 +169,22 @@ Cada fase es desplegable por sí sola y deja la `main` intacta (se trabaja en `p
 **Lo que no se copia:** ni una línea de Lua, ni arte, ni sonidos del juego. La baraja ya está
 compuesta en el repo y el resto es CSS/TS propio.
 
-## Decisiones que hacen falta antes de empezar
+## Hecho ya (primera pasada de movilidad, 10-11-2026)
 
-1. **¿A, B o C?** (recomendación: B+C y luego A por partes).
-2. **¿La partida se ve en el móvil de cada uno (como Kahoot) o en una pantalla común?** Cambia F5:
-   con pantalla común hace falta una vista «mesa grande» sin controles.
-3. **¿Cuántos jugadores por sala como máximo?** Hoy 4-6 según el juego; afecta al tamaño de carta.
-4. **¿Idioma del arte?** La baraja es de Balatro; si algún día se publica, conviene arte propio.
+Lo mínimo para que la carta deje de ser una imagen: **inclinación 3D hacia el dedo, brillo que
+sigue al puntero y muelle en los cambios de estado**, en el componente `playing-card` (común a los
+seis juegos, sin tocar cada mesa).
+
+- `--pc-rx` / `--pc-ry`: inclinación de **±7°** con ratón y **±4°** con el dedo, con el
+  desplazamiento **limitado a ±1** antes de pasarlo a grados (sin eso, en los bordes la carta se
+  deforma en un paralelogramo; es el mismo bug que arreglaron en el mod).
+- `--pc-luz-x/y`: el brillo (`::after`, `soft-light`) sigue al puntero. Solo en el mazo de Balatro:
+  sobre el pixel art de la baraja española un degradado lo enturbia.
+- Muelle de **120 ms** (`cubic-bezier(.2,.9,.25,1.15)`) y elevación pequeña en la carta, porque el
+  levantamiento grande ya lo hace el botón de la mano (10 px) — si sumaran, daría un salto doble.
+- **`prefers-reduced-motion`**: sin inclinación, sin brillo y sin animaciones.
+- Probado con `e2e/cartas.spec.ts`: la carta se inclina al mover el puntero, vuelve a plana al
+  salir, y con movimiento reducido no se mueve.
+
+Pendiente de esta familia (fases siguientes): el **abanico** de la mano (F2), los **gestos** (F3) y
+las **partículas/CRT** (F6).

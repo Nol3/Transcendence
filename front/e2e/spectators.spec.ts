@@ -22,7 +22,12 @@ import {
  * poder actuar y con chat de mesa— está en `scripts/audit/probe_spectators.py`,
  * que habla con el servidor de verdad (12/12).
  */
-test.describe('Espectadores — lobby y entrada', () => {
+// FIXME: estos dos tests **nunca iniciaban sesión** (`setAuthToken` es un no-op y el lobby del
+// póker pide cuenta), así que pasaban solo cuando el servidor de verdad tenía mesas abiertas de
+// otros tests: dependían del estado ambiente. El modo espectador está cubierto de verdad por
+// `scripts/audit/probe_spectators.py` (12/12 contra el servidor real). Hay que reescribirlos con
+// `bootAuthenticated` y un mock que case (`**/poker/tables/`), no con el estado del proceso.
+test.describe.fixme('Espectadores — lobby y entrada', () => {
   test.beforeEach(async ({ page }) => {
     await setAuthToken(page);
     await mockAuthMe(page);

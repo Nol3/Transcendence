@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input } from '@angular/core';
 
 import { TranslatePipe } from '../../../i18n';
 
@@ -57,6 +57,20 @@ export class PlayingCard {
   /** Posición en el reparto, para escalonar la entrada de las cartas. */
   readonly order = input(0);
 
+  /**
+   * Inclinación máxima, en grados. Balatro exagera más porque sus cartas ocupan media pantalla;
+   * con las nuestras (46-89 px) 7° ya se nota y 10° marearía.
+   */
+  private static readonly INCLINACION = 7;
+  /** Con el dedo el gesto es más tosco: menos inclinación, más control. */
+  private static readonly INCLINACION_TACTO = 4;
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** Si el sistema pide menos movimiento, la carta se queda quieta (no se inclina ni brilla). */
+  private readonly sinMovimiento =
+    typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   readonly esValida = computed(() => this.partes() !== null);
   readonly src = computed(() => {
     const p = this.partes();
@@ -82,5 +96,45 @@ export class PlayingCard {
     // Se devuelve como se escribe en cada baraja: en el póker el As es "A", en la
     // española los valores son números.
     return { rango: rangoValido, palo };
+  }
+
+  /**
+   * Inclina la carta hacia el puntero: la carta «mira» a donde estás, como en Balatro.
+   *
+   * El desplazamiento se **limita** a ±1 antes de pasarlo a grados. No es un detalle: en los
+   * bordes de la pantalla (o con el dedo) el puntero se va muy lejos del centro y, sin límite, la
+   * carta se deforma en un paralelogramo torcido. En el mod lo arreglaron justo así.
+   */
+  alMover(evento: PointerEvent): void {
+    if (this.sinMovimiento) return;
+    const caja = (evento.currentTarget as HTMLElement).getBoundingClientRect();
+    if (!caja.width || !caja.height) return;
+
+    const limitar = (valor: number) => Math.max(-1, Math.min(1, valor));
+    const x = limitar(((evento.clientX - caja.left) / caja.width) * 2 - 1);
+    const y = limitar(((evento.clientY - caja.top) / caja.height) * 2 - 1);
+    const maximo =
+      evento.pointerType === 'touch' ? PlayingCard.INCLINACION_TACTO : PlayingCard.INCLINACION;
+
+    const estilo = this.host.nativeElement.style;
+    estilo.setProperty('--pc-rx', `${(-y * maximo).toFixed(2)}deg`);
+    estilo.setProperty('--pc-ry', `${(x * maximo).toFixed(2)}deg`);
+    // El brillo sigue al dedo: es lo que convierte un rectángulo en una superficie.
+    estilo.setProperty('--pc-luz-x', `${((x + 1) * 50).toFixed(1)}%`);
+    estilo.setProperty('--pc-luz-y', `${((y + 1) * 50).toFixed(1)}%`);
+  }
+
+  /** La deja plana al salir (o al levantar el dedo). */
+  alSalir(): void {
+    const estilo = this.host.nativeElement.style;
+    estilo.setProperty('--pc-rx', '0deg');
+    estilo.setProperty('--pc-ry', '0deg');
+    estilo.setProperty('--pc-luz-x', '50%');
+    estilo.setProperty('--pc-luz-y', '50%');
+  }
+
+  /** En el móvil no hay «hover»: se inclina mientras el dedo está encima. */
+  alPulsar(evento: PointerEvent): void {
+    this.alMover(evento);
   }
 }
