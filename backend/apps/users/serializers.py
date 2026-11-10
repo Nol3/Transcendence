@@ -84,8 +84,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
                     return f"{scheme}://{host}{path}"
                 # Fallback if no request context
                 from django.conf import settings
-                backend_url = getattr(settings, 'BACKEND_URL', 'http://localhost:8000')
-                return f"{backend_url}{obj.avatar.url}"
+                backend_url = (
+                    getattr(settings, "BACKEND_URL", "")
+                    or getattr(settings, "PUBLIC_BASE_URL", "")
+                    or "http://localhost:8000"
+                )
+                return f"{backend_url.rstrip('/')}{obj.avatar.url}"
             except Exception:
                 return None
         return None

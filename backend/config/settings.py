@@ -243,6 +243,10 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# URL pública del sitio. Se usa para construir enlaces absolutos cuando el serializador
+# no tiene la petición a mano (avatares, por ejemplo). En producción viene del `.env`.
+PUBLIC_BASE_URL = config("PUBLIC_BASE_URL", default="http://localhost:8000")
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

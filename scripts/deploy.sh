@@ -41,6 +41,12 @@ pedir_dominio() {
 }
 
 copiar_certificado() {
+  # Con Cloudflare delante, el certificado de origen ya está en $SSL_DIR (lo deja
+  # scripts/instalar-certificado.sh) y no hay nada de Let's Encrypt que copiar.
+  if [ -f "$SSL_DIR/cert.pem" ] && [ -f "$SSL_DIR/key.pem" ]; then
+    echo "[1/4] Certificado ya presente en $SSL_DIR"
+    return 0
+  fi
   local origen="/etc/letsencrypt/live/$DOMINIO"
   if [ ! -f "$origen/fullchain.pem" ]; then
     echo "Todavía no hay certificado para $DOMINIO."
