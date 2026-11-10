@@ -13,7 +13,11 @@
       [class.mano__carta--ilegal]="!!c.ilegal"
       [disabled]="deshabilitada() || !!c.deshabilitada"
       [style.--i]="$index"
-      (click)="alTocar.emit(c.id)"
+      (click)="alPulsar(c.id)"
+      (pointerdown)="alBajar($event, c)"
+      (pointerup)="alSoltar($event, c)"
+      (pointercancel)="alCancelar()"
+      (pointerleave)="alCancelar()"
       [attr.aria-pressed]="estaElegida(c.id)"
       [attr.aria-label]="
         'culo.card'
@@ -34,3 +38,22 @@
     </button>
   }
 </div>
+
+@if (vistaPrevia(); as codigo) {
+  <!-- Toque mantenido: la carta, grande y en el centro, hasta que se toca en cualquier sitio. -->
+  <div class="vista" (click)="cerrarVista()" role="presentation">
+    <div class="vista__caja">
+      <app-playing-card [card]="codigo" [deck]="baraja()" size="xl" />
+      <p class="vista__nombre">
+        {{
+          'culo.card'
+            | translate
+              : {
+                  value: (clave() + '.rank.' + rango(codigo) | translate),
+                  suit: (clave() + '.suit.' + palo(codigo) | translate)
+                }
+        }}
+      </p>
+    </div>
+  </div>
+}

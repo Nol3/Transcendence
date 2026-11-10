@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  HostBinding,
   HostListener,
   inject,
   input,
@@ -69,11 +70,31 @@ export class Mano implements OnInit, OnDestroy {
   readonly turno = input(false);
 
   readonly alTocar = output<string>();
+  /** Se pide jugar esa carta sin pasar por el botón (doble toque o gesto hacia arriba). */
+  readonly alLanzar = output<string>();
+
+  /** Carta que se está mirando de cerca (toque mantenido). */
+  readonly vistaPrevia = signal<string | null>(null);
+
+  private temporizador: ReturnType<typeof setTimeout> | null = null;
+  private fueLarga = false;
+  private inicio: { x: number; y: number; cuando: number } | null = null;
+  private ultimoToque = { id: '', cuando: 0 };
+
+  /** Umbrales del mod, en píxeles: 56 de recorrido y 60 % de desviación lateral como máximo. */
+  private static readonly RECORRIDO = 56;
+  private static readonly LARGA = 450;
+  private static readonly DOBLE = 300;
 
   /** Ancho de la ventana, para recalcular el tamaño de carta al girar el móvil. */
   private readonly anchoVentana = signal(
     typeof window === 'undefined' ? 390 : window.innerWidth,
   );
+
+  @HostBinding('class.vista-abierta')
+  get conVista(): boolean {
+    return this.vistaPrevia() !== null;
+  }
 
   @HostListener('window:resize')
   alRedimensionar(): void {
@@ -100,6 +121,89 @@ export class Mano implements OnInit, OnDestroy {
 
   estaElegida(id: string): boolean {
     return this.elegidas().includes(id);
+  }
+
+  // ── Gestos ─────────────────────────────────────────────────────────────────────────────────
+  // Tocar elige; tocar dos veces seguidas (o arrastrar hacia arriba) juega; mantener pulsado enseña
+  // la carta de cerca. Todo con `pointer`, que en el móvil llega igual que el toque y en escritorio
+  // funciona con el ratón.
+
+  alBajar(ev: PointerEvent, c: CartaMano): void {
+    this.fueLarga = false;
+    this.inicio = { x: ev.clientX, y: ev.clientY, cuando: Date.now() };
+    this.cancelar();
+    this.temporizador = setTimeout(() => {
+      this.fueLarga = true;
+      this.vistaPrevia.set(c.card);
+      this.vibrar(10);
+    }, Mano.LARGA);
+  }
+
+  alSoltar(ev: PointerEvent, c: CartaMano): void {
+    this.cancelar();
+    const inicio = this.inicio;
+    this.inicio = null;
+    // Un toque mantenido ya ha hecho lo suyo (enseñar la carta): no elige ni juega.
+    if (this.fueLarga || !inicio) return;
+
+    const dx = ev.clientX - inicio.x;
+    const dy = ev.clientY - inicio.y;
+    const rapido = Date.now() - inicio.cuando <= 600;
+    // Hacia arriba, con recorrido suficiente y sin torcerse: se juega la carta directamente.
+    if (rapido && dy <= -Mano.RECORRIDO && Math.abs(dx) <= Math.abs(dy) * 0.6) {
+      this.alLanzar.emit(c.id);
+    }
+  }
+
+  alCancelar(): void {
+    this.cancelar();
+    this.inicio = null;
+  }
+
+  /** El `click` de verdad: selecciona, o juega si es el segundo toque seguido sobre la misma carta. */
+  alPulsar(id: string): void {
+    if (this.fueLarga) {
+      this.fueLarga = false;
+      return;
+    }
+    const ahora = Date.now();
+    const seguido = this.ultimoToque.id === id && ahora - this.ultimoToque.cuando < Mano.DOBLE;
+    this.ultimoToque = seguido ? { id: '', cuando: 0 } : { id, cuando: ahora };
+    if (seguido) {
+      this.alLanzar.emit(id);
+      return;
+    }
+    this.vibrar(6);
+    this.alTocar.emit(id);
+  }
+
+  cerrarVista(): void {
+    this.vistaPrevia.set(null);
+  }
+
+  /** Un toque en cualquier sitio cierra la vista previa (más fiable que el `click` del fondo). */
+  @HostListener('document:pointerdown', ['$event'])
+  alTocarFuera(ev: PointerEvent): void {
+    if (!this.vistaPrevia()) return;
+    const dentro = (ev.target as HTMLElement | null)?.closest('.vista__caja');
+    if (!dentro) this.cerrarVista();
+  }
+
+  @HostListener('document:keydown.escape')
+  alEscape(): void {
+    this.cerrarVista();
+  }
+
+  private cancelar(): void {
+    if (this.temporizador !== null) {
+      clearTimeout(this.temporizador);
+      this.temporizador = null;
+    }
+  }
+
+  private vibrar(ms: number): void {
+    if (!isPlatformBrowser(this.plataforma)) return;
+    navigator.vibrate?.(ms);
   }
 
   /** "5o" → "5"; "12b" → "12". */

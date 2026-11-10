@@ -234,6 +234,16 @@ export class Brisca implements OnDestroy {
     return elegida ? [elegida.id] : [];
   });
 
+
+  /**
+   * Doble toque o gesto hacia arriba sobre una carta: la elige y la juega de una vez, sin pasar por
+   * el botón. Es lo que permite echar una baza entera solo con gestos.
+   */
+  lanzarPorId(id: string): void {
+    this.tocaPorId(id);
+    this.jugar();
+  }
+
   tocaPorId(id: string): void {
     const carta = this.miMano().find((c) => c.id === id);
     if (carta) this.toca(carta);

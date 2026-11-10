@@ -26,6 +26,12 @@
   pointer-events: none;
 }
 
+// Con la vista previa abierta, la mano tiene que quedar por encima de la cabecera: el `z-index`
+// del host crea un contexto propio y, si se queda en 6, el `.vista` de dentro no puede superarla.
+:host(.vista-abierta) {
+  z-index: 50;
+}
+
 .mano {
   --giro-max: 8deg;
   // Caída de los extremos respecto al centro: la carta del medio es la más alta y las de fuera
@@ -67,6 +73,8 @@
     // Solape del 38 %: cada carta deja ver su 62 %. El ancho (`--carta-w`) lo calcula el
     // componente para que la mano quepa entera; aquí solo se aplica la misma proporción.
     margin-left: calc(var(--carta-w, 64px) * -0.38);
+    // El gesto hacia arriba es nuestro, no del scroll de la página.
+    touch-action: none;
     transform: translateY(calc(var(--arco-carta) + var(--alza))) rotate(var(--giro-carta));
     transform-origin: 50% 90%;
     // El mismo muelle que las cartas: responde al momento y no da tirones.
@@ -110,6 +118,9 @@
     }
   }
 
+  // Vista previa del toque mantenido: la carta grande, por encima de todo.
+  // (estilos abajo, fuera del anidado)
+
   // Turno: el borde de la mano se ilumina (el resto de la mesa ya lo marca).
   &--turno &__carta:not(:disabled) {
     --alza-max: 12px;
@@ -128,5 +139,42 @@
     &--sel {
       --alza: 0px;
     }
+  }
+}
+
+// ── Vista previa (toque mantenido) ───────────────────────────────────────────────────────────
+// La carta, grande y centrada, hasta que se toca en cualquier sitio o se pulsa Escape.
+.vista {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgb(0 0 0 / 62%);
+  cursor: zoom-out;
+  animation: vista-entra 140ms ease-out;
+  pointer-events: auto;
+
+  &__caja {
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+  }
+
+  &__nombre {
+    margin: 0;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--color-text, #f4f4f8);
+  }
+}
+
+@keyframes vista-entra {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

@@ -116,16 +116,22 @@ Cada fase es desplegable por sí sola y deja la `main` intacta (se trabaja en `p
 - **Hecho cuando:** la misma mano se ve igual en los cinco juegos y el e2e de jugar una carta sigue
   pasando en móvil.
 
-### F3 · Gestos: tocar, arrastrar, lanzar — 1 tanda
+### F3 · Gestos: tocar, arrastrar, lanzar · ✅ casi (10-11-2026)
 
-- [ ] **Toque** = seleccionar (nunca jugar). **Doble toque** = jugar la carta sola.
-- [ ] **Flick vertical** para jugar la selección, con los umbrales del mod traducidos a píxeles:
-      recorrido ≥ 56 px, desviación horizontal ≤ 60 %, soltar en ≤ 450 ms.
-- [ ] **Arrastrar** mantiene la selección agrupada (`group_follow`).
-- [ ] **Toque mantenido** abre la descripción de la carta; otro toque la cierra y **no** pasa al
-      botón de debajo.
-- [ ] Feedback inmediato: sonido (`card_select`, `card_flip`) + vibración corta (`navigator.vibrate`).
-- **Hecho cuando:** se puede jugar una baza entera de brisca sin tocar un botón, solo con gestos.
+- [x] **Toque** = seleccionar (nunca jugar). **Doble toque** = jugar la carta sola.
+- [x] **Gesto hacia arriba** para jugar: recorrido ≥ 56 px, desviación lateral ≤ 60 %, y se descarta
+      si el dedo se queda más de 600 ms (si no, sería un arrastre sin querer).
+- [x] **Toque mantenido** (450 ms) enseña la carta grande y centrada; se cierra tocando en cualquier
+      sitio o con Escape, y el toque **no** pasa al botón de debajo.
+- [x] Vibración corta al elegir (6 ms) y al abrir la vista (10 ms).
+- [x] Enganchado en **brisca**, **culo** y **tute** (`(alLanzar)` → `lanzarPorId`, que elige y juega).
+- [ ] **Arrastrar** manteniendo la selección agrupada (`group_follow`): pendiente.
+- [ ] Mus y mentiroso: su mano no juega (descartar / elegir valor), así que siguen con botones.
+- **Pendiente de verificar:** una baza entera de brisca solo con gestos (el doble toque y el gesto
+  están probados por separado; falta la partida completa).
+
+Ojo con el `z-index`: la mano fija es un contexto propio (6), así que la vista previa no puede
+superarla desde dentro; con la vista abierta el host sube a 50 (`:host(.vista-abierta)`).
 
 ### F4 · Botones y HUD de pulgar — 1 tanda
 
