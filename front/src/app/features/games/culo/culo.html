@@ -177,18 +177,16 @@
         }
       </div>
 
-      <div class="mano" [class.mano--turno]="miTurno()">
-        @for (c of miMano(); track c.id) {
-          <button type="button" class="mano__carta"
-                  [class.mano__carta--sel]="estaSeleccionada(c)"
-                  [disabled]="!miTurno()"
-                  (click)="toca(c)"
-                  [attr.aria-pressed]="estaSeleccionada(c)"
-                  [attr.aria-label]="'culo.card' | translate: { value: ('culo.rank.' + c.rank | translate), suit: ('culo.suit.' + c.suit | translate) }">
-            <app-playing-card [card]="codigo(c)" deck="spanish" [size]="'lg'" [order]="$index" />
-          </button>
-        }
-      </div>
+      <app-mano
+        [cartas]="cartasMano()"
+        [elegidas]="idsElegidos()"
+        [deshabilitada]="!miTurno()"
+        [turno]="miTurno()"
+        baraja="spanish"
+        tamano="lg"
+        clave="culo"
+        (alTocar)="tocaPorId($event)"
+      />
 
       <div class="controles">
         @if (miTurno()) {

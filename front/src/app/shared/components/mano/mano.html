@@ -1,0 +1,24 @@
+<div class="mano" [class.mano--turno]="turno()" [style.--n]="cartas().length">
+  @for (c of cartas(); track c.id) {
+    <button
+      type="button"
+      class="mano__carta"
+      [class.mano__carta--sel]="estaElegida(c.id)"
+      [class.mano__carta--ilegal]="!!c.ilegal"
+      [disabled]="deshabilitada() || !!c.deshabilitada"
+      [style.--i]="$index"
+      (click)="alTocar.emit(c.id)"
+      [attr.aria-pressed]="estaElegida(c.id)"
+      [attr.aria-label]="
+        'culo.card'
+          | translate
+            : {
+                value: (clave() + '.rank.' + rango(c.card) | translate),
+                suit: (clave() + '.suit.' + palo(c.card) | translate)
+              }
+      "
+    >
+      <app-playing-card [card]="c.card" [deck]="baraja()" [size]="tamano()" [order]="$index" />
+    </button>
+  }
+</div>

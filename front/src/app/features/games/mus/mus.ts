@@ -25,7 +25,7 @@ import {
 import { botDecision } from '../../../core/games/mus/mus-bots';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { FocoDialogoDirective } from '../../../shared/directives/foco-dialogo.directive';
-import { PlayingCard } from '../../../shared/components/playing-card/playing-card';
+import { Mano } from '../../../shared/components/mano/mano';
 import { GameSound } from '../../../core/audio/game-sound';
 import { MusVista, estadoDesdeVista } from '../../../core/games/mus/mus-online';
 import { SalaOnlineService } from '../../../core/services/sala-online.service';
@@ -46,7 +46,7 @@ interface LogLine {
  */
 @Component({
   selector: 'app-mus',
-  imports: [ButtonComponent, PlayingCard, RouterLink, SalaLobby, TranslatePipe, FocoDialogoDirective],
+  imports: [ButtonComponent, RouterLink, SalaLobby, TranslatePipe, FocoDialogoDirective, Mano],
   templateUrl: './mus.html',
   styleUrl: './mus.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -220,6 +220,16 @@ export class Mus implements OnDestroy {
     this.aDescartar.set(
       marcadas.includes(carta.id) ? marcadas.filter((id) => id !== carta.id) : [...marcadas, carta.id],
     );
+  }
+
+  /** El abanico compartido; en el mus solo se toca durante el descarte. */
+  readonly cartasMano = computed(() =>
+    this.miMano().map((c) => ({ id: c.id, card: this.codigo(c) })),
+  );
+
+  tocaPorId(id: string): void {
+    const carta = this.miMano().find((c) => c.id === id);
+    if (carta) this.toca(carta);
   }
 
   estaMarcada(carta: Card): boolean {

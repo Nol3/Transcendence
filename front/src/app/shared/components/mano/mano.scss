@@ -1,0 +1,100 @@
+// ── La mano como abanico ──────────────────────────────────────────────────────────────────────
+// Cada carta se coloca con dos números que le da la plantilla: `--i` (su posición) y `--n` (cuántas
+// hay). De ahí sale todo:
+//
+//   --d       distancia al centro del abanico (−3 … 0 … +3 con siete cartas)
+//   giro      --giro * --d   → los extremos se inclinan, el centro va recto
+//   arco      --arco * --d²  → los extremos caen un poco: el borde de arriba dibuja una curva
+//   solape    se solapan más cuantas más cartas haya, para que la mano quepa siempre
+//
+// Con dos variables en CSS, una mano de 3 y otra de 9 se reparten solas, sin recalcular nada al
+// añadir o quitar cartas.
+.mano {
+  --giro: 2.2deg;
+  --arco: 1.6px;
+  --alza-max: 10px;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding: var(--space-3, 0.9rem) 0.25rem;
+  min-height: 7rem;
+  // Que el abanico no se corte al levantar la carta elegida.
+  padding-top: 1.5rem;
+
+  &__carta {
+    --alza: 0px;
+    --d: calc(var(--i) - (var(--n) - 1) / 2);
+    --giro-local: var(--giro);
+
+    position: relative;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    // Con 7 cartas de 64 px no se cabe en un móvil de 390: se solapan más cuantas más haya.
+    margin-left: calc(-4px - var(--n) * 1.6px);
+    transform: translateY(calc(var(--arco) * var(--d) * var(--d) + var(--alza)))
+      rotate(calc(var(--giro-local) * var(--d)));
+    transform-origin: 50% 90%;
+    // El mismo muelle que las cartas: responde al momento y no da tirones.
+    transition: transform 160ms cubic-bezier(0.2, 0.9, 0.25, 1.15);
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    // Al pasar por encima (o con el teclado) la carta se levanta **y se endereza**: deja de tapar
+    // a la siguiente y se lee entera.
+    &:hover:not(:disabled),
+    &:focus-visible {
+      --alza: calc(-1 * var(--alza-max));
+      --giro-local: 0deg;
+      z-index: 5;
+    }
+
+    // Elegida: se queda arriba, con un aro de color.
+    &--sel {
+      --alza: calc(-1.6 * var(--alza-max));
+      --giro-local: 0deg;
+      z-index: 4;
+
+      app-playing-card {
+        filter: drop-shadow(0 0 6px var(--accent, #4ad9d9));
+        border-radius: 6px;
+      }
+    }
+
+    &:disabled {
+      cursor: default;
+      // Una mano bloqueada se ve apagada, pero sigue legible.
+      opacity: 0.72;
+    }
+
+    // Carta que no se puede jugar en este momento (tute: no asistes). Se distingue de «no es tu
+    // turno»: aquí sí es tu turno, pero esa carta no vale.
+    &--ilegal {
+      opacity: 0.42;
+    }
+  }
+
+  // Turno: el borde de la mano se ilumina (el resto de la mesa ya lo marca).
+  &--turno &__carta:not(:disabled) {
+    --alza-max: 12px;
+  }
+}
+
+// A quien pide menos movimiento no se le abre el abanico ni se le levantan las cartas.
+@media (prefers-reduced-motion: reduce) {
+  .mano__carta {
+    --giro: 0deg;
+    --arco: 0px;
+    transition: none;
+
+    &:hover:not(:disabled),
+    &:focus-visible,
+    &--sel {
+      --alza: 0px;
+    }
+  }
+}

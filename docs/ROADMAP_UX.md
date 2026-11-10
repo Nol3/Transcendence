@@ -107,7 +107,7 @@ Cada fase es desplegable por sí sola y deja la `main` intacta (se trabaja en `p
 - **Hecho cuando:** las 6 mesas se ven igual de grandes en un Pixel 7 y en un iPhone SE, sin scroll
   vertical, y los tests de móvil siguen en verde.
 
-### F2 · La mano como abanico (el cambio que más se nota) — 1-2 tandas
+### F2 · La mano como abanico · ✅ hecho (10-11-2026)
 
 - [ ] Componente **`mano`** compartido: reparte cartas a lo ancho (`usable_w`), calcula separación
       según cuántas haya, aplica rotación leve (±6° máximo) y desplazamiento vertical en arco.
@@ -186,5 +186,24 @@ seis juegos, sin tocar cada mesa).
 - Probado con `e2e/cartas.spec.ts`: la carta se inclina al mover el puntero, vuelve a plana al
   salir, y con movimiento reducido no se mueve.
 
-Pendiente de esta familia (fases siguientes): el **abanico** de la mano (F2), los **gestos** (F3) y
-las **partículas/CRT** (F6).
+### F2 · El abanico (hecho)
+
+Un componente **`app-mano`** que usan los cinco juegos (culo, brisca, tute, mus y mentiroso) en vez
+de repetir la mano en cada plantilla:
+
+- **Geometría en CSS**, con dos números por carta (`--i`, `--n`): giro de **2,2° por paso** (con siete
+  cartas, ±6,6°) y un **arco** de 1,6 px por paso al cuadrado. Una mano de 3 y otra de 10 se reparten
+  solas, sin recalcular nada al entrar o salir cartas.
+- **Solape según el número**: `-4px - n × 1,6px` (con siete cartas, −15 px). Así cabe en un móvil de
+  390 px sin scroll horizontal.
+- Al pasar por encima (o con el teclado) la carta **se levanta y se endereza**: deja de tapar a la
+  siguiente y se lee entera. La elegida se queda arriba, con aro de color.
+- **Por carta**: `deshabilitada` (el tute solo deja jugar algunas) e `ilegal` (se ve al 42 % para que
+  se entienda el porqué). El nombre accesible sale de `culo.*` o `baraja.*` según el juego.
+- **`prefers-reduced-motion`**: sin abanico ni levantamiento.
+
+Verificado con la suite completa (**68 e2e** de escritorio, **2 en `fixme`** documentado) y **4/4** en
+móvil. El test de móvil toca **la última carta** a propósito: en un abanico cada carta tapa el borde
+derecho de la anterior, así que el único trozo siempre visible es el derecho de la última.
+
+Pendiente de esta familia: los **gestos** (F3) y las **partículas/CRT** (F6).

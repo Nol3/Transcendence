@@ -29,7 +29,7 @@ import { SalaOnlineService } from '../../../core/services/sala-online.service';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { FocoDialogoDirective } from '../../../shared/directives/foco-dialogo.directive';
 import { SalaLobby } from '../../../shared/components/sala-lobby/sala-lobby';
-import { PlayingCard } from '../../../shared/components/playing-card/playing-card';
+import { Mano } from '../../../shared/components/mano/mano';
 import { GameSound } from '../../../core/audio/game-sound';
 
 /** Una línea del registro de la mesa, ya resuelta para pintarla. */
@@ -50,7 +50,7 @@ interface LogLine {
  */
 @Component({
   selector: 'app-mentiroso',
-  imports: [ButtonComponent, PlayingCard, RouterLink, SalaLobby, TranslatePipe, FocoDialogoDirective],
+  imports: [ButtonComponent, RouterLink, SalaLobby, TranslatePipe, FocoDialogoDirective, Mano],
   templateUrl: './mentiroso.html',
   styleUrl: './mentiroso.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -247,6 +247,18 @@ export class Mentiroso implements OnDestroy {
       return;
     }
     this.seleccion.set([...actual, carta]);
+  }
+
+  /** El abanico compartido. */
+  readonly cartasMano = computed(() =>
+    this.miMano().map((c) => ({ id: c.id, card: this.codigo(c) })),
+  );
+
+  readonly idsElegidos = computed(() => this.seleccion().map((c) => c.id));
+
+  tocaPorId(id: string): void {
+    const carta = this.miMano().find((c) => c.id === id);
+    if (carta) this.toca(carta);
   }
 
   estaSeleccionada(carta: Card): boolean {

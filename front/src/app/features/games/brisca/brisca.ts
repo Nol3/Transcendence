@@ -24,6 +24,7 @@ import {
 import { botDecision } from '../../../core/games/brisca/brisca-bots';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { FocoDialogoDirective } from '../../../shared/directives/foco-dialogo.directive';
+import { Mano } from '../../../shared/components/mano/mano';
 import { PlayingCard } from '../../../shared/components/playing-card/playing-card';
 import { GameSound } from '../../../core/audio/game-sound';
 import { BriscaVista, estadoDesdeVista } from '../../../core/games/brisca/brisca-online';
@@ -44,7 +45,7 @@ interface LogLine {
  */
 @Component({
   selector: 'app-brisca',
-  imports: [ButtonComponent, PlayingCard, RouterLink, SalaLobby, TranslatePipe, FocoDialogoDirective],
+  imports: [ButtonComponent, PlayingCard, RouterLink, SalaLobby, TranslatePipe, FocoDialogoDirective, Mano],
   templateUrl: './brisca.html',
   styleUrl: './brisca.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -221,6 +222,21 @@ export class Brisca implements OnDestroy {
     if (!this.miTurno()) return;
     this.sonido.tocar();
     this.seleccion.set(this.seleccion()?.id === carta.id ? null : carta);
+  }
+
+  /** Lo que pinta el abanico compartido. */
+  readonly cartasMano = computed(() =>
+    this.miMano().map((c) => ({ id: c.id, card: this.codigo(c) })),
+  );
+
+  readonly idsElegidos = computed(() => {
+    const elegida = this.seleccion();
+    return elegida ? [elegida.id] : [];
+  });
+
+  tocaPorId(id: string): void {
+    const carta = this.miMano().find((c) => c.id === id);
+    if (carta) this.toca(carta);
   }
 
   estaSeleccionada(carta: Card): boolean {

@@ -27,6 +27,7 @@ import {
 import { botDecision } from '../../../core/games/tute/tute-bots';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { FocoDialogoDirective } from '../../../shared/directives/foco-dialogo.directive';
+import { Mano } from '../../../shared/components/mano/mano';
 import { PlayingCard } from '../../../shared/components/playing-card/playing-card';
 import { GameSound } from '../../../core/audio/game-sound';
 import { TuteVista, estadoDesdeVista } from '../../../core/games/tute/tute-online';
@@ -48,7 +49,7 @@ interface LogLine {
  */
 @Component({
   selector: 'app-tute',
-  imports: [ButtonComponent, PlayingCard, RouterLink, SalaLobby, TranslatePipe, FocoDialogoDirective],
+  imports: [ButtonComponent, PlayingCard, RouterLink, SalaLobby, TranslatePipe, FocoDialogoDirective, Mano],
   templateUrl: './tute.html',
   styleUrl: './tute.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -234,6 +235,26 @@ export class Tute implements OnDestroy {
     if (!this.miTurno() || !this.esLegal(carta)) return;
     this.sonido.tocar();
     this.seleccion.set(this.seleccion()?.id === carta.id ? null : carta);
+  }
+
+  /** El abanico compartido: cada carta dice si se puede jugar (tute: hay que asistir). */
+  readonly cartasMano = computed(() =>
+    this.miMano().map((c) => ({
+      id: c.id,
+      card: this.codigo(c),
+      deshabilitada: !this.esLegal(c),
+      ilegal: this.miTurno() && !this.esLegal(c),
+    })),
+  );
+
+  readonly idsElegidos = computed(() => {
+    const elegida = this.seleccion();
+    return elegida ? [elegida.id] : [];
+  });
+
+  tocaPorId(id: string): void {
+    const carta = this.miMano().find((c) => c.id === id);
+    if (carta) this.toca(carta);
   }
 
   estaSeleccionada(carta: Card): boolean {

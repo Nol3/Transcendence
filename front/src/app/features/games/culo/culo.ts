@@ -30,6 +30,7 @@ import { CuloOnlineService } from '../../../core/services/culo-online.service';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { FocoDialogoDirective } from '../../../shared/directives/foco-dialogo.directive';
 import { PixelTitleComponent } from '../../../shared/components/pixel-title/pixel-title';
+import { Mano } from '../../../shared/components/mano/mano';
 import { PlayingCard } from '../../../shared/components/playing-card/playing-card';
 import { GameSound } from '../../../core/audio/game-sound';
 
@@ -55,7 +56,15 @@ export type ModoCulo = 'menu' | 'local' | 'online';
  */
 @Component({
   selector: 'app-culo',
-  imports: [ButtonComponent, PixelTitleComponent, PlayingCard, RouterLink, TranslatePipe, FocoDialogoDirective],
+  imports: [
+    ButtonComponent,
+    PixelTitleComponent,
+    PlayingCard,
+    Mano,
+    RouterLink,
+    TranslatePipe,
+    FocoDialogoDirective,
+  ],
   templateUrl: './culo.html',
   styleUrl: './culo.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -284,6 +293,19 @@ export class Culo implements OnDestroy {
 
   estaSeleccionada(carta: Card): boolean {
     return this.seleccion().some((c) => c.id === carta.id);
+  }
+
+  /** Lo que pinta el componente `mano` (el abanico compartido por los cinco juegos). */
+  readonly cartasMano = computed(() =>
+    this.miMano().map((c) => ({ id: c.id, card: this.codigo(c) })),
+  );
+
+  readonly idsElegidos = computed(() => this.seleccion().map((c) => c.id));
+
+  /** El abanico devuelve el id; aquí se traduce a la carta para reutilizar `toca`. */
+  tocaPorId(id: string): void {
+    const carta = this.miMano().find((c) => c.id === id);
+    if (carta) this.toca(carta);
   }
 
   jugar(): void {
