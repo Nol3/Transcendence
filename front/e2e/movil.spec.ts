@@ -110,6 +110,9 @@ test.describe('móvil @movil', () => {
     const antes = await cartas.count();
     const boton = (await jugar.isEnabled()) ? jugar : pasar;
     const cajaBoton = (await boton.boundingBox())!;
+    // F4: los botones de la mesa van a 56 px de alto, a lo ancho, en la zona del pulgar.
+    expect(cajaBoton.height, 'el botón debería medir al menos 56 px de alto').toBeGreaterThanOrEqual(56);
+    expect(cajaBoton.width, 'el botón debería ocupar el ancho disponible').toBeGreaterThan(120);
     // Toque de verdad (no `click` de ratón) en el centro del botón.
     await page.touchscreen.tap(cajaBoton.x + cajaBoton.width / 2, cajaBoton.y + cajaBoton.height / 2);
 

@@ -133,13 +133,20 @@ Cada fase es desplegable por sí sola y deja la `main` intacta (se trabaja en `p
 Ojo con el `z-index`: la mano fija es un contexto propio (6), así que la vista previa no puede
 superarla desde dentro; con la vista abierta el host sube a 50 (`:host(.vista-abierta)`).
 
-### F4 · Botones y HUD de pulgar — 1 tanda
+### F4 · Botones y HUD de pulgar · ⏳ a medias (10-11-2026)
 
-- [ ] Botonera inferior con **altura mínima 56 px** y contador (`3/5`), al estilo de Jugar/Descartar.
-- [ ] Acciones frecuentes en el **tercio inferior**; el HUD (turno, puntos, bazas) arriba, compacto.
-- [ ] Indicador de **turno** inequívoco: borde de la mesa iluminado y nombre de quien juega.
-- [ ] Nada importante a menos de 12 px del borde (pulgares y notch).
+- [x] Botonera inferior con **altura mínima 56 px** en el móvil (≤640 px), a lo ancho y repartida a
+      partes iguales. Va justo encima de la mano fija, en la zona del pulgar.
+- [x] Nada pegado al borde: `env(safe-area-inset-*)` a los lados y debajo de la mano.
+- [ ] Contador (`3/5`) junto a la acción: pendiente, cada juego tendría que exponer cuántas cartas
+      le quedan por jugar.
+- [ ] HUD (turno, puntos, bazas) compacto arriba: hoy cada juego pinta lo suyo.
+- [ ] Indicador de turno inequívoco (borde iluminado + nombre): el borde ya se ilumina; falta el
+      nombre.
 - **Hecho cuando:** una persona juega una ronda completa con una sola mano y sin mirar dos veces.
+
+Truco: el botón vive dentro de `app-button`, así que estirar `.controles__botones button` no basta;
+hay que estirar también el host (`.controles__botones > * { width: 100% }`).
 
 ### F5 · Sala común estilo Kahoot (el flujo con amigos) — 1-2 tandas
 

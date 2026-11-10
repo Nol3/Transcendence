@@ -326,6 +326,41 @@ body.tiene-mano {
   padding-bottom: calc(9.5rem + env(safe-area-inset-bottom, 0px));
 }
 
+/* ── F4 · Los controles, en la zona del pulgar ────────────────────────────────────────────────
+   En el móvil los botones de Jugar/Pasar/Descartar van a lo ancho, uno al lado del otro y con
+   56 px de alto: se pulsan con el pulgar sin mirar, y quedan justo encima de la mano. */
+@media (max-width: 640px) {
+  .controles {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .controles__botones {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  // El botón va dentro de `app-button`: hay que estirar también el host o se queda a su ancho.
+  .controles__botones > * {
+    width: 100%;
+  }
+
+  .controles__botones button {
+    width: 100%;
+    min-height: 56px;
+    font-size: 1rem;
+  }
+}
+
+/* Nada pegado al borde: en un móvil con notch o con bordes curvos, 12 px de aire. */
+body {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
 /* ── Controles que eran un carácter suelto ──────────────────────────────────────────────────
    Los tres son un «✕» o un emoji sin caja: medían 10×16 y 22×16, y con el dedo no se acierta.
    WCAG 2.2 AA (2.5.8) pide 24×24 como mínimo; con puntero grueso se sube a 44×44, que es lo que
