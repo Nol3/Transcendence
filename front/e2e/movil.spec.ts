@@ -91,23 +91,27 @@ test.describe('móvil @movil', () => {
       .poll(async () => (await jugar.isEnabled()) || (await pasar.isEnabled()), { timeout: 30000 })
       .toBe(true);
 
-    // Con el abanico, el centro de la carta puede quedar tapado por la siguiente (o por la
-    // cabecera si Playwright la sube al borde). Se pulsa la esquina que se ve, como haría un dedo.
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    // La mano tiene que caber entera: con 10 cartas y 64 px fijos se salía por la izquierda y
+    // quedaba media mano fuera de la pantalla.
+    const cartas = page.locator('.mano__carta');
+    const cuantas = await cartas.count();
+    expect(cuantas, 'debería haber cartas en la mano').toBeGreaterThan(0);
 
-    // Se toca la **última** carta: en el abanico cada carta tapa el borde derecho de la anterior,
-    // así que el único trozo que siempre se ve es el derecho de la última. Con el centro de una
-    // carta cualquiera, el dedo cae en la vecina.
-    const carta = page.locator('.mano__carta:not([disabled])').last();
-    const caja = await carta.boundingBox();
-    await carta.tap({
-      position: { x: (caja?.width ?? 64) - 10, y: (caja?.height ?? 88) / 2 },
-    });
-    await expect(carta).toHaveAttribute('aria-pressed', 'true');
+    for (let i = 0; i < cuantas; i++) {
+      const caja = (await cartas.nth(i).boundingBox())!;
+      expect(caja.y, `la carta ${i} se sale por arriba`).toBeGreaterThanOrEqual(0);
+      // La rotación del abanico ensancha la caja: se deja un margen de una carta.
+      expect(caja.x, `la carta ${i} se sale por la izquierda`).toBeGreaterThan(-20);
+      expect(caja.x + caja.width, `la carta ${i} se sale por la derecha`).toBeLessThanOrEqual(390 + 40);
+      // Y el borde inferior, pegado al de la pantalla.
+      expect(caja.y + caja.height, `la carta ${i} se sale por abajo`).toBeLessThanOrEqual(844);
+    }
 
-    const antes = await page.locator('.mano__carta').count();
+    const antes = await cartas.count();
     const boton = (await jugar.isEnabled()) ? jugar : pasar;
-    await boton.tap();
+    const cajaBoton = (await boton.boundingBox())!;
+    // Toque de verdad (no `click` de ratón) en el centro del botón.
+    await page.touchscreen.tap(cajaBoton.x + cajaBoton.width / 2, cajaBoton.y + cajaBoton.height / 2);
 
     await expect
       .poll(

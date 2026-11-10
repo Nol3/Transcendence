@@ -12,14 +12,19 @@ const BARAJA = {
   poker: {
     rangos: ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'],
     palos: ['c', 'd', 'h', 's'],
-    // El mazo de Balatro, recompuesto a partir de la tinta que trae el juego
-    // (`scripts/generar_cartas_balatro.py`). El 8-bit sigue en `cards/` por si se quiere volver.
-    carpeta: 'cards/balatro',
+    // El mazo **8-bit** del propio juego (`juego/assets/cards/BASIC`), reescalado a WebP por
+    // `scripts/generar_baraja_8bit.py`: arte completo de la carta (rango y palo dibujados), no solo
+    // los pips. Es el mismo dibujo que usa el juego en C.
+    carpeta: 'cards/8bit',
+    extension: 'webp',
   },
   spanish: {
     rangos: ['1', '2', '3', '4', '5', '6', '7', '10', '11', '12'],
     palos: ['o', 'c', 'e', 'b'],
-    carpeta: 'cards/es',
+    // La española de 40 es la francesa sin 8, 9 ni 10: mismo arte, con los nombres de aquí
+    // (oros → diamantes, copas → corazones, espadas → picas, bastos → tréboles).
+    carpeta: 'cards/es8bit',
+    extension: 'webp',
   },
 } as const;
 
@@ -53,6 +58,11 @@ export class PlayingCard {
   /** Si se enseña el dorso (cartas del rival, o antes del showdown). */
   readonly faceDown = input(false);
   readonly size = input<CardSize>('md');
+  /**
+   * Ancho en píxeles. Lo usa la mano para que quepan todas las cartas: con muchas y una pantalla
+   * estrecha, un tamaño fijo las saca de la pantalla. Si es `null`, manda el token `size`.
+   */
+  readonly ancho = input<number | null>(null);
   readonly state = input<CardState>('idle');
   /** Posición en el reparto, para escalonar la entrada de las cartas. */
   readonly order = input(0);
@@ -75,8 +85,9 @@ export class PlayingCard {
   readonly src = computed(() => {
     const p = this.partes();
     // El dorso sale de la carpeta del mazo: el de Balatro y el de la española no se parecen.
-    if (this.faceDown() || !p) return `${BARAJA[this.deck()].carpeta}/back.png`;
-    return `${BARAJA[this.deck()].carpeta}/${this.card()}.png`;
+    const { carpeta, extension } = BARAJA[this.deck()];
+    if (this.faceDown() || !p) return `${carpeta}/back.${extension}`;
+    return `${carpeta}/${this.card()}.${extension}`;
   });
 
   /** Rango y palo por separado, para componer el nombre accesible traducido. */

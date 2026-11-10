@@ -9,33 +9,60 @@
 //
 // Con dos variables en CSS, una mano de 3 y otra de 9 se reparten solas, sin recalcular nada al
 // añadir o quitar cartas.
+// La mano va **pegada al borde inferior** de la pantalla, como en Pokémon TCG Pocket: fija abajo,
+// encima de la mesa, y la página reserva su hueco (`body.tiene-mano`, en `styles.scss`) para que
+// nada quede tapado. Se hace con `fixed` y no con `sticky` porque en estas mesas la mano va antes
+// que los controles en el HTML: con `sticky` los controles acabarían detrás.
+:host {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6;
+  display: block;
+  // Un degradado detrás para que el contenido que pasa por debajo no se mezcle con las cartas.
+  background: linear-gradient(to top, var(--color-bg, #08080d) 58%, transparent);
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 2px);
+  pointer-events: none;
+}
+
 .mano {
-  --giro: 2.2deg;
-  --arco: 1.6px;
+  --giro-max: 10deg;
+  // Negativo a propósito: la carta central queda a ras del borde y los extremos **suben** (arco).
+  // Con el signo contrario, los extremos se hundían hasta 50 px por debajo de la pantalla.
+  --arco: -2px;
   --alza-max: 10px;
 
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  padding: var(--space-3, 0.9rem) 0.25rem;
-  min-height: 7rem;
+  // Las cartas sí reciben el toque (el host no, para que el degradado no bloquee la mesa).
+  pointer-events: auto;
+  max-width: 56rem;
+  margin: 0 auto;
+  // Sin aire abajo: las cartas quedan a ras del borde de la pantalla.
+  padding: 0 0.25rem;
+  min-height: 6rem;
   // Que el abanico no se corte al levantar la carta elegida.
-  padding-top: 1.5rem;
+  padding-top: 1.75rem;
 
   &__carta {
     --alza: 0px;
     --d: calc(var(--i) - (var(--n) - 1) / 2);
-    --giro-local: var(--giro);
+    // El giro se reparte entre los extremos: la primera y la última carta van a `--giro-max` y el
+    // centro recto. Así la apertura no depende de cuántas cartas haya.
+    --giro-carta: calc(var(--giro-max) * var(--d) / var(--dmax));
 
     position: relative;
     padding: 0;
     border: 0;
     background: none;
     cursor: pointer;
-    // Con 7 cartas de 64 px no se cabe en un móvil de 390: se solapan más cuantas más haya.
-    margin-left: calc(-4px - var(--n) * 1.6px);
+    // Solape del 38 %: cada carta deja ver su 62 %. El ancho (`--carta-w`) lo calcula el
+    // componente para que la mano quepa entera; aquí solo se aplica la misma proporción.
+    margin-left: calc(var(--carta-w, 64px) * -0.38);
     transform: translateY(calc(var(--arco) * var(--d) * var(--d) + var(--alza)))
-      rotate(calc(var(--giro-local) * var(--d)));
+      rotate(var(--giro-carta));
     transform-origin: 50% 90%;
     // El mismo muelle que las cartas: responde al momento y no da tirones.
     transition: transform 160ms cubic-bezier(0.2, 0.9, 0.25, 1.15);
@@ -49,14 +76,14 @@
     &:hover:not(:disabled),
     &:focus-visible {
       --alza: calc(-1 * var(--alza-max));
-      --giro-local: 0deg;
+      --giro-carta: 0deg;
       z-index: 5;
     }
 
     // Elegida: se queda arriba, con un aro de color.
     &--sel {
       --alza: calc(-1.6 * var(--alza-max));
-      --giro-local: 0deg;
+      --giro-carta: 0deg;
       z-index: 4;
 
       app-playing-card {
@@ -87,7 +114,7 @@
 // A quien pide menos movimiento no se le abre el abanico ni se le levantan las cartas.
 @media (prefers-reduced-motion: reduce) {
   .mano__carta {
-    --giro: 0deg;
+    --giro-carta: 0deg;
     --arco: 0px;
     transition: none;
 

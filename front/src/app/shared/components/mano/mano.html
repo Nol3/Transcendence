@@ -1,4 +1,10 @@
-<div class="mano" [class.mano--turno]="turno()" [style.--n]="cartas().length">
+<div
+  class="mano"
+  [class.mano--turno]="turno()"
+  [style.--n]="cartas().length"
+  [style.--dmax]="mitad()"
+  [style.--carta-w.px]="anchoCarta()"
+>
   @for (c of cartas(); track c.id) {
     <button
       type="button"
@@ -18,7 +24,13 @@
               }
       "
     >
-      <app-playing-card [card]="c.card" [deck]="baraja()" [size]="tamano()" [order]="$index" />
+      <app-playing-card
+        [card]="c.card"
+        [deck]="baraja()"
+        [size]="tamano()"
+        [ancho]="anchoCarta()"
+        [order]="$index"
+      />
     </button>
   }
 </div>

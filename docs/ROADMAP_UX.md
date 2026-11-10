@@ -191,19 +191,33 @@ seis juegos, sin tocar cada mesa).
 Un componente **`app-mano`** que usan los cinco juegos (culo, brisca, tute, mus y mentiroso) en vez
 de repetir la mano en cada plantilla:
 
-- **Geometría en CSS**, con dos números por carta (`--i`, `--n`): giro de **2,2° por paso** (con siete
-  cartas, ±6,6°) y un **arco** de 1,6 px por paso al cuadrado. Una mano de 3 y otra de 10 se reparten
-  solas, sin recalcular nada al entrar o salir cartas.
-- **Solape según el número**: `-4px - n × 1,6px` (con siete cartas, −15 px). Así cabe en un móvil de
-  390 px sin scroll horizontal.
+- **Geometría en CSS**, con dos números por carta (`--i`, `--n`): el giro se reparte entre los
+  extremos (**±10°**, la primera y la última; el centro recto, sea cual sea el número de cartas) y un
+  **arco** de 2 px por paso al cuadrado hacia **arriba** en los extremos (el centro queda a ras del
+  borde; con el signo contrario se hundían 50 px fuera de la pantalla).
+- **La mano va pegada al borde inferior** de la pantalla, como en Pokémon TCG Pocket: `position:
+  fixed` y la página reserva su hueco (`body.tiene-mano`), en vez de `sticky`, porque en estas mesas
+  la mano va antes que los controles en el HTML y con `sticky` los controles acababan detrás.
+- **El ancho de carta se calcula**: N cartas ocupan `W + (N−1)·0,62·W`, así que con el ancho de la
+  ventana se despeja W (64 px con siete cartas, ~54 px con diez en un móvil de 390). Antes, con diez
+  cartas la mano se salía 48 px por la izquierda y media mano quedaba fuera.
 - Al pasar por encima (o con el teclado) la carta **se levanta y se endereza**: deja de tapar a la
   siguiente y se lee entera. La elegida se queda arriba, con aro de color.
 - **Por carta**: `deshabilitada` (el tute solo deja jugar algunas) e `ilegal` (se ve al 42 % para que
   se entienda el porqué). El nombre accesible sale de `culo.*` o `baraja.*` según el juego.
 - **`prefers-reduced-motion`**: sin abanico ni levantamiento.
 
+### La baraja
+
+El poker y los cinco juegos usan ya el **arte 8-bit del propio juego** (`juego/assets/cards/BASIC`),
+reescalado a WebP por `scripts/generar_baraja_8bit.py`: 53 cartas francesas en `cards/8bit` y las 41
+de la española en `cards/es8bit`, 0,4 MB entre las dos. La española de 40 es la francesa **sin 8, 9
+ni 10**, así que es el mismo dibujo con los nombres de aquí (oros → diamantes, copas → corazones,
+espadas → picas, bastos → tréboles; sota → J, caballo → Q, rey → K). Las reglas no cambian: por
+dentro la sota sigue siendo la carta 10.
+
 Verificado con la suite completa (**68 e2e** de escritorio, **2 en `fixme`** documentado) y **4/4** en
-móvil. El test de móvil toca **la última carta** a propósito: en un abanico cada carta tapa el borde
-derecho de la anterior, así que el único trozo siempre visible es el derecho de la última.
+móvil. El test de móvil comprueba, carta por carta, que **ninguna se sale** de la pantalla (ni por
+arriba, ni por los lados, ni por abajo) y que los botones responden a un toque de verdad.
 
 Pendiente de esta familia: los **gestos** (F3) y las **partículas/CRT** (F6).

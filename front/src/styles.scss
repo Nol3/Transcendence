@@ -318,6 +318,14 @@ ul, ol { list-style: none; }
 .animate-fade-in    { animation: fade-in var(--transition-slow) both; }
 .animate-flicker     { animation: flicker 3s linear infinite; }
 
+/* ── La mano fija de las mesas ──────────────────────────────────────────────────────────────
+   Las cartas van pegadas al borde inferior (`app-mano`), así que la página reserva su hueco o
+   taparía el final del contenido (los botones de Jugar/Pasar). El alto cubre carta grande, el
+   arco y el levantamiento de la carta elegida. */
+body.tiene-mano {
+  padding-bottom: calc(9.5rem + env(safe-area-inset-bottom, 0px));
+}
+
 /* ── Controles que eran un carácter suelto ──────────────────────────────────────────────────
    Los tres son un «✕» o un emoji sin caja: medían 10×16 y 22×16, y con el dedo no se acierta.
    WCAG 2.2 AA (2.5.8) pide 24×24 como mínimo; con puntero grueso se sube a 44×44, que es lo que

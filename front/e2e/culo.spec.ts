@@ -61,7 +61,7 @@ test.describe('Culo', () => {
     // Las cartas son las de la baraja española y cargan de verdad.
     const src = await page.locator('.mano__carta app-playing-card img').first().getAttribute('src');
     // Ruta relativa a propósito (el <base href> de la app), así que sin barra inicial.
-    expect(src).toContain('cards/es/');
+    expect(src).toContain('cards/es8bit/');
     const cargadas = await page.locator('.mano__carta img').evaluateAll(
       (imgs: HTMLImageElement[]) => imgs.length > 0 && imgs.every((i) => i.naturalWidth > 0),
     );

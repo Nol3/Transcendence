@@ -1,4 +1,6 @@
 <span class="pc"
+      [style.width.px]="ancho()"
+      [style.height.px]="ancho() ? ancho()! * 1.327 : null"
       [class]="'pc--' + size() + ' pc--' + state() + ' pc--baraja-' + deck()
         + (faceDown() || !esValida() ? ' pc--dorso' : '')"
       [style.--pc-orden]="order()"
