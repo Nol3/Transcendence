@@ -15,7 +15,7 @@ DOCKER_COMPOSE := $(shell \
 
 .DEFAULT_GOAL := help
 
-.PHONY: dev dev42 \
+.PHONY: dev \
         up down restart build rebuild \
         logs logs-backend logs-frontend logs-nginx logs-vault \
         status health urls diagnose \
@@ -29,9 +29,6 @@ dev: ## Full setup and launch (standard environment)
 	@printf "$(BLUE)$(BOLD)» Launching Transcendence (standard)...$(RESET)\n"
 	@bash setup-docker.sh
 
-dev42: ## Full setup and launch (42 school / rootless Docker)
-	@printf "$(BLUE)$(BOLD)» Launching Transcendence (42 school)...$(RESET)\n"
-	@bash setup-docker-42.sh
 
 up: ## Start containers (no rebuild)
 	@printf "$(GREEN)» Starting containers...$(RESET)\n"
