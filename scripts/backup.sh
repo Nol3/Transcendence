@@ -13,7 +13,7 @@
 #   - base-<fecha>.sql.gz    : volcado de PostgreSQL comprimido.
 #   - media-<fecha>.tar.gz   : avatares y demás ficheros subidos.
 #
-# Para restaurar, ver docs/DESPLIEGUE.md.
+# Para restaurar, usa scripts/restaurar.sh.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

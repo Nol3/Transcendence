@@ -92,7 +92,7 @@ Evidencia en el repositorio:
 - **Despliegue reproducible**: un único `docker compose up -d` levanta backend, frontend, nginx con
   TLS y WAF, y Vault; el mismo comando funciona en local y en el servidor.
 - **Calidad antes de integrar**: `backend/`: `python manage.py test` (91 tests) y
-  `front/`: `npx playwright test` (e2e) más los `scripts/audit/*.sh` de verificación.
+  `front/`: `npx playwright test` (e2e) más las sondas de `scripts/audit/` cuando haga falta.
 
 ### Contribuciones individuales
 
