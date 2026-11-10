@@ -67,10 +67,11 @@
     </section>
   } @else {
     <section class="mesa">
-      <ul class="mesa__rivales">
+      <ul class="mesa__rivales" [style.--n]="rivales().length">
         @for (m of marcador(); track m.id) {
           @if (m.id !== 0) {
             <li class="rival" [class.rival--turno]="estado()!.turn === m.id && estado()!.phase === 'playing'">
+              [style.--i]="$index"
               <span class="rival__nombre font-pixel">{{ m.name }}</span>
               <span class="rival__cartas font-mono">{{ estado()!.players[m.id].hand.length }} 🂠</span>
               <span class="rival__tantos text-sm">{{ 'brisca.points' | translate: { n: m.tantos } }}</span>

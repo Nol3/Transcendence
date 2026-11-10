@@ -74,9 +74,10 @@
         {{ 'mentiroso.hand' | translate: { n: estado()!.hand, total: estado()!.targetWins } }}
       </p>
 
-      <ul class="mesa__rivales">
+      <ul class="mesa__rivales" [style.--n]="rivales().length">
         @for (r of rivales(); track r.id) {
           <li class="rival" [class.rival--turno]="estado()!.turn === r.id && estado()!.phase === 'playing'">
+              [style.--i]="$index"
             <span class="rival__nombre font-pixel">{{ r.name }}</span>
             <span class="rival__cartas font-mono">{{ r.hand.length }} 🂠</span>
             <span class="rival__ganadas text-muted text-sm">

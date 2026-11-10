@@ -326,6 +326,29 @@ body.tiene-mano {
   padding-bottom: calc(9.5rem + env(safe-area-inset-bottom, 0px));
 }
 
+/* ── Mesa ovalada ─────────────────────────────────────────────────────────────────────────────
+   Los rivales se sientan en arco (los del medio más lejos, los de los extremos más cerca) y el
+   centro se pinta como un óvalo de fieltro: la mesa se lee redonda desde arriba en vez de como una
+   lista con una caja debajo. */
+.mesa__rivales {
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.mesa__rivales > * {
+  --d: calc(var(--i, 0) - (var(--n, 1) - 1) / 2);
+  transform: translateY(calc(-1 * var(--d) * var(--d) * 2px));
+}
+
+.mesa__centro {
+  border-radius: 50%;
+  padding: 2rem 2.5rem;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgb(74 217 217 / 7%), transparent 62%),
+    radial-gradient(ellipse at 50% 50%, #12121c 0%, #0b0b12 70%, transparent 71%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 6%);
+}
+
 /* ── F4 · Los controles, en la zona del pulgar ────────────────────────────────────────────────
    En el móvil los botones de Jugar/Pasar/Descartar van a lo ancho, uno al lado del otro y con
    56 px de alto: se pulsan con el pulgar sin mirar, y quedan justo encima de la mano. */
