@@ -17,6 +17,7 @@ Welcome to FT Transcendence! This is your complete documentation guide for the p
   **Empieza por su sección «⏸️ DÓNDE RETOMAR»**: estado verificado, cabos sueltos y el siguiente paso recomendado.
 - **[docs/AUDITORIA_PROYECTO.md](docs/AUDITORIA_PROYECTO.md)** — Auditoría del estado actual (integridad, privacidad, calidad)
 - **[docs/AUDITORIA_JUEGO_POKER.md](docs/AUDITORIA_JUEGO_POKER.md)** — Auditoría del juego y plan por fases
+- **[docs/ROADMAP_UX.md](docs/ROADMAP_UX.md)** — Transformación visual tipo Balatro en móvil y sala común estilo Kahoot: tres acercamientos, seis fases y lo que se puede reutilizar
 - **[docs/DESPLIEGUE_CLOUDFLARE.md](docs/DESPLIEGUE_CLOUDFLARE.md)** — Publicar con tu dominio y Cloudflare delante: certificado de origen, IP real, ajustes que hay que apagar y problemas típicos (526, 502, CSRF, bucles)
 - **[docs/POKER_ONLINE.md](docs/POKER_ONLINE.md)** — Póker online: reglas, protocolo WebSocket, UI y despliegue
 - **[docs/JUEGOS.md](docs/JUEGOS.md)** — Cómo añadir un juego al apartado «Juegos» (catálogo, ruta, textos y, si es online, dónde engancha en el servidor)

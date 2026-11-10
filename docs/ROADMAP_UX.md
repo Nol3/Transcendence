@@ -1,0 +1,169 @@
+# Transformación visual: de mesa de cartas a «Balatro táctil» en sala común
+
+Objetivo: que los seis juegos se **sientan** como Balatro en un móvil —cartas grandes que responden
+al dedo, una mano que se puede jugar con un pulgar— y que la partida con amigos funcione como una
+**sala común estilo Kahoot**: un código, todos dentro, cada uno desde su teléfono.
+
+Referencia estudiada: `LoreanXavier/balatro-portrait-mobile` (mod no oficial, MIT para su código).
+Copiado **fuera del repositorio**, en `C:\Users\aleja\Desktop\github\_refs\balatro-portrait-mobile`,
+para consulta. No se versiona ni se copia código: se toman **decisiones de diseño y cifras**.
+
+---
+
+## Lo que hace que Balatro se sienta a Balatro (y no a una mesa de cartas)
+
+Del código del mod (parches en Lua sobre el juego real) y del vídeo, lo que de verdad mueve la
+sensación:
+
+1. **La carta es un objeto físico.** Se inclina en 3D siguiendo el dedo/ratón (`tilt_var.mx/my`),
+   con un reflejo que se mueve con ella. El mod tiene que **limitar** ese desplazamiento porque con
+   el dedo se dispara y la carta se «deforma en paralelo»: la inclinación es sutil, de unos pocos
+   grados, no un efecto de feria.
+2. **La mano es un abanico, no una fila.** Las cartas se reparten a lo ancho del hueco disponible
+   (`usable_w`), con separación calculada según cuántas hay y un pequeño levantamiento; al
+   seleccionar, **suben** y se tiñen.
+3. **Un gesto, una acción.** El mod define el *flick* así: recorrido vertical mínimo de **1,4**
+   unidades de juego, desviación horizontal máxima del **60 %** del recorrido vertical, y soltar en
+   **menos de 0,45 s**. Fuera de eso es un toque o un arrastre, no una jugada. Y las cartas
+   seleccionadas **acompañan** el arrastre (`group_follow`).
+4. **Tocar pide información, no juega.** Desde la 1.0.6, un toque en una carta/joker/consumible abre
+   su descripción y la deja abierta; otro toque (o tocar fuera) la cierra. Mantener pulsado sigue
+   funcionando. La descripción abierta **no** deja pasar el toque al botón de debajo.
+5. **Todo está sobredimensionado.** `card_button_mult = 1.4` en móvil; el HUD se escala según la
+   altura de la pantalla (0,39 en pantallas altas, 0,46 en cortas) en vez de tener un tamaño fijo.
+6. **Nada de scroll.** La mesa cabe entera: HUD arriba, zona de juego en medio, mano abajo. Si algo
+   no cabe, se encoge el HUD, no se añade una barra de desplazamiento.
+7. **Juice contenido:** rebote al repartir, golpe seco al jugar, números que suben con conteo,
+   partículas al puntuar. Todo corto (<300 ms) y con sonido.
+
+Medido en los fotogramas del vídeo (1080×1350): la mano ocupa la franja **y 55–90 %** y llega al
+**80–94 % del ancho**, con cartas solapadas. Es decir: media pantalla para jugar, la otra mitad para
+leer el estado.
+
+---
+
+## Tres acercamientos posibles
+
+Antes de tocar nada hay que elegir el alcance. Los tres parten de lo que ya existe (componente
+`playing-card`, baraja de Balatro ya compuesta, sonidos, i18n).
+
+### A · «Arcade táctil» (máximo parecido a Balatro)
+
+Cartas con inclinación 3D, abanico con rotación, barrido de brillo, partículas y rebotes; botones
+grandes con contador; tipografía pixel. Es lo que se ve en el vídeo.
+
+- **A favor:** es lo que pides y lo que engancha; se nota muchísimo en móvil.
+- **En contra:** más CSS/animación por juego (seis), riesgo de marear si se abusa, y hay que
+  mantenerlo accesible (movimiento reducido).
+- **Coste:** alto (6-8 tandas).
+
+### B · «Mesa limpia de un pulgar» (Balatro en la mecánica, sobrio en el adorno)
+
+Misma disposición y mismos gestos (abanico, subir al seleccionar, flick para jugar, toque para
+información), pero sin inclinación 3D ni partículas: sombras duras, transiciones cortas, tipografía
+del proyecto.
+
+- **A favor:** el 80 % de la sensación con el 40 % del trabajo; menos ruido y menos bugs.
+- **En contra:** no es «igual que Balatro»; quien compare lado a lado lo notará.
+- **Coste:** medio (3-4 tandas).
+
+### C · «Sala común» primero (Kahoot con cartas)
+
+Prioriza el flujo social —código grande, lobby en vivo, turnos con cuenta atrás, marcador entre
+rondas, móvil para cada jugador— sobre el acabado de las cartas.
+
+- **A favor:** es lo que hace que se juegue **con amigos**, que es el objetivo real.
+- **En contra:** sin el trabajo de A/B las cartas siguen pareciendo una web.
+- **Coste:** medio (3-4 tandas), pero **no se pisa** con A/B: se puede hacer en paralelo.
+
+**Recomendación:** **B + C a la vez**, y luego subir a A por partes (la inclinación y el abanico son
+lo que más se nota; las partículas y el CRT son lo último). Con B+C el juego ya se siente móvil y se
+juega en grupo; A se añade encima sin rehacer nada.
+
+---
+
+## Plan por fases
+
+Cada fase es desplegable por sí sola y deja la `main` intacta (se trabaja en `preprod`).
+
+### F1 · Fundación de movimiento y medidas (base de todo) — 1 tanda
+
+- [ ] **Tokens de carta** en `styles.scss`: grosor de borde, radio, sombra dura (`0 4px 0`),
+      duración de muelle (`--card-spring: cubic-bezier(.2,.9,.25,1.2)`), elevación al seleccionar.
+- [ ] **`playing-card` con estados**: `idle`, `elevada`, `seleccionada`, `jugada`, `ganadora`.
+      Hoy la carta es estática; los juegos la decoran por fuera.
+- [ ] **Tamaño por variable, no por `@media`**: `--carta-w` calculado con `clamp()` y con la altura
+      disponible (equivalente al `hud_scale_tall/normal/short` del mod: 0,39 / 0,42 / 0,46).
+- [ ] **Regla de oro:** nada de scroll en la mesa; si no cabe, encoge la mano.
+- **Hecho cuando:** las 6 mesas se ven igual de grandes en un Pixel 7 y en un iPhone SE, sin scroll
+  vertical, y los tests de móvil siguen en verde.
+
+### F2 · La mano como abanico (el cambio que más se nota) — 1-2 tandas
+
+- [ ] Componente **`mano`** compartido: reparte cartas a lo ancho (`usable_w`), calcula separación
+      según cuántas haya, aplica rotación leve (±6° máximo) y desplazamiento vertical en arco.
+- [ ] **Selección**: la carta sube ~10 px, se escala 1,06 y se tiñe; el resto se aparta un poco.
+- [ ] **Sustituir** las cinco manos actuales (culo, brisca, tute, mus, mentiroso) por el componente.
+- **Hecho cuando:** la misma mano se ve igual en los cinco juegos y el e2e de jugar una carta sigue
+  pasando en móvil.
+
+### F3 · Gestos: tocar, arrastrar, lanzar — 1 tanda
+
+- [ ] **Toque** = seleccionar (nunca jugar). **Doble toque** = jugar la carta sola.
+- [ ] **Flick vertical** para jugar la selección, con los umbrales del mod traducidos a píxeles:
+      recorrido ≥ 56 px, desviación horizontal ≤ 60 %, soltar en ≤ 450 ms.
+- [ ] **Arrastrar** mantiene la selección agrupada (`group_follow`).
+- [ ] **Toque mantenido** abre la descripción de la carta; otro toque la cierra y **no** pasa al
+      botón de debajo.
+- [ ] Feedback inmediato: sonido (`card_select`, `card_flip`) + vibración corta (`navigator.vibrate`).
+- **Hecho cuando:** se puede jugar una baza entera de brisca sin tocar un botón, solo con gestos.
+
+### F4 · Botones y HUD de pulgar — 1 tanda
+
+- [ ] Botonera inferior con **altura mínima 56 px** y contador (`3/5`), al estilo de Jugar/Descartar.
+- [ ] Acciones frecuentes en el **tercio inferior**; el HUD (turno, puntos, bazas) arriba, compacto.
+- [ ] Indicador de **turno** inequívoco: borde de la mesa iluminado y nombre de quien juega.
+- [ ] Nada importante a menos de 12 px del borde (pulgares y notch).
+- **Hecho cuando:** una persona juega una ronda completa con una sola mano y sin mirar dos veces.
+
+### F5 · Sala común estilo Kahoot (el flujo con amigos) — 1-2 tandas
+
+- [ ] **Código de sala gigante** (4 caracteres, legible a un metro) y enlace/QR para entrar directo.
+- [ ] **Lobby en vivo**: avatares que aparecen, «listo» por jugador, cuenta atrás compartida.
+- [ ] **Ritmo**: ronda → marcador entre rondas → siguiente. Marcador con animación de subida.
+- [ ] **Espectador** claro: «estás mirando», sin cartas ajenas.
+- [ ] Reconexión silenciosa (ya hay JWT y WebSocket): si se cae la red, vuelve a su silla.
+- **Hecho cuando:** cuatro móviles entran con un código y terminan una partida de Mus sin recargar.
+
+### F6 · El adorno de Balatro (solo si F1-F5 están cerradas) — 2 tandas
+
+- [ ] **Inclinación 3D** de la carta siguiendo el dedo, con el desplazamiento **limitado** (el mod lo
+      limita justo para que no se deforme) y reflejo que se mueve.
+- [ ] **Barrido de brillo** al repartir, rebote al aterrizar.
+- [ ] **Partículas** al ganar baza (10-14, cortas) y números que cuentan hacia arriba.
+- [ ] **CRT/scanlines sutil y opcional** (ajuste en preferencias, apagado por defecto en móvil).
+- [ ] Todo respeta `prefers-reduced-motion`: con movimiento reducido, sin inclinación ni partículas.
+- **Hecho cuando:** se puede jugar igual con el ajuste de movimiento reducido activado.
+
+---
+
+## Lo que se puede reutilizar tal cual
+
+| Del mod | En nuestro proyecto |
+|---|---|
+| Umbrales del *flick* (1,4 / 60 % / 0,45 s) | Constantes en `gestos.ts`, en píxeles |
+| Escala del HUD por altura (0,39-0,46) | `clamp()` sobre `--altura-disponible` |
+| `card_button_mult = 1.4` | Altura mínima de botón en mesa (56 px) |
+| Toque = descripción, no acción | Comportamiento de la mano |
+| Ajuste de movimiento reducido | `@media (prefers-reduced-motion)` |
+
+**Lo que no se copia:** ni una línea de Lua, ni arte, ni sonidos del juego. La baraja ya está
+compuesta en el repo y el resto es CSS/TS propio.
+
+## Decisiones que hacen falta antes de empezar
+
+1. **¿A, B o C?** (recomendación: B+C y luego A por partes).
+2. **¿La partida se ve en el móvil de cada uno (como Kahoot) o en una pantalla común?** Cambia F5:
+   con pantalla común hace falta una vista «mesa grande» sin controles.
+3. **¿Cuántos jugadores por sala como máximo?** Hoy 4-6 según el juego; afecta al tamaño de carta.
+4. **¿Idioma del arte?** La baraja es de Balatro; si algún día se publica, conviene arte propio.
