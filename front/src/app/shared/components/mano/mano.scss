@@ -27,10 +27,11 @@
 }
 
 .mano {
-  --giro-max: 10deg;
-  // Negativo a propósito: la carta central queda a ras del borde y los extremos **suben** (arco).
-  // Con el signo contrario, los extremos se hundían hasta 50 px por debajo de la pantalla.
-  --arco: -2px;
+  --giro-max: 8deg;
+  // Caída de los extremos respecto al centro: la carta del medio es la más alta y las de fuera
+  // bajan, como un abanico de verdad apoyado en los extremos. Se reserva ese hueco abajo
+  // (`padding-bottom`) para que la caída no saque las cartas de la pantalla.
+  --arco-max: 26px;
   --alza-max: 10px;
 
   display: flex;
@@ -40,8 +41,9 @@
   pointer-events: auto;
   max-width: 56rem;
   margin: 0 auto;
-  // Sin aire abajo: las cartas quedan a ras del borde de la pantalla.
-  padding: 0 0.25rem;
+  // El hueco de la caída del abanico: el centro sube `--arco-max` y los extremos quedan a ras del
+  // borde inferior de la pantalla.
+  padding: 0 0.25rem var(--arco-max);
   min-height: 6rem;
   // Que el abanico no se corte al levantar la carta elegida.
   padding-top: 1.75rem;
@@ -52,6 +54,10 @@
     // El giro se reparte entre los extremos: la primera y la última carta van a `--giro-max` y el
     // centro recto. Así la apertura no depende de cuántas cartas haya.
     --giro-carta: calc(var(--giro-max) * var(--d) / var(--dmax));
+    // Caída relativa: los extremos bajan siempre `--arco-max`, haya 3 cartas o 10.
+    --arco-carta: calc(
+      var(--arco-max) * var(--d) * var(--d) / var(--dmax) / var(--dmax)
+    );
 
     position: relative;
     padding: 0;
@@ -61,8 +67,7 @@
     // Solape del 38 %: cada carta deja ver su 62 %. El ancho (`--carta-w`) lo calcula el
     // componente para que la mano quepa entera; aquí solo se aplica la misma proporción.
     margin-left: calc(var(--carta-w, 64px) * -0.38);
-    transform: translateY(calc(var(--arco) * var(--d) * var(--d) + var(--alza)))
-      rotate(var(--giro-carta));
+    transform: translateY(calc(var(--arco-carta) + var(--alza))) rotate(var(--giro-carta));
     transform-origin: 50% 90%;
     // El mismo muelle que las cartas: responde al momento y no da tirones.
     transition: transform 160ms cubic-bezier(0.2, 0.9, 0.25, 1.15);
@@ -115,7 +120,7 @@
 @media (prefers-reduced-motion: reduce) {
   .mano__carta {
     --giro-carta: 0deg;
-    --arco: 0px;
+    --arco-carta: 0px;
     transition: none;
 
     &:hover:not(:disabled),

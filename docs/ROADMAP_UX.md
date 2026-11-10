@@ -192,9 +192,10 @@ Un componente **`app-mano`** que usan los cinco juegos (culo, brisca, tute, mus 
 de repetir la mano en cada plantilla:
 
 - **Geometría en CSS**, con dos números por carta (`--i`, `--n`): el giro se reparte entre los
-  extremos (**±10°**, la primera y la última; el centro recto, sea cual sea el número de cartas) y un
-  **arco** de 2 px por paso al cuadrado hacia **arriba** en los extremos (el centro queda a ras del
-  borde; con el signo contrario se hundían 50 px fuera de la pantalla).
+  extremos (**±8°**, la primera y la última; el centro recto, sea cual sea el número de cartas) y un
+  **arco de abanico**: la carta del medio es la más alta y las de fuera bajan 26 px, como un abanico
+  de verdad apoyado en los extremos. El hueco de esa caída se reserva abajo (`padding-bottom`), si no
+  las cartas se salían de la pantalla.
 - **La mano va pegada al borde inferior** de la pantalla, como en Pokémon TCG Pocket: `position:
   fixed` y la página reserva su hueco (`body.tiene-mano`), en vez de `sticky`, porque en estas mesas
   la mano va antes que los controles en el HTML y con `sticky` los controles acababan detrás.
@@ -206,6 +207,24 @@ de repetir la mano en cada plantilla:
 - **Por carta**: `deshabilitada` (el tute solo deja jugar algunas) e `ilegal` (se ve al 42 % para que
   se entienda el porqué). El nombre accesible sale de `culo.*` o `baraja.*` según el juego.
 - **`prefers-reduced-motion`**: sin abanico ni levantamiento.
+
+### La baraja española (para más adelante)
+
+La de 40 no está hecha con arte propio: los cinco juegos usan el arte 8-bit del juego en C con los
+nombres de aquí. Cuando haya una baraja española de verdad, se cambia `BARAJA.es` en
+`playing-card.ts` y listo (el componente ya pide `carpeta` + `extension`).
+
+- **Descargada y guardada** en `Desktop/github/_refs/baraja-espanola-pixel/` (fuera del repo):
+  [Spanish Deck – Pixel Art, de jcanabal](https://jcanabal.itch.io/spanish-deck-pixel-art). Edición
+  gratuita: **40 cartas + dorso, PNG transparente de 73×113**. Encaja con el estilo del proyecto.
+  ⚠️ La página **no indica licencia**: antes de publicarlo hay que pedírsela al autor o comprar la
+  edición completa.
+- **Alternativa sin dudas de licencia**: [Baraja española completa en Wikimedia
+  Commons](https://commons.wikimedia.org/wiki/File:Baraja_espa%C3%B1ola_completa.png) (dominio
+  público, una sola imagen de 2.496×1.595 que habría que recortar en 40 cartas) y
+  [Baraja española.svg](https://commons.wikimedia.org/wiki/File:Baraja_espa%C3%B1ola.svg).
+- **Numeración del pack**: los ficheros van `1.PNG` … `40.PNG` sin decir el palo; hay que mirarlos uno
+  a uno para hacer el mapa (los pips se cuentan igual que se hizo con `1.cards` del juego).
 
 ### La baraja
 
