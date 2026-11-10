@@ -237,6 +237,19 @@
 .mesa {
   display: flex;
   flex-direction: column;
+
+  // Los rivales, sentados alrededor de la mesa: la fila se curva en arco, con los del medio más
+  // lejos (arriba) y los de los extremos más cerca. Es lo que hace que se lea como una mesa
+  // redonda y no como una lista.
+  &__rivales {
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .rival {
+    --d: calc(var(--i, 0) - (var(--n, 1) - 1) / 2);
+    transform: translateY(calc(-1 * var(--d) * var(--d) * 2px));
+  }
   gap: var(--space-4, 1rem);
 
   &__rivales {

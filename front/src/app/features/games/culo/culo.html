@@ -148,9 +148,10 @@
     <!-- ── La mesa ─────────────────────────────────────────────────────────── -->
     <section class="mesa container">
 
-      <ul class="mesa__rivales">
+      <ul class="mesa__rivales" [style.--n]="rivales().length">
         @for (r of rivales(); track r.id) {
           <li class="rival"
+              [style.--i]="$index"
               [class.rival--turno]="estado()!.turn === r.id && estado()!.phase === 'playing'"
               [class.rival--fuera]="r.hand.length === 0">
             <span class="rival__nombre font-pixel">{{ r.name }}</span>
