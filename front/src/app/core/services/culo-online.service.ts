@@ -32,6 +32,8 @@ interface ServerState {
 export interface RoomView {
   code: string;
   hostId: number;
+  /** Marca (ms) del arranque común; `null` mientras no se ha repartido. */
+  startsAt: number | null;
   status: 'lobby' | 'playing' | 'finished';
   decks: number;
   isHost: boolean;

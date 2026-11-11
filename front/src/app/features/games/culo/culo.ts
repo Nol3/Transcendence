@@ -97,6 +97,9 @@ export class Culo implements OnDestroy {
   // Sala online.
   readonly codigoSala = signal('');
   readonly codigoEntrada = signal('');
+
+  /** Segundos que faltan para el reparto, calculados desde `startsAt` del servidor. */
+  readonly restante = signal<number | null>(null);
   readonly creando = signal(false);
   readonly copiado = signal(false);
   readonly sala = computed(() => this.online.room());
@@ -165,6 +168,23 @@ export class Culo implements OnDestroy {
       if (this.modo() !== 'local' || !s || s.phase !== 'playing') return;
       if (!s.players[s.turn]?.isBot) return;
       this.programarBot();
+    });
+
+    // Cuenta atrás del reparto: la marca la pone el servidor, así que las seis pantallas
+    // cuentan desde el mismo instante y no cada una desde que le llegó el mensaje.
+    effect((onCleanup) => {
+      const sala = this.online.room();
+      if (!sala?.startsAt) {
+        this.restante.set(null);
+        return;
+      }
+      const marca = sala.startsAt;
+      const reloj = setInterval(() => {
+        const resto = Math.ceil((marca - Date.now()) / 1000);
+        this.restante.set(resto > 0 ? resto : null);
+        if (resto <= 0) clearInterval(reloj);
+      }, 200);
+      onCleanup(() => clearInterval(reloj));
     });
 
     // Enlace compartido: /culo?codigo=ABCD (o ?sala=ABCD, que es lo que lleva el QR) entra directo.

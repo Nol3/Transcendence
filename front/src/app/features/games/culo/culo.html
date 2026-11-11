@@ -150,6 +150,10 @@
     }
   }
 
+  @if (restante(); as n) {
+    <div class="cuenta-atras font-pixel" role="status" aria-live="polite">{{ n }}</div>
+  }
+
   @if (estado()) {
 
     <!-- ── La mesa ─────────────────────────────────────────────────────────── -->

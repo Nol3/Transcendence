@@ -650,3 +650,17 @@
 .lobby__listo {
   color: var(--accent, #4ad9d9);
 }
+
+// 3-2-1 antes de repartir: en el centro y por encima de todo.
+.cuenta-atras {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: clamp(4rem, 22vw, 9rem);
+  color: var(--accent, #4ad9d9);
+  text-shadow: 0 4px 0 #000;
+  background: rgb(0 0 0 / 45%);
+  pointer-events: none;
+  z-index: 60;
+}
