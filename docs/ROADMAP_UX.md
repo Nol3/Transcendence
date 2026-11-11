@@ -377,3 +377,49 @@ tocar las reglas, hay que separarlos:
       **unitarios**, y en local solo estaba corriendo e2e. De ahí que un input con alias y tres rutas
       viejas en los unitarios llegaran a `main`. Regla nueva: antes de publicar, los mismos cinco
       comandos que el CI.
+
+
+## Auditoría del 11-11-2026 · lo que hay que arreglar
+
+Medido, no supuesto: 2 `TODO` en el código, `check --deploy` con **46 avisos**, `npm audit` **0
+vulnerabilidades** y **5,1 MB** en `dist/front/browser` (incluye las 92 cartas).
+
+### Riesgo alto (puede romper la partida o la seguridad)
+
+- [ ] **46 avisos de `manage.py check --deploy` sin revisar** (eran 41). HSTS, cookies seguras,
+      `SECURE_PROXY_SSL_HEADER`… Cada uno es una línea, pero detrás de Cloudflare mal configurado
+      acabas en un bucle de redirecciones o con la cookie de sesión viajando sin `Secure`.
+- [ ] **El usuario ya recibe `ready` del servidor y no se pinta**: el «listo» está a medias (backend
+      hecho, front no). Una función a medio cablear es peor que no tenerla, porque el jugador pulsa
+      «Listo» y no ve nada cambiar.
+- [ ] **Sin cuenta atrás común**: el reparto tiene que esperar a `starts_at` del servidor. Hoy, si se
+      añade el botón, el anfitrión reparte y cada pantalla arranca cuando le llega, no a la vez.
+- [ ] **Sin reconexión**: si se cae la red un segundo, el jugador pierde la silla y no hay vuelta.
+- [ ] **`ruff` no está en la imagen `backend`**: el lint de Python solo se puede reproducir en CI.
+      Lo mismo con cualquier otro chequeo que no esté instalado: si no se puede correr en local, se
+      descubre en el correo de GitHub.
+
+### Riesgo medio (calidad y velocidad de trabajo)
+
+- [ ] **Ruido de los e2e**: 7 `route.fetch: Test ended` al desmontar los mocks, que ensucian el
+      código de salida y obligan a publicar a mano. Arreglo: `unrouteAll({ behavior: 'ignoreErrors' })`.
+- [ ] **7 e2e se saltan en local** (los que necesitan WebSocket con Docker). El multijugador, que es
+      justo lo que más duele cuando falla, no se prueba en la pasada normal.
+- [ ] **Presupuesto de tamaño**: 5,1 MB en `dist`. Falta saber cuánto es JS inicial y poner un tope
+      que falle el build si se pasa; hoy nadie mira el peso.
+- [ ] **`prefers-reduced-motion`**: el abanico, la vista previa y las animaciones de la mesa no lo
+      respetan. Es una línea de CSS y hay gente a la que el movimiento le marea.
+- [ ] **Carga de cartas**: comprobar que las 92 imágenes van con `loading="lazy"` fuera de la mano y
+      que no se descargan las dos barajas enteras al entrar.
+- [ ] **Accesibilidad del lobby**: el QR es una imagen con texto alternativo, pero falta revisar el
+      orden de tabulación, el foco visible y el contraste del código de sala.
+
+### Mejoras (cuando lo anterior esté cerrado)
+
+- [ ] **Espectador explícito** («estás mirando»), sin cartas ajenas ni botones de jugar.
+- [ ] **Auditoría de dependencias en CI** (`npm audit` y `pip-audit`), no solo a mano.
+- [ ] **Un test de concurrencia**: seis clientes en una sala jugando una baza, en el backend. Hoy los
+      tests de consumidor van de uno en uno.
+- [ ] **Métricas mínimas**: tiempo de una partida, partidas abandonadas, errores de WebSocket. Sin
+      números, «va lento» es una opinión.
+- [ ] **Los 2 `TODO` del código**: leerlos y decidir si se arreglan o se borran.
