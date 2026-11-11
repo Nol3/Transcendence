@@ -178,6 +178,12 @@
         }
       </ul>
 
+      @if (estado()!.phase === 'playing') {
+        <p class="mesa__turno font-pixel">
+          {{ 'culo.turn' | translate }}: {{ estado()!.players[estado()!.turn].name }}
+        </p>
+      }
+
       <div class="mesa__centro">
         @if (estado()!.table; as jugada) {
           <div class="jugada">

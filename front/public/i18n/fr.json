@@ -716,7 +716,8 @@
       },
       "desconectado": "La connexion à la salle a été coupée.",
       "reconectar": "Reconnecter"
-    }
+    },
+    "turn": "Tour"
   },
   "baraja": {
     "rank": {

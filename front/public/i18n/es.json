@@ -716,7 +716,8 @@
       },
       "desconectado": "Se ha cortado la conexión con la sala.",
       "reconectar": "Volver a entrar"
-    }
+    },
+    "turn": "Turno"
   },
   "baraja": {
     "rank": {

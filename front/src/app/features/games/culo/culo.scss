@@ -238,6 +238,13 @@
   display: flex;
   flex-direction: column;
 
+  // Quién juega, en una línea sobre la mesa: el borde iluminado no basta si hay seis asientos.
+  &__turno {
+    margin: 0 0 0.25rem;
+    text-align: center;
+    color: var(--accent, #4ad9d9);
+  }
+
   // Los rivales, sentados alrededor de la mesa: la fila se curva en arco, con los del medio más
   // lejos (arriba) y los de los extremos más cerca. Es lo que hace que se lea como una mesa
   // redonda y no como una lista.

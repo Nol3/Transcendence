@@ -716,7 +716,8 @@
       },
       "desconectado": "The connection to the room dropped.",
       "reconectar": "Reconnect"
-    }
+    },
+    "turn": "Turn"
   },
   "baraja": {
     "rank": {
