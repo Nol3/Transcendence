@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, computed, inject, input } from '@angular/core';
 
 import { TranslatePipe } from '../../../i18n';
+import { rutaDeCarta } from './decks';
 
 /**
  * Códigos de carta, por baraja. En las dos el patrón es el mismo —valor + palo— pero
@@ -84,10 +85,9 @@ export class PlayingCard {
   readonly esValida = computed(() => this.partes() !== null);
   readonly src = computed(() => {
     const p = this.partes();
-    // El dorso sale de la carpeta del mazo: el de Balatro y el de la española no se parecen.
-    const { carpeta, extension } = BARAJA[this.deck()];
-    if (this.faceDown() || !p) return `${carpeta}/back.${extension}`;
-    return `${carpeta}/${this.card()}.${extension}`;
+    // La ruta la decide `decks.ts`, que es el único sitio que sabe de ficheros: aquí solo se pide
+    // la carta (o el dorso) de la baraja elegida.
+    return rutaDeCarta(this.deck(), this.faceDown() || !p ? null : this.card());
   });
 
   /** Rango y palo por separado, para componer el nombre accesible traducido. */
