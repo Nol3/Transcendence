@@ -322,3 +322,39 @@ tocar las reglas, hay que separarlos:
       recortar `--arco-max` o quitar el `drop-shadow`.
 - [ ] **Política de tests inestables**: si un test necesita reintento, se arregla el test; no se sube
       el timeout. (Ya han caído dos así: el doble toque y la ronda entera.)
+
+
+---
+
+## Estado al 11-11-2026 (cierre de la tanda)
+
+9 casillas hechas, 45 pendientes. Lo que **ya está publicado** en `main` y `preprod`:
+
+- Abanico de 8° con caída hacia los extremos, mano fija al borde inferior y tamaño de carta que se
+  adapta al número (hasta 10 cartas caben en 390 px).
+- Baraja 8-bit del juego (española mapeada y francesa) servida en WebP; 0,4 MB las dos.
+- `decks.ts`: mapa canónico, equivalencias y validación de que una baraja puede pintar la carta.
+- Test que pide las **92 cartas + 2 dorsos** y falla si falta alguna (el 404 silencioso).
+- Gestos: tocar elige, doble toque y gesto hacia arriba juegan, mantener pulsado enseña la carta,
+  vibración corta.
+- Mesa ovalada: fieltro, asientos por ángulo y nombre al tocar el icono del jugador (solo el Culo).
+- Botones de la mesa a 56 px y a lo ancho en el móvil.
+- **Selector de baraja en la cabecera**, con la preferencia en `localStorage`; la mano de los cinco
+  juegos ya la sigue.
+
+## Huecos que ha dejado el trabajo de hoy (nuevo)
+
+- [ ] **Las cartas de la mesa no siguen el selector**: la jugada, el descarte y el marcador llevan
+      `deck="spanish"` fijo. Hay que inyectar `Baraja` en los cinco juegos y pasar
+      `[deck]="baraja.baraja()"`. **Ojo**: no vale cambiar el valor por defecto de `playing-card`,
+      porque el póker se apoya en él y empezaría a enseñar cartas españolas (se probó y se revirtió).
+- [ ] **Mesa ovalada solo en el Culo**: falta brisca, tute y mentiroso; y la última carta de cada
+      rival en su asiento (necesita que el estado guarde la jugada de cada uno, no solo la última).
+- [ ] **El ruido de los e2e**: la suite acaba con 7 «errores que no son de ningún test»
+      (`route.fetch: Test ended`). Es desmontaje de los mocks de red, no fallos, pero ensucia el
+      código de salida y bloquea publicar en automático. Arreglo: `unrouteAll({ behavior: 'ignoreErrors' })`
+      al terminar cada test en los helpers.
+- [ ] **Paridad con el CI en local**: el CI corre `lint`, `i18n:check`, `audit`, `build` y los
+      **unitarios**, y en local solo estaba corriendo e2e. De ahí que un input con alias y tres rutas
+      viejas en los unitarios llegaran a `main`. Regla nueva: antes de publicar, los mismos cinco
+      comandos que el CI.
