@@ -152,7 +152,10 @@ export class Mano implements OnInit, OnDestroy {
     // Hacia arriba, con recorrido suficiente y sin torcerse: se juega la carta directamente.
     if (rapido && dy <= -Mano.RECORRIDO && Math.abs(dx) <= Math.abs(dy) * 0.6) {
       this.alLanzar.emit(c.id);
+      return;
     }
+    // Ni gesto ni toque mantenido: es un toque normal, y aquí se decide si es el segundo seguido.
+    this.registrarToque(c);
   }
 
   alCancelar(): void {
@@ -160,21 +163,30 @@ export class Mano implements OnInit, OnDestroy {
     this.inicio = null;
   }
 
-  /** El `click` de verdad: selecciona, o juega si es el segundo toque seguido sobre la misma carta. */
-  alPulsar(id: string): void {
+  /**
+   * El `click` solo se usa para el **teclado** (Enter y espacio llegan con `detail === 0`).
+   * Con ratón o dedo manda `pointerup`: si se contara también aquí, cada toque contaría dos veces y
+   * el doble toque saldría en el primero. Ese era el fallo intermitente.
+   */
+  alPulsar(ev: MouseEvent, c: CartaMano): void {
     if (this.fueLarga) {
       this.fueLarga = false;
       return;
     }
+    if (ev.detail === 0) this.registrarToque(c);
+  }
+
+  /** Un toque: el primero elige; el segundo sobre la misma carta, en menos de `DOBLE`, juega. */
+  private registrarToque(c: CartaMano): void {
     const ahora = Date.now();
-    const seguido = this.ultimoToque.id === id && ahora - this.ultimoToque.cuando < Mano.DOBLE;
-    this.ultimoToque = seguido ? { id: '', cuando: 0 } : { id, cuando: ahora };
+    const seguido = this.ultimoToque.id === c.id && ahora - this.ultimoToque.cuando < Mano.DOBLE;
+    this.ultimoToque = seguido ? { id: '', cuando: 0 } : { id: c.id, cuando: ahora };
     if (seguido) {
-      this.alLanzar.emit(id);
+      this.alLanzar.emit(c.id);
       return;
     }
     this.vibrar(6);
-    this.alTocar.emit(id);
+    this.alTocar.emit(c.id);
   }
 
   cerrarVista(): void {

@@ -13,7 +13,7 @@
       [class.mano__carta--ilegal]="!!c.ilegal"
       [disabled]="deshabilitada() || !!c.deshabilitada"
       [style.--i]="$index"
-      (click)="alPulsar(c.id)"
+      (click)="alPulsar($event, c)"
       (pointerdown)="alBajar($event, c)"
       (pointerup)="alSoltar($event, c)"
       (pointercancel)="alCancelar()"
