@@ -697,7 +697,8 @@
       "freeSeat": "Asiento libre",
       "addBot": "Añadir bot",
       "waitingHost": "Esperando a que reparta quien creó la sala…",
-      "qr": "Escanea para entrar en la sala"
+      "qr": "Escanea para entrar en la sala",
+      "ready": "Estoy listo"
     },
     "online": {
       "errorCrear": "No se pudo crear la sala. Prueba otra vez.",

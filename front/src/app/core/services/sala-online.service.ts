@@ -12,6 +12,7 @@ export interface SalaPlayerView {
   username: string;
   isBot: boolean;
   connected: boolean;
+  ready: boolean;
 }
 
 /** La sala: el lobby y, si ya ha empezado, la partida (cada uno recibe la suya). */

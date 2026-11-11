@@ -381,6 +381,10 @@ export class Culo implements OnDestroy {
     this.online.repartir();
   }
 
+  marcarListo(): void {
+    this.online.marcarListo();
+  }
+
   anadirBot(): void {
     this.online.anadirBot();
   }

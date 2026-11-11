@@ -697,7 +697,8 @@
       "freeSeat": "Place libre",
       "addBot": "Ajouter un bot",
       "waitingHost": "En attente de la distribution par l'hôte…",
-      "qr": "Scannez pour rejoindre la salle"
+      "qr": "Scannez pour rejoindre la salle",
+      "ready": "Je suis prêt"
     },
     "online": {
       "errorCrear": "La salle n'a pas pu être créée. Réessaie.",

@@ -120,6 +120,7 @@
             <li class="lobby__jugador" [class.lobby__jugador--fuera]="!p.connected">
               <span class="font-pixel">{{ p.username }}</span>
               @if (p.isBot) { <span class="text-muted text-sm">{{ 'culo.lobby.bot' | translate }}</span> }
+              @if (p.ready && !p.isBot) { <span class="lobby__listo" [attr.title]="'culo.lobby.ready' | translate">✓</span> }
               @if (!p.connected) { <span class="text-muted text-sm">{{ 'culo.lobby.gone' | translate }}</span> }
               @if (soyAnfitrion() && p.isBot) {
                 <button type="button" class="lobby__quitar" (click)="quitarBot()"
@@ -139,7 +140,9 @@
               {{ 'culo.start' | translate }}
             </app-button>
           } @else {
-            <span class="text-muted">{{ 'culo.lobby.waitingHost' | translate }}</span>
+            <app-button variant="primary" (click)="marcarListo()">
+              {{ 'culo.lobby.ready' | translate }}
+            </app-button>
           }
           <app-button variant="ghost" (click)="salir()">{{ 'culo.leave' | translate }}</app-button>
         </div>

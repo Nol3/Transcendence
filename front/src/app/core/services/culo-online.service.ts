@@ -15,6 +15,7 @@ interface ServerPlayer {
   role: Role | null;
   place: number | null;
   connected: boolean;
+  ready: boolean;
 }
 
 interface ServerState {
@@ -34,7 +35,7 @@ export interface RoomView {
   status: 'lobby' | 'playing' | 'finished';
   decks: number;
   isHost: boolean;
-  players: { userId: number | null; username: string; isBot: boolean; connected: boolean }[];
+  players: { userId: number | null; username: string; isBot: boolean; connected: boolean; ready: boolean }[];
   game?: ServerState;
 }
 
@@ -138,6 +139,9 @@ export class CuloOnlineService {
 
   repartir(): void { this.enviar({ action: 'start' }); }
   anadirBot(): void { this.enviar({ action: 'add_bot' }); }
+
+  /** Avisa a la sala de que este jugador está listo (o deja de estarlo). */
+  marcarListo(ready = true): void { this.enviar({ action: 'ready', ready }); }
   quitarBot(): void { this.enviar({ action: 'remove_bot' }); }
   pasar(): void { this.enviar({ action: 'pass' }); }
   siguienteRonda(): void { this.enviar({ action: 'next_round' }); }

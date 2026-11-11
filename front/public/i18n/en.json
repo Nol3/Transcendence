@@ -697,7 +697,8 @@
       "freeSeat": "Free seat",
       "addBot": "Add bot",
       "waitingHost": "Waiting for the host to deal…",
-      "qr": "Scan to join the room"
+      "qr": "Scan to join the room",
+      "ready": "I'm ready"
     },
     "online": {
       "errorCrear": "The room could not be created. Try again.",
