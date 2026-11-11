@@ -145,6 +145,19 @@ superarla desde dentro; con la vista abierta el host sube a 50 (`:host(.vista-ab
       nombre.
 - **Hecho cuando:** una persona juega una ronda completa con una sola mano y sin mirar dos veces.
 
+### La mesa ovalada (empezada)
+
+- [x] Centro como **óvalo de fieltro** y rivales **sentados en arco** (los del medio más lejos, los
+      de fuera más cerca). Regla común en `styles.scss` sobre `.mesa__rivales` con `--i` / `--n`.
+- [x] Puesto en culo, brisca, tute y mentiroso. **Mus** no usa ese marcado: pendiente.
+- [ ] Cada rival en **su posición** del óvalo (izquierda, arriba, derecha) en vez de una fila curvada.
+- [ ] **La última carta que echó** cada uno delante de su asiento (hoy el centro solo enseña la
+      última jugada, con el nombre de quien la echó).
+- [ ] El turno marcado en el asiento de quien juega.
+
+Nota de test: el e2e del doble toque se reintenta hasta tres veces porque los bots juegan entre
+medias y la mano se recoloca; sin reintento fallaba por carrera, no por el gesto.
+
 Truco: el botón vive dentro de `app-button`, así que estirar `.controles__botones button` no basta;
 hay que estirar también el host (`.controles__botones > * { width: 100% }`).
 

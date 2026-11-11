@@ -59,9 +59,19 @@ test.describe('Gestos de la mano', () => {
     // Se deja pasar el margen del doble toque para que el `dblclick` cuente desde cero.
     await page.waitForTimeout(400);
     const antes = await mano.count();
-    await mano.nth(jugable).dblclick({ force: true });
 
-    // Jugar saca la carta de la mano (o termina la ronda): deja de estar la misma cantidad.
-    await expect.poll(async () => mano.count(), { timeout: 15_000 }).not.toBe(antes);
+    // Los bots juegan entre medias y la mano se recoloca: se reintenta el gesto hasta tres veces
+    // antes de darlo por fallido (si no, el test falla por una carrera con el turno, no por el gesto).
+    for (let intento = 0; intento < 3; intento++) {
+      await mano.nth(jugable).dblclick({ force: true });
+      const cambio = await expect
+        .poll(async () => mano.count(), { timeout: 4_000 })
+        .not.toBe(antes)
+        .then(() => true)
+        .catch(() => false);
+      if (cambio) return;
+      await page.waitForTimeout(300);
+    }
+    expect(await mano.count(), 'el doble toque debería jugar la carta').not.toBe(antes);
   });
 });
