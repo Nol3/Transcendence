@@ -152,9 +152,20 @@
         @for (r of rivales(); track r.id) {
           <li class="rival"
               [style.--i]="$index"
+              [class.rival--abierto]="asientoAbierto() === r.id"
               [class.rival--turno]="estado()!.turn === r.id && estado()!.phase === 'playing'"
               [class.rival--fuera]="r.hand.length === 0">
-            <span class="rival__nombre font-pixel">{{ r.name }}</span>
+            <button
+              type="button"
+              class="rival__icono font-pixel"
+              (click)="alternarAsiento(r.id)"
+              [attr.aria-label]="r.name"
+              [attr.aria-expanded]="asientoAbierto() === r.id"
+            >{{ r.name.slice(0, 1) }}</button>
+
+            @if (asientoAbierto() === r.id) {
+              <span class="rival__nombre font-pixel">{{ r.name }}</span>
+            }
             <span class="rival__cartas font-mono">{{ cartasDe(r) }} 🂠</span>
             @if (r.role) {
               <span class="rival__rol text-sm">{{ rolClave(r.role) | translate }}</span>

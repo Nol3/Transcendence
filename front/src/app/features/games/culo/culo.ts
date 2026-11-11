@@ -241,6 +241,13 @@ export class Culo implements OnDestroy {
     });
   }
 
+  /** Rival cuyo nombre se está mirando (se enseña al tocar su icono y se oculta al volver a tocar). */
+  readonly asientoAbierto = signal<number | null>(null);
+
+  alternarAsiento(id: number): void {
+    this.asientoAbierto.set(this.asientoAbierto() === id ? null : id);
+  }
+
   /** Volver a entrar tras una caída de la conexión, sin salir de la mesa. */
   reconectar(): void {
     if (this.codigoSala()) this.online.conectar(this.codigoSala());
