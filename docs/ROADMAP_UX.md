@@ -163,11 +163,30 @@ hay que estirar también el host (`.controles__botones > * { width: 100% }`).
 
 ### F5 · Sala común estilo Kahoot (el flujo con amigos) — 1-2 tandas
 
-- [ ] **Código de sala gigante** (4 caracteres, legible a un metro) y enlace/QR para entrar directo.
-- [ ] **Lobby en vivo**: avatares que aparecen, «listo» por jugador, cuenta atrás compartida.
-- [ ] **Ritmo**: ronda → marcador entre rondas → siguiente. Marcador con animación de subida.
-- [ ] **Espectador** claro: «estás mirando», sin cartas ajenas.
-- [ ] Reconexión silenciosa (ya hay JWT y WebSocket): si se cae la red, vuelve a su silla.
+**Ya existe** (comprobado en `culo.html`, se replicará en los demás): el lobby con el **código de sala
+en grande** (`.lobby__code`), botón de **copiar enlace** con su confirmación, lista de jugadores en
+vivo con su estado de conexión, añadir y quitar bots, y asiento libre cuando quedan huecos. La
+conexión ya va por WebSocket con JWT, y el estado de la sala llega del servidor.
+
+Lo que falta, y por qué importa cada cosa:
+
+- [ ] **QR de la sala**. Hoy hay enlace, pero escribirlo a mano delante de la gente es lo que rompe la
+      magia de Kahoot. Un QR generado en el cliente (sin servicio externo, para no filtrar el código
+      de la sala a un tercero) que se pinte en el lobby y en la pantalla de espera.
+- [ ] **«Listo» por jugador y cuenta atrás compartida**. Ahora el anfitrión reparte cuando le parece y
+      los demás no saben cuándo empieza. Con un «listo» por persona y una cuenta atrás de 3-2-1
+      igual para todos, la partida empieza a la vez en seis pantallas distintas.
+- [ ] **Ritmo entre rondas**: marcador entre rondas con animación de subida, y un «siguiente» claro.
+      Hoy una ronda termina y cada uno tiene que adivinar qué pasa.
+- [ ] **Modo espectador explícito**: «estás mirando», sin cartas ajenas ni botones de jugar. Sirve
+      tanto para el que llega tarde como para el que se queda sin silla.
+- [ ] **Reconexión silenciosa**: si se cae la red un momento, el jugador vuelve a su silla sin salir
+      ni reescribir el código. JWT y WebSocket ya están puestos; falta el reintento con espera y el
+      mensaje «volviendo a la mesa».
+- [ ] **Deep link** `?sala=XXXX`: entrar desde el enlace compartido sin teclear nada. Cierra el
+      círculo del QR.
+- **Hecho cuando:** seis personas entran con el QR, marcan «listo», juegan una ronda y nadie escribe
+      un código a mano ni pregunta «¿ya empieza?».
 - **Hecho cuando:** cuatro móviles entran con un código y terminan una partida de Mus sin recargar.
 
 ### F6 · El adorno de Balatro (solo si F1-F5 están cerradas) — 2 tandas
