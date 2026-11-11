@@ -140,7 +140,7 @@
                     <div class="hand__board">
                       <span class="text-muted font-mono text-sm">{{ 'poker.history.board' | translate }}</span>
                       @for (c of cards(h.board); track $index) {
-                        <app-playing-card [card]="c" [size]="'sm'" [order]="$index" />
+                        <app-playing-card [card]="c" deck="poker" deck="poker" [size]="'sm'" [order]="$index" />
                       }
                     </div>
                   }
@@ -153,7 +153,7 @@
                         @if (p.is_bot) { <app-badge variant="default">{{ 'poker.table.bot' | translate }}</app-badge> }
                         @if (cards(p.hole).length > 0) {
                           @for (c of cards(p.hole); track $index) {
-                            <app-playing-card [card]="c" [size]="'sm'" [order]="$index"
+                            <app-playing-card [card]="c" deck="poker" deck="poker" [size]="'sm'" [order]="$index"
                                               [state]="p.folded ? 'folded' : (p.won > 0 ? 'winner' : 'idle')" />
                           }
                         } @else {
