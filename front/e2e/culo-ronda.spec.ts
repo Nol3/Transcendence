@@ -38,18 +38,28 @@ test('una ronda entera termina con roles e intercambio', async ({ page }) => {
   const pasar = page.locator('.controles__botones button').nth(1);
   const jugar = page.locator('.controles__botones button').nth(0);
 
-  // Juega hasta que se acabe la ronda (o se agote el tiempo).
-  for (let turno = 0; turno < 80; turno++) {
-    if (await page.locator('.fin').isVisible().catch(() => false)) break;
-    const puedoActuar = await pasar.isEnabled().catch(() => false);
-    if (puedoActuar) {
-      if (await jugar.isEnabled()) await jugar.click();
-      else await pasar.click();
-    }
-    await page.waitForTimeout(700);
+  // Juega hasta que se acabe la ronda. En vez de dormir 700 ms por turno (que hacía el test lento
+  // y frágil), se espera a que **pase algo**: o me toca, o se acabó. Así avanza al ritmo real de los
+  // bots y no se queda corto si un turno tarda más.
+  const fin = page.locator('.fin');
+  for (let turno = 0; turno < 200; turno++) {
+    if (await fin.isVisible().catch(() => false)) break;
+    await expect
+      .poll(
+        async () =>
+          (await fin.isVisible().catch(() => false)) ||
+          (await jugar.isEnabled().catch(() => false)) ||
+          (await pasar.isEnabled().catch(() => false)),
+        { timeout: 20_000, intervals: [100, 200, 400] },
+      )
+      .toBe(true);
+    if (await fin.isVisible().catch(() => false)) break;
+    if (await jugar.isEnabled().catch(() => false)) await jugar.click();
+    else if (await pasar.isEnabled().catch(() => false)) await pasar.click();
+    await page.waitForTimeout(120);
   }
 
-  await expect(page.locator('.fin')).toBeVisible({ timeout: 60_000 });
+  await expect(fin).toBeVisible({ timeout: 90_000 });
 
   // Roles: tres puestos distintos y uno de ellos el Presidente.
   const puestos = await page.locator('.fin__puesto').count();
