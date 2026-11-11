@@ -186,6 +186,9 @@ class CuloConsumer(AsyncWebsocketConsumer):
                 sala.add_bot(self.user_id)
             elif action == "remove_bot":
                 sala.remove_bot(self.user_id)
+            elif action == "ready":
+                # Cada uno avisa de que está listo; el estado va en el broadcast.
+                sala.set_ready(self.user_id, bool(mensaje.get("ready", True)))
             elif action == "start":
                 sala.start(self.user_id)
             elif action == "leave":

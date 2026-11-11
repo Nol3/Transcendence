@@ -42,6 +42,8 @@ class RoomPlayer:
     username: str
     is_bot: bool = False
     connected: bool = True
+    # «Listo» para empezar: sin esto el anfitrión reparte y los demás no saben cuándo.
+    ready: bool = False
     channel: str | None = None
 
     def to_dict(self) -> dict:
@@ -50,6 +52,7 @@ class RoomPlayer:
             "username": self.username,
             "isBot": self.is_bot,
             "connected": self.connected,
+            "ready": self.is_bot or self.ready,
         }
 
 
@@ -145,6 +148,16 @@ class Room:
         if self.state is not None:
             self.state.players[self.players.index(jugador)].connected = False
         return True
+
+    def set_ready(self, user_id: int, ready: bool = True) -> None:
+        """Marca (o desmarca) a un jugador como listo.
+
+        Los bots no se marcan: cuentan como listos siempre, que es lo que son.
+        """
+        for jugador in self.players:
+            if jugador.user_id == user_id and not jugador.is_bot:
+                jugador.ready = bool(ready)
+                return
 
     def start(self, host_id: int) -> None:
         if host_id != self.host_id:

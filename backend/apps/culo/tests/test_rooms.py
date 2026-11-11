@@ -166,3 +166,29 @@ class SalaTests(unittest.TestCase):
     def test_buscar_una_sala_que_no_existe(self):
         self.assertIsNone(self.registry.get("ZZZZ"))
         self.assertIsNone(self.registry.get(""))
+
+    def test_marcar_listo_solo_afecta_a_quien_lo_pide(self):
+        self.sala.join(1, "ana", "canal-1")
+        self.sala.join(2, "bea", "canal-2")
+        self.sala.set_ready(1, True)
+        listos = {j["username"]: j["ready"] for j in self.sala.to_dict()["players"]}
+        self.assertTrue(listos["ana"])
+        self.assertFalse(listos["bea"])
+
+    def test_desmarcar_listo_vuelve_a_dejar_la_sala_esperando(self):
+        self.sala.join(1, "ana", "canal-1")
+        self.sala.set_ready(1, True)
+        self.sala.set_ready(1, False)
+        listos = {j["username"]: j["ready"] for j in self.sala.to_dict()["players"]}
+        self.assertFalse(listos["ana"])
+
+    def test_los_bots_cuentan_como_listos_sin_que_nadie_los_marque(self):
+        self.sala.join(1, "ana", "canal-1")
+        self.sala.add_bot(1)
+        jugadores = self.sala.to_dict()["players"]
+        self.assertEqual(len(jugadores), 2)
+        bots = [j for j in jugadores if j["isBot"]]
+        humanos = [j for j in jugadores if not j["isBot"]]
+        self.assertEqual(len(bots), 1)
+        self.assertTrue(bots[0]["ready"])
+        self.assertFalse(humanos[0]["ready"])
