@@ -104,6 +104,10 @@
         <h3 class="lobby__titulo font-pixel neon-text-cyan">{{ 'culo.lobby.title' | translate }}</h3>
         <p class="text-muted text-sm">{{ 'culo.lobby.share' | translate }}</p>
 
+        <div class="lobby__qr">
+          <app-qr-sala [texto]="enlaceSala" [tam]="180" [etiqueta]="'culo.lobby.qr' | translate" />
+        </div>
+
         <div class="lobby__codigo">
           <span class="lobby__code font-pixel">{{ s.code }}</span>
           <button type="button" class="lobby__copiar" (click)="copiarEnlace()">

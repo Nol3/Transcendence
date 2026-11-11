@@ -6,7 +6,16 @@ const angular = require('angular-eslint');
 
 module.exports = tseslint.config(
   {
-    ignores: ['dist/**', '.angular/**', 'node_modules/**', 'playwright-report/**', 'test-results/**'],
+    // `qrcodegen.ts` es código de terceros (Project Nayuki, MIT) tal cual: se vendoriza sin tocar
+    // su estilo, así que no se le pasa el linter.
+    ignores: [
+      'dist/**',
+      '.angular/**',
+      'node_modules/**',
+      'playwright-report/**',
+      'test-results/**',
+      'src/app/shared/qr/qrcodegen.ts',
+    ],
   },
   {
     files: ['**/*.ts'],

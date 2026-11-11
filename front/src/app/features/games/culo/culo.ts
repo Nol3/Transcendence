@@ -31,6 +31,7 @@ import { ButtonComponent } from '../../../shared/components/button/button';
 import { FocoDialogoDirective } from '../../../shared/directives/foco-dialogo.directive';
 import { PixelTitleComponent } from '../../../shared/components/pixel-title/pixel-title';
 import { Mano } from '../../../shared/components/mano/mano';
+import { QrSala } from '../../../shared/qr/qr-sala';
 import { PlayingCard } from '../../../shared/components/playing-card/playing-card';
 import { GameSound } from '../../../core/audio/game-sound';
 
@@ -57,6 +58,7 @@ export type ModoCulo = 'menu' | 'local' | 'online';
 @Component({
   selector: 'app-culo',
   imports: [
+    QrSala,
     ButtonComponent,
     PixelTitleComponent,
     PlayingCard,
@@ -75,6 +77,7 @@ export class Culo implements OnDestroy {
   readonly online = inject(CuloOnlineService);
 
   readonly modo = signal<ModoCulo>('menu');
+
   private readonly estadoLocal = signal<GameState | null>(null);
 
   /** El estado de la mesa, venga del motor local o del servidor. */
@@ -164,9 +167,10 @@ export class Culo implements OnDestroy {
       this.programarBot();
     });
 
-    // Enlace compartido: /culo?codigo=ABCD entra directo en la sala.
+    // Enlace compartido: /culo?codigo=ABCD (o ?sala=ABCD, que es lo que lleva el QR) entra directo.
     if (typeof window !== 'undefined') {
-      const codigo = new URLSearchParams(window.location.search).get('codigo');
+      const parametros = new URLSearchParams(window.location.search);
+      const codigo = parametros.get('codigo') ?? parametros.get('sala');
       if (codigo) {
         this.codigoEntrada.set(codigo.toUpperCase());
         void this.entrarSala();

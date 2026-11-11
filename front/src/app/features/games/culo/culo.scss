@@ -632,3 +632,10 @@
     transform: none;
   }
 }
+
+// El QR del enlace, centrado y con aire sobre el código.
+.lobby__qr {
+  display: flex;
+  justify-content: center;
+  margin: 0.75rem 0 1rem;
+}
