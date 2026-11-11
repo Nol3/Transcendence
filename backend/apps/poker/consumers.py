@@ -410,9 +410,14 @@ class PokerMatchmakingConsumer(AuthedConsumer):
 
     async def disconnect(self, close_code):
         self.queued = False
-        await self._remove_from_queue(self.channel_name)
-        if self.queue_timer:
-            self.queue_timer.cancel()
+        # `queue` y `queue_timer` solo existen si el handshake pasó de `authenticate()`: con un
+        # token caducado se cierra antes de `connect()` y este `disconnect` llegaba con
+        # AttributeError, dejando una traza por cada conexión rechazada.
+        if getattr(self, "queue", None) is not None:
+            await self._remove_from_queue(self.channel_name)
+        timer = getattr(self, "queue_timer", None)
+        if timer is not None:
+            timer.cancel()
 
     async def matchmaking_message(self, event):
         payload = event["payload"]
