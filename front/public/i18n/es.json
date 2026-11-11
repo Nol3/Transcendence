@@ -969,5 +969,12 @@
       "not_playing": "La partida ya ha terminado.",
       "not_finished": "La partida todavía no ha terminado."
     }
+  },
+  "ajustes": {
+    "baraja": {
+      "spanish": "Española 8 bits",
+      "poker": "Francesa",
+      "titulo": "Baraja"
+    }
   }
 }

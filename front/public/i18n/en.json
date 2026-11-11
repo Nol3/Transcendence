@@ -969,5 +969,12 @@
       "not_playing": "The game is already over.",
       "not_finished": "The game is not over yet."
     }
+  },
+  "ajustes": {
+    "baraja": {
+      "spanish": "Spanish 8-bit",
+      "poker": "French",
+      "titulo": "Deck"
+    }
   }
 }
