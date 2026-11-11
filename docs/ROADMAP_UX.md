@@ -266,3 +266,59 @@ móvil. El test de móvil comprueba, carta por carta, que **ninguna se sale** de
 arriba, ni por los lados, ni por abajo) y que los botones responden a un toque de verdad.
 
 Pendiente de esta familia: los **gestos** (F3) y las **partículas/CRT** (F6).
+
+
+---
+
+## F7 · Selector de baraja (nuevo, 11-11-2026)
+
+Un botón al lado del de idioma para elegir con qué baraja se juega. La baraja es **solo arte**: las
+reglas no cambian (por dentro la sota sigue siendo la carta 10).
+
+- [ ] **Botón en la cabecera**, junto al selector de idioma y con el mismo patrón (mismo tamaño
+      táctil, `aria-haspopup`, cierre con Escape y con clic fuera, foco devuelto al botón).
+- [ ] Opciones: **Española 8-bit** (la actual, arte de Balatro mapeado), **Española pixel** (pack de
+      itch, cuando esté la licencia) y **Francesa** (póker y quien la prefiera).
+- [ ] **Preferencia persistida** (`localStorage`, clave versionada) y aplicada al arrancar sin
+      parpadeo; por defecto la española.
+- [ ] **Cambio en caliente**: `playing-card` ya recibe `deck` como input, así que no debe recargar ni
+      perder la mano a medias.
+- [ ] Nombre accesible del botón y de cada opción con la baraja y su idioma (`Ajustes · baraja`).
+- [ ] Tests: cambiar de baraja cambia el `src` de una carta, se mantiene al recargar y no rompe la
+      partida en curso.
+
+## Compatibilidad de barajas en la lógica de los juegos (nuevo)
+
+Hoy el arte y el código de carta van juntos en `playing-card.ts`. Para que convivan dos barajas sin
+tocar las reglas, hay que separarlos:
+
+- [ ] **`decks.ts`**: un mapa por baraja de *código canónico ↔ fichero* (rango y palo), con test de
+      cobertura (40 cartas españolas, 52 francesas) y de que no quedan códigos sin arte.
+- [ ] **Los juegos hablan de códigos canónicos** (`"10o"`, `"1c"`), nunca de nombres ni de ficheros.
+      Revisar los cinco juegos y el póker: ninguna plantilla debe componer una ruta de imagen.
+- [ ] **Mapa de equivalencias explícito**: 1→A, 2-7→2-7, 10→J, 11→Q, 12→K; oros→diamantes,
+      copas→corazones, espadas→picas, bastos→tréboles. En un solo sitio y con test.
+- [ ] **i18n por baraja**: `baraja.rank.*` / `baraja.suit.*` para la española y `deck.*` para la
+      francesa; el `aria-label` sale del mapa, no de un texto fijo.
+- [ ] **Reglas y validación**: los juegos que usan 1-12 deben rechazar cartas que su baraja no tiene
+      (8, 9 y 10 franceses) — un test por juego con el mazo francés cargado.
+- [ ] **Backend y WebSocket sin cambios**: se siguen enviando códigos españoles; la traducción a arte
+      ocurre solo en la vista.
+- [ ] **Red de seguridad**: test que abre cada pantalla con cada baraja y comprueba que **ninguna
+      imagen da 404** (hoy el fallo sería silencioso: una carta en blanco).
+
+## Antes de producción (nuevo, por orden de riesgo)
+
+- [ ] **Licencia de la baraja**: los PNG 8-bit salen de Balatro (juego comercial). Antes de abrir el
+      dominio: pack de itch con licencia del autor o la de Wikimedia (dominio público).
+- [ ] **Regresión visual**: `toHaveScreenshot` por pantalla y viewport, para que un cambio de CSS no
+      rompa la mesa sin que nadie lo vea.
+- [ ] **`manage.py check --deploy`**: revisar los avisos uno a uno (HSTS, cookies seguras,
+      `SECURE_PROXY_SSL_HEADER` detrás de Cloudflare).
+- [ ] **Operación**: copia de la base de datos programada (`scripts/backup.sh` existe, falta el cron),
+      rotación de logs y comprobación externa de `/api/health/`.
+- [ ] **Reconexión** a mitad de baza (JWT + WebSocket ya están): volver a la silla sin reentrar.
+- [ ] **Rendimiento en móvil de gama baja**: medir con 4× de CPU; si el abanico baja de 30 fps,
+      recortar `--arco-max` o quitar el `drop-shadow`.
+- [ ] **Política de tests inestables**: si un test necesita reintento, se arregla el test; no se sube
+      el timeout. (Ya han caído dos así: el doble toque y la ronda entera.)
