@@ -19,15 +19,15 @@ describe('PlayingCard', () => {
   }
 
   it('resuelve el PNG por el código de la carta', () => {
-    expect(montar('As').src()).toBe('cards/balatro/As.png');
-    expect(montar('7c').src()).toBe('cards/balatro/7c.png');
-    expect(montar('Td').src()).toBe('cards/balatro/Td.png');
-    expect(montar('Kh').src()).toBe('cards/balatro/Kh.png');
+    expect(montar('As').src()).toBe('cards/8bit/As.webp');
+    expect(montar('7c').src()).toBe('cards/8bit/7c.webp');
+    expect(montar('Td').src()).toBe('cards/8bit/Td.webp');
+    expect(montar('Kh').src()).toBe('cards/8bit/Kh.webp');
   });
 
   it('enseña el dorso cuando la carta está boca abajo', () => {
     const c = montar('As', true);
-    expect(c.src()).toBe('cards/balatro/back.png');
+    expect(c.src()).toBe('cards/8bit/back.webp');
   });
 
   it('acepta las 52 cartas de la baraja', () => {
@@ -46,7 +46,7 @@ describe('PlayingCard', () => {
     for (const malo of ['', 'X', 'Zz', '10c', 'Az', '1h']) {
       const c = montar(malo);
       expect(c.esValida(), `"${malo}" no es una carta`).toBe(false);
-      expect(c.src()).toBe('cards/balatro/back.png');
+      expect(c.src()).toBe('cards/8bit/back.webp');
     }
   });
 

@@ -62,10 +62,8 @@ export class Mano implements OnInit, OnDestroy {
   readonly cartas = input.required<readonly CartaMano[]>();
   /** Ids de las cartas elegidas. */
   readonly elegidas = input<readonly string[]>([]);
-  /** Baraja fija para esta mano. Si no se pasa, manda la elegida en la cabecera. */
-  readonly barajaFija = input<CardDeck | null>(null, { alias: 'baraja' });
-  /** La que se pinta: la fija del juego o la del selector global. */
-  readonly baraja = computed<CardDeck>(() => this.barajaFija() ?? this.barajaElegida.baraja());
+  /** La baraja la elige el selector de la cabecera y vale para todas las mesas. */
+  readonly baraja = computed<CardDeck>(() => this.barajaElegida.baraja());
   readonly tamano = input<CardSize>('lg');
   /** De dónde salen los nombres accesibles: `culo` y `baraja` tienen sus propias claves. */
   readonly clave = input<'culo' | 'baraja'>('baraja');
