@@ -246,9 +246,26 @@
     justify-content: center;
   }
 
+  // Asientos repartidos por el óvalo: cada rival se coloca por su ángulo sobre un arco de 7 rem,
+  // con los del centro arriba y los de los extremos a los lados, como en una mesa vista desde
+  // arriba. `--factor` apaga el reparto cuando solo hay un rival (si no, se iría a 75°).
+  &__rivales {
+    position: relative;
+    height: 9rem;
+    display: block;
+  }
+
   .rival {
-    --d: calc(var(--i, 0) - (var(--n, 1) - 1) / 2);
-    transform: translateY(calc(-1 * var(--d) * var(--d) * 2px));
+    --factor: clamp(0, var(--n, 1) - 1, 1);
+    --ang: calc(
+      (var(--i, 0) / max(var(--n, 1) - 1, 1) - 0.5) * 130deg * var(--factor)
+    );
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    margin: 0;
+    transform: translate(-50%, -50%) rotate(var(--ang)) translateY(-7rem)
+      rotate(calc(-1 * var(--ang)));
   }
   gap: var(--space-4, 1rem);
 
