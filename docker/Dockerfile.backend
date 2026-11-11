@@ -24,6 +24,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gettext \
     && rm -rf /var/lib/apt/lists/*
 
+# `ruff` para poder correr el mismo lint que el CI sin salir del contenedor: si no está aquí,
+# el lint de Python solo se reproduce en GitHub y los fallos se descubren por correo.
+RUN pip install --no-cache-dir ruff
+
 # Copy Python packages from builder
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
