@@ -47,7 +47,9 @@ test.describe('Gestos de la mano', () => {
     const cuantas = await mano.count();
     let jugable = -1;
     for (let i = 0; i < cuantas; i++) {
-      await mano.nth(i).click({ force: true });
+      // `click()` del DOM, no del ratón: en el abanico las cartas se tapan y el clic por
+      // coordenadas cae en la vecina (y dos clics en la misma carta la juegan sin querer).
+      await mano.nth(i).evaluate((el) => (el as HTMLElement).click());
       await page.waitForTimeout(150);
       if (await jugar.isEnabled()) {
         jugable = i;

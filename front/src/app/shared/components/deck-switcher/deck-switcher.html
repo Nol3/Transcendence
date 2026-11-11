@@ -1,0 +1,30 @@
+<div class="lang-switcher" [class.lang-switcher--open]="isOpen()">
+  <button
+    class="lang-switcher__trigger font-pixel"
+    type="button"
+    (click)="toggle()"
+    [attr.aria-label]="'ajustes.baraja.titulo' | translate"
+    [attr.aria-expanded]="isOpen()"
+    aria-haspopup="listbox"
+  >
+    <span>{{ actual.flag }}</span>
+    <span class="deck-switcher__label">{{ actual.label | translate }}</span>
+    <span class="lang-switcher__arrow">{{ isOpen() ? '\u25B2' : '\u25BC' }}</span>
+  </button>
+  @if (isOpen()) {
+    <ul class="lang-switcher__dropdown animate-slide-up" role="listbox">
+      @for (baraja of barajas(); track baraja.code) {
+        <li
+          role="option"
+          [attr.aria-selected]="baraja.code === actual.code"
+          [class.lang-switcher__option--active]="baraja.code === actual.code"
+          class="lang-switcher__option font-pixel"
+          (click)="select(baraja.code)"
+        >
+          <span>{{ baraja.flag }}</span>
+          <span>{{ baraja.label | translate }}</span>
+        </li>
+      }
+    </ul>
+  }
+</div>

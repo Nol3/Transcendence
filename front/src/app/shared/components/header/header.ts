@@ -2,13 +2,14 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { DeckSwitcher } from '../deck-switcher/deck-switcher';
 import { LanguageSwitcherComponent } from '../language-switcher/language-switcher';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, LanguageSwitcherComponent, TranslatePipe],
+  imports: [RouterLink, RouterLinkActive, LanguageSwitcherComponent, DeckSwitcher, TranslatePipe],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })

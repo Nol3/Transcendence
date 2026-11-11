@@ -15,6 +15,7 @@ import {
 } from '@angular/core';
 
 import { TranslatePipe } from '../../../i18n';
+import { Baraja } from '../../../core/baraja';
 import { CardDeck, CardSize, PlayingCard } from '../playing-card/playing-card';
 
 /** Una carta de la mano: su id (para el `track` y el estado) y el código del mazo ("5o", "As"). */
@@ -45,6 +46,7 @@ export interface CartaMano {
 export class Mano implements OnInit, OnDestroy {
   private readonly plataforma = inject(PLATFORM_ID);
   private readonly documento = inject(DOCUMENT);
+  private readonly barajaElegida = inject(Baraja);
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.plataforma)) return;
@@ -60,7 +62,10 @@ export class Mano implements OnInit, OnDestroy {
   readonly cartas = input.required<readonly CartaMano[]>();
   /** Ids de las cartas elegidas. */
   readonly elegidas = input<readonly string[]>([]);
-  readonly baraja = input<CardDeck>('spanish');
+  /** Baraja fija para esta mano. Si no se pasa, manda la elegida en la cabecera. */
+  readonly barajaFija = input<CardDeck | null>(null, { alias: 'baraja' });
+  /** La que se pinta: la fija del juego o la del selector global. */
+  readonly baraja = computed<CardDeck>(() => this.barajaFija() ?? this.barajaElegida.baraja());
   readonly tamano = input<CardSize>('lg');
   /** De dónde salen los nombres accesibles: `culo` y `baraja` tienen sus propias claves. */
   readonly clave = input<'culo' | 'baraja'>('baraja');
