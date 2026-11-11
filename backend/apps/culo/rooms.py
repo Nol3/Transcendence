@@ -16,6 +16,9 @@ from .engine import GameState, new_game
 # Sin O/0, I/1, S/5: el código se dicta en voz alta.
 ALFABETO = "ABCDEFGHJKLMNPQRTUVWXYZ2346789"
 LARGO_CODIGO = 4
+# Segundos de cuenta atrás antes de repartir, iguales para toda la sala.
+START_COUNTDOWN = 3
+
 MAX_JUGADORES = 6
 MIN_JUGADORES = 3  # el juego no tiene sentido con dos; con dos humanos entra un bot
 MAX_BOTS = 5
@@ -61,6 +64,7 @@ class Room:
     code: str
     host_id: int
     decks: int = 1
+    starts_at: float | None = None
     status: str = "lobby"  # lobby | playing | finished
     players: list[RoomPlayer] = field(default_factory=list)
     state: GameState | None = None
@@ -172,6 +176,8 @@ class Room:
             decks=self.decks,
         )
         self.status = "playing"
+        # Marca común de arranque: las pantallas cuentan 3-2-1 desde aquí, no desde su propio reloj.
+        self.starts_at = time.time() + START_COUNTDOWN
         self.touched = time.time()
 
     # ── Consultas ────────────────────────────────────────────────────────────
@@ -199,6 +205,7 @@ class Room:
             "code": self.code,
             "hostId": self.host_id,
             "status": self.status,
+            "startsAt": self.starts_at,
             "decks": self.decks,
             "players": [p.to_dict() for p in self.players],
             "isHost": viewer_id == self.host_id,

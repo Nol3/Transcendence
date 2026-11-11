@@ -4,6 +4,7 @@ La sala es lo que hace que se pueda jugar «entre amigos»: alguien la crea, sal
 corto y se lo pasa. Aquí se prueba ese recorrido y lo que tiene que impedir (entrar en
 una sala llena, empezar sin gente, entrar en una partida ya empezada).
 """
+import time
 import unittest
 
 from apps.culo.rooms import (
@@ -192,3 +193,14 @@ class SalaTests(unittest.TestCase):
         self.assertEqual(len(bots), 1)
         self.assertTrue(bots[0]["ready"])
         self.assertFalse(humanos[0]["ready"])
+
+    def test_empezar_fija_la_cuenta_atras_comun(self):
+        self.sala.join(1, "ana", "canal-1")
+        self.sala.join(2, "bea", "canal-2")
+        self.sala.add_bot(1)
+        antes = time.time()
+        self.sala.start(1)
+        self.assertIsNotNone(self.sala.starts_at)
+        self.assertGreaterEqual(self.sala.starts_at, antes + 2.5)
+        self.assertLessEqual(self.sala.starts_at, time.time() + 3.5)
+        self.assertIn("startsAt", self.sala.to_dict())
