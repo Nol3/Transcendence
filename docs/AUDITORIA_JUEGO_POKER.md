@@ -288,19 +288,20 @@ wsl -d Ubuntu -- bash scripts/audit/run2.sh
 wsl -d Ubuntu -- bash -lc 'source ~/emsdk/emsdk_env.sh; cd juego && make web'
 
 # ── Backend: check, migraciones y tests del torneo ───────────────────
-wsl -d Ubuntu -- bash scripts/audit/run_backend.sh
+cd backend && python manage.py check && python manage.py migrate
+python manage.py test apps.tournament
 #   -> check limpio · migrate OK · 8/8 tests de torneo
 
 # ── Sonda REST + WebSocket (matchmaking y salas) ─────────────────────
-wsl -d Ubuntu -- bash scripts/audit/run_e2e.sh
+python scripts/audit/probe_multi_seat.py
 
 # ── Juego en navegador real (headless + CDP) ─────────────────────────
-wsl -d Ubuntu -- bash scripts/audit/start_server.sh   # sirve juego/web en :8099
+cd juego/web && python -m http.server 8099 &
 node scripts/audit/probe_wasm.js http://localhost:8099/index.html
 
 # ── Póker online: tests y partida real por WebSocket ─────────────────
-wsl -d Ubuntu -- bash scripts/audit/run_poker_tests.sh      # 46 tests
-wsl -d Ubuntu -- bash scripts/audit/run_poker_e2e.sh        # 21 comprobaciones e2e
+cd backend && python manage.py test apps.poker
+python scripts/audit/probe_poker_ws2.py
 
 # ── UI de póker en navegador real (con backend y ng serve levantados) ─
 node scripts/audit/probe_poker_ui.js
