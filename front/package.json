@@ -40,7 +40,7 @@
     "@angular/compiler-cli": "^20.3.35",
     "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.59.1",
+    "@playwright/test": "^1.65.1",
     "@types/express": "^5.0.1",
     "@types/node": "^20.17.19",
     "angular-eslint": "^22.6.0",
@@ -49,6 +49,6 @@
     "prettier": "^3.8.1",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.71.2",
-    "vitest": "~3.2.4"
+    "vitest": "~5.1.0"
   }
 }
