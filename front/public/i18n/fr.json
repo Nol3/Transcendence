@@ -341,7 +341,8 @@
       "call": "Suivre",
       "raise": "Relancer à",
       "bet": "Miser",
-      "allIn": "Tapis"
+      "allIn": "Tapis",
+      "potOdds": "Cotes du pot : {{pct}} %"
     },
     "result": {
       "won": "TU GAGNES LA MAIN !",

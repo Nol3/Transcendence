@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from './auth.service';
+import { GameSound } from '../audio/game-sound';
 import { environment } from '../../../environments/environment';
 
 export type QueueStatus = 'idle' | 'connecting' | 'searching' | 'matched' | 'error';
@@ -143,6 +144,7 @@ export interface TournamentMatchContext {
 export class PokerService {
   private readonly auth = inject(AuthService);
   private readonly http = inject(HttpClient);
+  private readonly sonido = inject(GameSound);
 
   readonly status = signal<QueueStatus>('idle');
   readonly stakes = signal<Record<string, StakeLevel>>({});
@@ -450,7 +452,12 @@ export class PokerService {
 
   private onTableMessage(msg: Record<string, any>): void {
     if (msg['type'] === 'table_state') {
+      const eraMiTurno = this.myTurn();
       this.state.set(msg as unknown as TableState);
+      // Aviso sonoro cuando la acción pasa a mi asiento. En una mesa con reloj, mirar
+      // la pantalla a tiempo es la mitad del juego; los clientes grandes lo hacen y aquí
+      // no había ni un sonido en el póker.
+      if (!eraMiTurno && this.myTurn()) this.sonido.piedra();
       this.armTurnClock();
     } else if (msg['type'] === 'chat') {
       const mio = msg['from'] === this.auth.user()?.username;

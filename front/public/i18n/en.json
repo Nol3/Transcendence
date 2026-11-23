@@ -341,7 +341,8 @@
       "call": "Call",
       "raise": "Raise to",
       "bet": "Bet",
-      "allIn": "All-in"
+      "allIn": "All-in",
+      "potOdds": "Pot odds: {{pct}} %"
     },
     "result": {
       "won": "YOU WIN THE HAND!",

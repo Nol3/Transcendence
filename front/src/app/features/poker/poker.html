@@ -328,9 +328,17 @@
               </app-button>
             }
             @if (poker.callAction(); as call) {
-              <app-button variant="secondary" (clicked)="act('call', call.amount)">
-                {{ 'poker.action.call' | translate }} {{ call.amount }}
-              </app-button>
+              <span class="call-block">
+                <app-button variant="secondary" (clicked)="act('call', call.amount)">
+                  {{ 'poker.action.call' | translate }} {{ call.amount }}
+                </app-button>
+                @if (callOdds(); as pct) {
+                  <span class="call-block__odds text-muted font-mono text-sm"
+                        [attr.title]="'poker.action.potOdds' | translate: { pct }">
+                    {{ pct }} %
+                  </span>
+                }
+              </span>
             }
             @if (poker.canAllIn()) {
               <app-button variant="accent" (clicked)="act('all_in')">

@@ -62,6 +62,18 @@ export class Poker implements OnDestroy {
 
   readonly lastEvents = computed(() => (this.poker.state()?.log ?? []).slice(-4).reverse());
 
+  /**
+   * Cuota del bote al igualar: cuánto hay que poner sobre el bote final. Es el dato que
+   * convierte «igualar 40» en una decisión (40 / (bote + 40)). Null si no hay nada que igualar.
+   */
+  readonly callOdds = computed(() => {
+    const call = this.poker.callAction();
+    const amount = call?.amount ?? 0;
+    const pot = this.poker.state()?.game?.pot ?? 0;
+    if (!call || pot <= 0 || amount <= 0) return null;
+    return Math.round((amount / (pot + amount)) * 100);
+  });
+
   constructor() {
     // Si venimos del bracket de un torneo, la mesa ya existe en el servidor: se
     // entra directo a ella, sin pasar por la cola ni por un bot.

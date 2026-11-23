@@ -397,6 +397,20 @@
   }
 }
 
+// Botón de igualar + cuota del bote, en la misma línea.
+.call-block {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  &__odds {
+    padding: 0.15rem 0.4rem;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    cursor: help;
+  }
+}
+
 .raise {
   display: grid;
   gap: 0.5rem;

@@ -341,7 +341,8 @@
       "call": "Igualar",
       "raise": "Subir a",
       "bet": "Apostar",
-      "allIn": "All-in"
+      "allIn": "All-in",
+      "potOdds": "Cuota del bote: {{pct}} %"
     },
     "result": {
       "won": "¡GANAS LA MANO!",
