@@ -355,7 +355,9 @@
                 </app-button>
               </div>
               <div class="raise__quick">
+                <button type="button" class="raise__quick-btn font-mono" (click)="quickRaise(0.33)">⅓ {{ 'poker.table.pot' | translate }}</button>
                 <button type="button" class="raise__quick-btn font-mono" (click)="quickRaise(0.5)">½ {{ 'poker.table.pot' | translate }}</button>
+                <button type="button" class="raise__quick-btn font-mono" (click)="quickRaise(0.75)">¾ {{ 'poker.table.pot' | translate }}</button>
                 <button type="button" class="raise__quick-btn font-mono" (click)="quickRaise(1)">{{ 'poker.table.pot' | translate }}</button>
                 <button type="button" class="raise__quick-btn font-mono" (click)="quickRaise(2)">2× {{ 'poker.table.pot' | translate }}</button>
               </div>

@@ -105,3 +105,6 @@ docker/ssl/*.pem
 *.crt
 # Capturas de revisión visual (front/e2e/capturas.spec.ts)
 front/capturas/
+
+# Estado del juego de escritorio (se genera al jugar; no es código)
+juego/highscores.dat

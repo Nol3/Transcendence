@@ -1551,6 +1551,31 @@ queda en `print` y que el ojo mide ≥24.
   de depuración del front.
 - **Hecho cuando**: `git clone` baja de ~40 MB y el `docker compose up` sigue sirviendo el juego.
 
+**Hecho (23-11-2026)**: el árbol de trabajo baja de **141 MB a 47 MB** (sin `.git`, `node_modules`,
+`dist` ni `.venv`) en un solo commit de limpieza:
+
+- `juego/raylib-6.0` conserva solo `src/` (+ `LICENSE` y `README`): fuera `examples/` (71 MB),
+  `projects/` (9,1 MB), `tools/` (1,4 MB) y los ficheros de CMake/Zig. El `make build-raylib-web`
+  sigue funcionando porque `src/Makefile` no depende de nada de eso.
+- Fuera los assets que ningún código carga: `juego/assets/cards/DEFAULT` (5,8 MB), la baraja
+  `front/public/cards/balatro` y la carpeta `cards/es` (el componente solo usa `8bit` y `es8bit`),
+  la fuente `resolide_serif` (4,1 MB, no se carga en `renderer.c`) y las previsualizaciones/
+  cursivas de las fuentes que sí se usan.
+- Fuera 18 avatares de prueba (`shrek_*`, `WhatsApp_Image_*`) y `backend/media` se queda solo con
+  `default_avatar.jpg`; `juego/highscores.dat` deja de versionarse (estado de partida de escritorio,
+  añadido a `.gitignore`).
+- Fuera restos de auditoría sin referencias (`test_eval*.c`, `serve.py`, `replay_hand.py`,
+  `validate_playbook.js`, capturas sueltas de `scripts/audit/`) y los dos `TODO.md` de trabajo ya
+  completados. Las sondas que citan `docs/AUDITORIA_*.md` se quedan.
+- `favicon.png` pasa de **968 KB a 22 KB** (96×96 generado del logo) y se añade
+  `apple-touch-icon.png` de 180×180.
+- De paso, el tapete del `game-board` deja de pedirse a `http://localhost:8000` (en producción
+  HTTPS el navegador lo bloqueaba por contenido mixto) y pasa a `/game-assets/tapete/tapete.png`.
+
+**Queda pendiente** para cerrar M11: reconstruir `juego/web` con emcc (el `index.data` actual, de
+14 MB, todavía empaqueta las fuentes y barajas retiradas), decidir si el WASM se compila en la
+imagen y purgar los avatares del historial con `git filter-repo` (decisión RGPD aparte).
+
 ### M12 · Dependencias vigiladas · P2
 - **Por qué**: no hay `dependabot.yml` ni Renovate, y el CI no corre `npm audit` ni `pip-audit`:
   los 12 avisos de M1 llevaban tiempo ahí sin que nada avisara.
