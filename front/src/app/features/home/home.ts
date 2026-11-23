@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, OnDestroy, signal, computed } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService, LeaderboardEntry, UserStats } from '../../core/services/user.service';
@@ -29,6 +29,7 @@ import { TranslatePipe } from '../../i18n/translate.pipe';
 export class Home implements OnInit, OnDestroy {
   readonly auth = inject(AuthService);
   private readonly userService = inject(UserService);
+  private readonly router = inject(Router);
 
   readonly leaderboard = signal<LeaderboardEntry[]>([]);
   readonly leaderboardLoading = signal(true);
@@ -55,6 +56,14 @@ export class Home implements OnInit, OnDestroy {
   });
 
   private timer?: ReturnType<typeof setInterval>;
+
+  /**
+   * Quick seat: la home no lleva al lobby a configurar, entra directo a la cola con
+   * las preferencias guardadas. El lobby sigue disponible para elegir mesa a mano.
+   */
+  playNow(): void {
+    void this.router.navigate(['/poker'], { queryParams: { quick: 1 } });
+  }
 
   ngOnInit() {
     this.loadLeaderboard();

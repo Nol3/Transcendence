@@ -326,6 +326,7 @@
       "waitingFor": "Waiting for {{name}}…",
       "matchOver": "MATCH OVER",
       "backToLobby": "BACK TO QUEUE",
+      "rematch": "REMATCH",
       "leave": "Leave the table"
     },
     "street": {
@@ -348,9 +349,10 @@
       "won": "YOU WIN THE HAND!",
       "lost": "YOU LOSE THE HAND",
       "wonFold": "YOU WIN: everyone folded",
-      "lostFold": "YOU FOLDED",
+      "lostFold": "YOU ESCAPED!",
       "pot": "Pot",
-      "showdown": "showdown"
+      "showdown": "showdown",
+      "share": "Share result"
     },
     "log": {
       "timeout": "turn timed out",
@@ -402,6 +404,7 @@
     },
     "chat": {
       "title": "Table chat",
+      "emotes": "Quick emotes",
       "empty": "Nobody has said anything yet. Be the first.",
       "placeholder": "Say something to the table…",
       "send": "Send"

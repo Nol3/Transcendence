@@ -326,6 +326,7 @@
       "waitingFor": "Esperando a {{name}}…",
       "matchOver": "PARTIDA TERMINADA",
       "backToLobby": "VOLVER A LA COLA",
+      "rematch": "REVANCHA",
       "leave": "Salir de la mesa"
     },
     "street": {
@@ -348,9 +349,10 @@
       "won": "¡GANAS LA MANO!",
       "lost": "PIERDES LA MANO",
       "wonFold": "GANAS: todos se retiran",
-      "lostFold": "TE RETIRAS",
+      "lostFold": "¡ESCAPASTE!",
       "pot": "Bote",
-      "showdown": "showdown"
+      "showdown": "showdown",
+      "share": "Compartir resultado"
     },
     "log": {
       "timeout": "turno agotado",
@@ -402,6 +404,7 @@
     },
     "chat": {
       "title": "Chat de mesa",
+      "emotes": "Emoticonos rápidos",
       "empty": "Nadie ha dicho nada todavía. Sé el primero.",
       "placeholder": "Escribe algo a la mesa…",
       "send": "Enviar"

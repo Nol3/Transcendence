@@ -183,6 +183,9 @@
         @if (poker.turnSeconds() !== null) {
           <span class="turn-clock font-pixel" [class.turn-clock--low]="poker.turnSeconds()! <= 5">
             ⏱ {{ poker.turnSeconds() }}s
+            <span class="turn-clock__bar" aria-hidden="true">
+              <span class="turn-clock__fill" [style.width.%]="(turnFraction() ?? 0) * 100"></span>
+            </span>
           </span>
         }
       </div>
@@ -279,6 +282,9 @@
           @if (myWinnings() > 0) {
             <span class="outcome__amount font-pixel neon-text-green">+{{ myWinnings() }}</span>
           }
+          <app-button variant="ghost" size="sm" (clicked)="shareResult()">
+            {{ 'poker.result.share' | translate }}
+          </app-button>
         </div>
       }
 
@@ -299,6 +305,13 @@
                 <span class="table-chat__at text-muted text-sm">{{ m.at }}</span>
               </div>
             }
+          }
+        </div>
+        <div class="emotes" role="group" [attr.aria-label]="'poker.chat.emotes' | translate">
+          @for (e of emotes; track e) {
+            <button type="button" class="emotes__btn" (click)="sendEmote(e)" [attr.aria-label]="e">
+              {{ e }}
+            </button>
           }
         </div>
         <div class="compose">
@@ -387,7 +400,16 @@
             {{ 'poker.table.matchOver' | translate }}
             @if (table.table.winner) { — {{ table.table.winner }} }
           </p>
-          <app-button variant="primary" (clicked)="leave()">{{ 'poker.table.backToLobby' | translate }}</app-button>
+          <div class="match-over__actions">
+            @if (!isTournamentMatch()) {
+              <app-button variant="primary" (clicked)="rematch()">
+                {{ 'poker.table.rematch' | translate }}
+              </app-button>
+            }
+            <app-button variant="ghost" (clicked)="leave()">
+              {{ 'poker.table.backToLobby' | translate }}
+            </app-button>
+          </div>
         </div>
       }
 

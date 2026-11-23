@@ -314,7 +314,7 @@ export class PokerService {
   }
 
   /** Trae las preferencias guardadas (tema, ciegas, tamaño de mesa). */
-  loadPreferences(): void {
+  loadPreferences(alCargar?: () => void): void {
     this.http
       .get<PokerPreferences>(`${environment.apiUrl}/poker/preferences/`)
       .subscribe({
@@ -323,9 +323,10 @@ export class PokerService {
           if (p.theme) this.theme.set(p.theme);
           if (p.stake) this.stake.set(p.stake);
           if (p.table_size) this.tableSize.set(p.table_size);
+          alCargar?.();
         },
         // Las preferencias son una comodidad: si fallan, se sigue con las de casa.
-        error: () => undefined,
+        error: () => alCargar?.(),
       });
   }
 
