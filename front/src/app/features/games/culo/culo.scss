@@ -150,20 +150,27 @@
 
 // ── Empezar ──────────────────────────────────────────────────────────────────
 .inicio {
+  // Centrada y con el mismo lenguaje visual que las otras mesas.
   max-width: 34rem;
+  margin-inline: auto;
   padding: var(--space-5, 1.5rem);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md, 8px);
-  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-xl, 16px);
+  background: linear-gradient(180deg, rgba(30, 30, 48, 0.72), rgba(18, 18, 30, 0.94));
+  box-shadow: var(--shadow-card, 0 4px 24px rgba(0, 0, 0, 0.45));
+  text-align: center;
 
   &__intro {
     margin-top: 0;
+    color: var(--color-text-secondary);
+    line-height: 1.75;
   }
 
   &__ajustes {
     display: flex;
     gap: var(--space-4, 1rem);
     flex-wrap: wrap;
+    justify-content: center;
     margin: var(--space-4, 1rem) 0;
   }
 

@@ -2,7 +2,9 @@
 // cartas se ve igual en todos los juegos, y así el jugador no aprende dos interfaces.
 
 .brisca {
-  padding: var(--space-4, 1rem) 0 var(--space-6, 2rem);
+  // `padding-block` a propósito: si se usa el atajo `padding`, se anula el
+  // padding lateral que pone `.container` y todo el contenido se pega al borde.
+  padding-block: var(--space-4, 1rem) var(--space-6, 2rem);
 
   &__cabecera {
     display: flex;
@@ -46,17 +48,37 @@
 }
 
 .inicio {
-  max-width: 44rem;
+  // Antes era un bloque de 44rem pegado a la izquierda. Ahora es una ficha
+  // centrada: en escritorio no deja un vacío a la derecha y en móvil respira.
+  width: min(100%, 46rem);
+  margin: clamp(1.5rem, 6vh, 3.5rem) auto;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl, 16px);
+  background: linear-gradient(180deg, rgba(30, 30, 48, 0.72), rgba(18, 18, 30, 0.94));
+  box-shadow: var(--shadow-card, 0 4px 24px rgba(0, 0, 0, 0.45));
+  text-align: center;
 
   &__intro {
-    margin-bottom: var(--space-4, 1rem);
+    max-width: 38rem;
+    margin: 0 auto var(--space-5, 1.5rem);
+    color: var(--color-text-secondary);
+    line-height: 1.75;
+  }
+
+  &__modos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4, 1rem);
   }
 
   &__ajustes {
     display: flex;
     gap: var(--space-4, 1.5rem);
     flex-wrap: wrap;
-    margin-bottom: var(--space-3, 1rem);
+    justify-content: center;
+    margin: var(--space-5, 1.5rem) 0;
   }
 
   &__campo {
@@ -65,6 +87,7 @@
     gap: 0.3rem;
     font-size: 0.9rem;
     color: var(--color-text-muted);
+    text-align: left;
 
     select {
       padding: 0.35rem 0.5rem;
@@ -77,7 +100,9 @@
   }
 
   &__empezar {
-    margin-top: var(--space-3, 1rem);
+    display: flex;
+    justify-content: center;
+    margin-top: var(--space-4, 1rem);
   }
 }
 

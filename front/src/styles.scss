@@ -373,8 +373,13 @@ body.tiene-mano {
 
   .controles__botones button {
     width: 100%;
-    min-height: 56px;
     font-size: 1rem;
+  }
+
+  // Especificidad extra: `app-button` fija 44 px en puntero grueso y, con la
+  // encapsulación de Angular, ganaba a esta regla. Los controles de mesa van a 56.
+  .controles__botones button.btn {
+    min-height: 56px;
   }
 }
 

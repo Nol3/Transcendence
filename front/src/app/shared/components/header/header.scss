@@ -47,7 +47,12 @@
   }
 
   &__nav-link {
-    font-size: var(--font-pixel-xs);
+    // 8 px era ilegible en escritorio. El pixel font se queda para el logo y
+    // los títulos; la navegación necesita leerse de un vistazo.
+    font-size: 0.6875rem;
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
     color: var(--color-text-secondary);
     text-decoration: none;
     padding: var(--space-2) var(--space-3);
@@ -77,7 +82,10 @@
   }
 
   &__btn {
-    font-size: var(--font-pixel-xs);
+    font-size: 0.6875rem;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
     padding: var(--space-2) var(--space-4);
     border-radius: var(--radius-sm);
     letter-spacing: 0.08em;

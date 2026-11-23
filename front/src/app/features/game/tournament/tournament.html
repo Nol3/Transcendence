@@ -6,7 +6,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
-          Back
+          {{ 'common.back' | translate }}
         </button>
         <div class="tournament-detail__title">
           <h1 class="font-pixel neon-text-magenta">{{ selectedTournament()!.name }}</h1>
@@ -16,7 +16,7 @@
         </div>
       </div>
 
-      <app-card [title]="'BRACKET'" [glowing]="true" [padding]="'lg'">
+      <app-card [title]="'tournament.bracket' | translate" [glowing]="true" [padding]="'lg'">
         @if (selectedTournament()!.rounds.length > 0) {
           <app-bracket
             [rounds]="selectedTournament()!.rounds"
@@ -46,21 +46,24 @@
           class="tab"
           [class.tab--active]="selectedTab() === 'active'"
           (click)="selectTab('active')">
-          {{ 'tournament.active' | translate }}
+          <span class="tab__label tab__label--long">{{ 'tournament.active' | translate }}</span>
+          <span class="tab__label tab__label--short">{{ 'tournament.activeShort' | translate }}</span>
           <span class="tab__count">{{ activeCount() }}</span>
         </button>
         <button
           class="tab"
           [class.tab--active]="selectedTab() === 'upcoming'"
           (click)="selectTab('upcoming')">
-          {{ 'tournament.upcoming' | translate }}
+          <span class="tab__label tab__label--long">{{ 'tournament.upcoming' | translate }}</span>
+          <span class="tab__label tab__label--short">{{ 'tournament.upcomingShort' | translate }}</span>
           <span class="tab__count">{{ upcomingCount() }}</span>
         </button>
         <button
           class="tab"
           [class.tab--active]="selectedTab() === 'finished'"
           (click)="selectTab('finished')">
-          {{ 'tournament.finished' | translate }}
+          <span class="tab__label tab__label--long">{{ 'tournament.finished' | translate }}</span>
+          <span class="tab__label tab__label--short">{{ 'tournament.finishedShort' | translate }}</span>
           <span class="tab__count">{{ finishedCount() }}</span>
         </button>
       </div>

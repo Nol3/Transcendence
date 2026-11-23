@@ -237,6 +237,20 @@
   gap: var(--space-6);
 }
 
+.leaderboard__footer {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-3);
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-sm);
+  }
+}
+
 // ── Player status ──────────────────────────────────────────────
 .player-status {
   display: flex;
