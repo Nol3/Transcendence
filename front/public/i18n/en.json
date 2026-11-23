@@ -183,7 +183,10 @@
     "noGames": "You haven't played any games yet.",
     "gameResultWin": "Won match",
     "gameResultLoss": "Lost match",
-    "username": "Username"
+    "username": "Username",
+    "accessibility": "Accessibility",
+    "reduceMotion": "Reduce animations",
+    "reduceMotionHint": "Turns off bounces, tilts and transitions. If your system already asks for less motion, that is respected too."
   },
   "common": {
     "loading": "Loading",

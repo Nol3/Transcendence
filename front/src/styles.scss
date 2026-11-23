@@ -414,3 +414,27 @@ body {
     min-height: 44px;
   }
 }
+
+/* ── Movimiento reducido manual ──────────────────────────────────────────────────────────────
+   Además de `prefers-reduced-motion`, el perfil ofrece «Reducir animaciones» (Balatro lo pone
+   en primer nivel). La clase `reduce-motion` en <html> corta animaciones y transiciones; los
+   spinners se quedan, porque sin ellos una carga parece rota. */
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+html.reduce-motion .spinner {
+  animation-duration: 0.9s !important;
+  animation-iteration-count: infinite !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

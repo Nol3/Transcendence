@@ -183,7 +183,10 @@
     "noGames": "No has jugado ninguna partida aún.",
     "gameResultWin": "Partida ganada",
     "gameResultLoss": "Partida perdida",
-    "username": "Usuario"
+    "username": "Usuario",
+    "accessibility": "Accesibilidad",
+    "reduceMotion": "Reducir animaciones",
+    "reduceMotionHint": "Desactiva rebotes, inclinaciones y transiciones. Si tu sistema ya pide menos movimiento, se respeta igual."
   },
   "common": {
     "loading": "Cargando",

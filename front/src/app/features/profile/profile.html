@@ -154,6 +154,16 @@
             }
           </app-card>
 
+          <app-card [title]="'profile.accessibility' | translate" [padding]="'md'">
+            <label class="motion-toggle">
+              <input type="checkbox" [checked]="motion.reduce()" (change)="toggleMotion()">
+              <span>{{ 'profile.reduceMotion' | translate }}</span>
+            </label>
+            <p class="text-secondary text-sm motion-hint">
+              {{ 'profile.reduceMotionHint' | translate }}
+            </p>
+          </app-card>
+
           <app-card [title]="'profile.achievements' | translate" [padding]="'md'">
             <div class="achievements-list">
               @for (ach of achievements(); track ach.labelKey) {

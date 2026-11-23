@@ -13,6 +13,7 @@ import { DividerComponent } from '../../shared/components/divider/divider';
 import { SpinnerComponent } from '../../shared/components/spinner/spinner';
 import { TranslatePipe } from '../../i18n/translate.pipe';
 import { I18nService } from '../../i18n/i18n.service';
+import { MotionService } from '../../core/ui/motion.service';
 
 interface Achievement {
   icon: string;
@@ -45,6 +46,7 @@ export class Profile implements OnInit {
   private readonly notif = inject(NotificationService);
   private readonly i18n = inject(I18nService);
   private readonly userService = inject(UserService);
+  readonly motion = inject(MotionService);
 
   readonly user = this.auth.user;
   readonly isEditing = signal(false);
@@ -54,6 +56,11 @@ export class Profile implements OnInit {
   readonly statsLoading = signal(true);
   readonly historyLoading = signal(true);
   private selectedAvatarFile: File | null = null;
+
+  /** Alterna el movimiento reducido (se guarda por dispositivo). */
+  toggleMotion(): void {
+    this.motion.alternar();
+  }
 
   readonly stats = signal<UserStats | null>(null);
   readonly history = signal<GameHistoryEntry[]>([]);
