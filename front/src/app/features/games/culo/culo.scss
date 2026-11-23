@@ -164,6 +164,7 @@
     margin-top: 0;
     color: var(--color-text-secondary);
     line-height: 1.75;
+    text-align: left;
   }
 
   &__ajustes {
@@ -210,6 +211,7 @@
   padding: var(--space-3, 0.9rem);
   border: 1px solid var(--border);
   border-radius: 6px;
+  text-align: left;
 
   &__titulo {
     margin: 0;
@@ -244,6 +246,8 @@
 .mesa {
   display: flex;
   flex-direction: column;
+  width: min(100%, 60rem);
+  margin-inline: auto;
 
   // Quién juega, en una línea sobre la mesa: el borde iluminado no basta si hay seis asientos.
   &__turno {
@@ -298,8 +302,16 @@
     left: 50%;
     top: 100%;
     margin: 0;
-    transform: translate(-50%, -50%) rotate(var(--ang)) translateY(-7rem)
-      rotate(calc(-1 * var(--ang)));
+    transform: translate(-50%, -50%) rotate(var(--ang))
+      translateY(calc(-1 * clamp(5rem, 18vw, 7rem))) rotate(calc(-1 * var(--ang)));
+  }
+
+  // En 320 px el arco de 7 rem sacaba un rival por cada lado.
+  @media (max-width: 360px) {
+    .rival {
+      min-width: 5.5rem;
+      padding: 0.4rem 0.5rem;
+    }
   }
   gap: var(--space-4, 1rem);
 

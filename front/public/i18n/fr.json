@@ -27,7 +27,9 @@
     "streak": "SÉRIE",
     "loginStreak": "JOURS D'AFFILÉE",
     "tagline": "🪙",
-    "cards": "CARTES"
+    "cards": "CARTES",
+    "tournaments": "TOURNOIS",
+    "winsShort": "VICTOIRES"
   },
   "auth": {
     "errors": {
@@ -59,6 +61,9 @@
       "hasAccount": "Déjà inscrit ? Se connecter",
       "subtitle": "Crée ton profil de joueur",
       "usernamePlaceholder": "joueur_un",
+    "usernameHint": "Lettres, chiffres et _ uniquement",
+    "passwordHint": "8 caractères minimum",
+    "confirmPassword": "Confirmer le mot de passe",
       "hasAccountShort": "Déjà un compte ?"
     },
     "forgot": {
@@ -71,6 +76,7 @@
     "reset": {
       "title": "Nouveau mot de passe",
       "subtitle": "Choisissez un mot de passe que vous n'utilisez nulle part ailleurs.",
+      "password": "Mot de passe",
       "repeat": "Répétez le mot de passe",
       "submit": "Changer le mot de passe",
       "ok": "Mot de passe modifié. Vous pouvez maintenant vous connecter.",
@@ -111,11 +117,13 @@
     },
     "tute": {
       "name": "Tute",
-      "desc": "Le classique des plis espagnol : le roi et le cavalier chantent quarante."
+      "desc": "Le classique des plis espagnol : le roi et le cavalier chantent quarante.",
+      "how": "Huit cartes par joueur ; annonce 20, 40 ou tute pour marquer."
     },
     "mus": {
       "name": "Mus",
-      "desc": "Quatre joueurs en deux paires : quatre tours et beaucoup de paris."
+      "desc": "Quatre joueurs en deux paires : quatre tours et beaucoup de paris.",
+      "how": "Quatre cartes par joueur ; mus, paris et órdago en équipes."
     }
   },
   "lobby": {
@@ -157,6 +165,7 @@
     "create": "Créer un Tournoi",
     "createDescription": "Organise ton propre tournoi et défie d'autres joueurs",
     "name": "Nom du Tournoi",
+    "nameError": "Le nom doit contenir au moins 3 caractères.",
     "description": "Description du Tournoi",
     "players": "Joueurs",
     "maxPlayers": "Joueurs max.",
@@ -199,6 +208,12 @@
     "back": "Retour",
     "save": "Enregistrer",
     "cancel": "Annuler",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "soundToggle": "Activer ou couper le son",
+    "unknown": "Inconnu",
+    "online": "EN LIGNE",
+    "offline": "HORS LIGNE",
     "confirm": "Confirmer",
     "status": "Statut",
     "ready": "PRÊT",

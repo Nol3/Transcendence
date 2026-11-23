@@ -169,6 +169,41 @@ especificidad al componente). Se corrigió con `.controles__botones button.btn` 
 verde. Es la prueba de que el plan necesita la Fase 8 (red de seguridad visual), no solo revisar
 capturas a ojo.
 
+### 5.5 Segunda pasada: sistema de juego y títulos
+
+Después de la auditoría se encontró un fallo mayor que ninguna captura previa había detectado:
+**todos los `app-pixel-title` se pintaban vacíos**. El componente tenía un `<ng-content>` dentro de
+cada `@case` de un `@switch`; Angular solo conserva una proyección, así que “Login”, “Games”,
+“Player Profile” u “Online Poker” no aparecían. Se sustituyó por una única proyección con
+`ngTemplateOutlet` y se añadió `pixel-title.spec.ts` para que no vuelva.
+
+En la misma pasada:
+
+- **GameShell y RulesDialog compartidos** para Brisca, Tute, Mus, Mentiroso y Culo: una sola
+  cabecera con `h1`, un solo diálogo con Escape, clic en el fondo, bloqueo de scroll y foco.
+- **Binding roto** `[style.--i]="$index"` que se pintaba como texto en las mesas de Brisca, Tute y
+  Mentiroso; ahora es un atributo del `<li>`.
+- **Selects que ignoraban su valor inicial** en los menús (Culo mostraba 3 jugadores y una baraja
+  vacía en vez de 4 y 1): `[selected]` en cada opción.
+- **Mesa centrada** (`margin-inline: auto`) y overlays de final con `padding` y `width: min(32rem,
+  100%)`.
+- **Torneo**: modal de creación con `role="dialog"`, `aria-modal`, foco atrapado, Escape, labels
+  asociados y error visible del nombre.
+- **Juegos**: grid sin overflow a 320 px, iconos en un marco homogéneo de 44 px y títulos con altura
+  mínima para alinear las tarjetas.
+- **Home**: CTA de invitado con texto de acción, “TOURNAMENTS” en plural, `WINS`/`UNKNOWN`/estado
+  online traducidos.
+- **Chat**: un solo estado vacío en móvil y CTA secundaria.
+- **Footer**: enlaces de cuenta según sesión, “Games” en vez de “Play” y redes con target de 44 px.
+- **Accesibilidad**: `aria-live` en turno y registro, emojis decorativos con `aria-hidden`,
+  `prefers-reduced-motion` global, cierre de modal a 44 px y errores de auth con `role="alert"`.
+- **i18n**: `game.tute.how`, `game.mus.how`, `tournament.nameError`, `common.online/offline/unknown`
+  y textos de registro/recuperación.
+
+**Verificación de la segunda pasada:** build OK, **185 unitarios**, lint limpio, **65 e2e de
+Chromium + 7 skipped**, **4 e2e móviles** y auditoría propia de 64 combinaciones ruta × ancho con
+`overflow: 0` y un `h1` por pantalla.
+
 ---
 
 ## 6. Diagnóstico por área

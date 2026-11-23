@@ -1,5 +1,6 @@
-import { Component, Input, forwardRef } from '@angular/core';
+import { Component, Input, forwardRef, inject } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { I18nService } from '../../../i18n/i18n.service';
 
 @Component({
   selector: 'app-input',
@@ -16,6 +17,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@a
   ],
 })
 export class InputComponent implements ControlValueAccessor {
+  private readonly i18n = inject(I18nService);
+
   @Input() label = '';
   @Input() type: 'text' | 'email' | 'password' | 'number' = 'text';
   @Input() placeholder = '';
@@ -34,6 +37,16 @@ export class InputComponent implements ControlValueAccessor {
   get inputType(): string {
     if (this.type === 'password') return this.showPassword ? 'text' : 'password';
     return this.type;
+  }
+
+  get toggleLabel(): string {
+    return this.showPassword ? this.i18n.t('common.hidePassword') : this.i18n.t('common.showPassword');
+  }
+
+  get describedBy(): string | null {
+    if (this.error) return `${this.id}-error`;
+    if (this.hint) return `${this.id}-hint`;
+    return null;
   }
 
   onInput(event: Event) {

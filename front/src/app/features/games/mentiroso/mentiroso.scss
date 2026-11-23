@@ -62,6 +62,7 @@
     margin: 0 auto var(--space-5, 1.5rem);
     color: var(--color-text-secondary);
     line-height: 1.75;
+    text-align: left;
   }
 
   &__modos {
@@ -107,6 +108,7 @@
 // ── La mesa ──────────────────────────────────────────────────────────────────
 .mesa {
   max-width: 60rem;
+  margin-inline: auto;
 
   &__mano {
     margin: 0 0 var(--space-3, 0.8rem);
@@ -259,6 +261,7 @@
   inset: 0;
   display: grid;
   place-items: center;
+  padding: var(--space-4);
   background: rgba(0, 0, 0, 0.7);
   z-index: 20;
 
@@ -267,6 +270,7 @@
     flex-direction: column;
     align-items: center;
     gap: 0.8rem;
+    width: min(32rem, 100%);
     padding: var(--space-5, 1.5rem) var(--space-6, 2rem);
     border: 1px solid var(--border);
     border-radius: var(--radius-md, 10px);

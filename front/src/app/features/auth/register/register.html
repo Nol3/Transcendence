@@ -11,7 +11,7 @@
 
     <!-- Header -->
     <div class="auth-card__header">
-      <app-pixel-title [level]="2" color="magenta">{{ 'auth.register.title' | translate }}</app-pixel-title>
+      <app-pixel-title [level]="1" color="magenta">{{ 'auth.register.title' | translate }}</app-pixel-title>
       <p class="auth-card__subtitle text-secondary text-sm">{{ 'auth.register.subtitle' | translate }}</p>
     </div>
 
@@ -20,17 +20,17 @@
 
       <app-input
         formControlName="username"
-        label="USERNAME"
+        [label]="'auth.register.username' | translate"
         type="text"
         [placeholder]="'auth.register.usernamePlaceholder' | translate"
         autocomplete="username"
         [error]="fieldError('username')"
-        hint="Letters, numbers and _ only"
+        [hint]="'auth.register.usernameHint' | translate"
       />
 
       <app-input
         formControlName="email"
-        label="EMAIL"
+        [label]="'auth.register.email' | translate"
         type="email"
         [placeholder]="'auth.login.emailPlaceholder' | translate"
         autocomplete="email"
@@ -39,17 +39,17 @@
 
       <app-input
         formControlName="password"
-        label="PASSWORD"
+        [label]="'auth.register.password' | translate"
         type="password"
         placeholder="••••••••"
         autocomplete="new-password"
         [error]="fieldError('password')"
-        hint="Minimum 8 characters"
+        [hint]="'auth.register.passwordHint' | translate"
       />
 
       <app-input
         formControlName="confirmPassword"
-        label="CONFIRM PASSWORD"
+        [label]="'auth.register.confirmPassword' | translate"
         type="password"
         placeholder="••••••••"
         autocomplete="new-password"
@@ -57,7 +57,7 @@
       />
 
       @if (error()) {
-        <div class="auth-card__error">
+        <div class="auth-card__error" role="alert">
           <span class="font-mono">✕</span>
           {{ error() }}
         </div>
@@ -69,7 +69,7 @@
         [loading]="loading()"
         [fullWidth]="true"
       >
-        CREATE ACCOUNT
+        {{ 'auth.register.submit' | translate }}
       </app-button>
 
     </form>

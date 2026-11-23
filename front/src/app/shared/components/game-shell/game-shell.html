@@ -1,0 +1,30 @@
+<div [class]="'game-shell container game-shell--' + accent">
+  <a class="game-shell__back" routerLink="/games"><span aria-hidden="true">←</span> {{ 'games.back' | translate }}</a>
+
+  <header class="game-shell__header">
+    <div class="game-shell__heading">
+      <h1 class="game-shell__title font-pixel">{{ title }}</h1>
+      @if (subtitle) {
+        <p class="game-shell__subtitle">{{ subtitle }}</p>
+      }
+    </div>
+
+    <div class="game-shell__actions">
+      <app-button variant="ghost" size="sm" (clicked)="rules.emit()">
+        <span aria-hidden="true">📖</span> {{ rulesLabel | translate }}
+      </app-button>
+
+      <button
+        type="button"
+        class="game-shell__sound"
+        (click)="sound.emit()"
+        [attr.aria-pressed]="soundOn"
+        [attr.aria-label]="'common.soundToggle' | translate"
+      >
+        <span aria-hidden="true">{{ soundOn ? '🔊' : '🔇' }}</span>
+      </button>
+    </div>
+  </header>
+
+  <ng-content />
+</div>

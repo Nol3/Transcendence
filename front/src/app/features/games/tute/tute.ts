@@ -8,8 +8,6 @@ import {
   signal,
 } from '@angular/core';
 
-import { RouterLink } from '@angular/router';
-
 import { TranslatePipe } from '../../../i18n';
 import { Card, SpanishSuit } from '../../../core/games/baraja';
 import { Baza, puntos } from '../../../core/games/bazas';
@@ -27,6 +25,8 @@ import {
 import { botDecision } from '../../../core/games/tute/tute-bots';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { FocoDialogoDirective } from '../../../shared/directives/foco-dialogo.directive';
+import { GameShell } from '../../../shared/components/game-shell/game-shell';
+import { RulesDialog } from '../../../shared/components/rules-dialog/rules-dialog';
 import { Mano } from '../../../shared/components/mano/mano';
 import { PlayingCard } from '../../../shared/components/playing-card/playing-card';
 import { GameSound } from '../../../core/audio/game-sound';
@@ -49,7 +49,7 @@ interface LogLine {
  */
 @Component({
   selector: 'app-tute',
-  imports: [ButtonComponent, PlayingCard, RouterLink, SalaLobby, TranslatePipe, FocoDialogoDirective, Mano],
+  imports: [ButtonComponent, PlayingCard, SalaLobby, TranslatePipe, FocoDialogoDirective, Mano, GameShell, RulesDialog],
   templateUrl: './tute.html',
   styleUrl: './tute.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,7 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, computed, effect, inject, signal } from '@angular/core';
 
-import { RouterLink } from '@angular/router';
-
 import { TranslatePipe } from '../../../i18n';
 import { Card } from '../../../core/games/baraja';
 import {
@@ -25,6 +23,8 @@ import {
 import { botDecision } from '../../../core/games/mus/mus-bots';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { FocoDialogoDirective } from '../../../shared/directives/foco-dialogo.directive';
+import { GameShell } from '../../../shared/components/game-shell/game-shell';
+import { RulesDialog } from '../../../shared/components/rules-dialog/rules-dialog';
 import { Mano } from '../../../shared/components/mano/mano';
 import { GameSound } from '../../../core/audio/game-sound';
 import { MusVista, estadoDesdeVista } from '../../../core/games/mus/mus-online';
@@ -46,7 +46,7 @@ interface LogLine {
  */
 @Component({
   selector: 'app-mus',
-  imports: [ButtonComponent, RouterLink, SalaLobby, TranslatePipe, FocoDialogoDirective, Mano],
+  imports: [ButtonComponent, SalaLobby, TranslatePipe, FocoDialogoDirective, Mano, GameShell, RulesDialog],
   templateUrl: './mus.html',
   styleUrl: './mus.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

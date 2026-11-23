@@ -1,23 +1,11 @@
-<div class="brisca container mus">
-  <header class="brisca__cabecera">
-    <h2 class="font-pixel neon-text-yellow">{{ 'game.mus.name' | translate }}</h2>
-    <div class="brisca__acciones">
-      <app-button variant="ghost" size="sm" (click)="reglasAbiertas.set(true)">
-        📖 {{ 'mus.rules.title' | translate }}
-      </app-button>
-      <button
-        type="button"
-        class="brisca__sonido"
-        (click)="alternarSonido()"
-        [attr.aria-pressed]="sonidoActivo()"
-        [attr.aria-label]="'culo.sound.toggle' | translate"
-      >
-        {{ sonidoActivo() ? '🔊' : '🔇' }}
-      </button>
-      <a class="brisca__volver" routerLink="/games">← {{ 'games.back' | translate }}</a>
-    </div>
-  </header>
-
+<app-game-shell
+  [title]="'game.mus.name' | translate"
+  accent="yellow"
+  rulesLabel="mus.rules.title"
+  [soundOn]="sonidoActivo()"
+  (rules)="reglasAbiertas.set(true)"
+  (sound)="alternarSonido()"
+>
   @if (modo() === 'menu') {
     <section class="inicio">
       <p class="inicio__intro">{{ 'mus.intro' | translate }}</p>
@@ -151,6 +139,7 @@
             <label class="envite__cuantas">
               <span class="text-muted text-sm">{{ 'mus.betAmount' | translate }}</span>
               <input
+                class="envite__input"
                 type="number"
                 min="2"
                 max="20"
@@ -204,7 +193,7 @@
       }
 
       @if (registro().length > 0) {
-        <ul class="registro">
+        <ul class="registro" aria-live="polite">
           @for (l of registro(); track $index) {
             <li class="registro__linea" [class]="'registro__linea--' + l.kind">
               {{ l.key | translate: l.params }}
@@ -233,17 +222,17 @@
   }
 
   @if (reglasAbiertas()) {
-    <div class="reglas" role="dialog" aria-modal="true" appFocoDialogo [attr.aria-label]="'mus.rules.title' | translate">
-      <div class="reglas__caja">
-        <h3 class="font-pixel neon-text-yellow">{{ 'mus.rules.title' | translate }}</h3>
-        <p>{{ 'mus.rules.goal' | translate }}</p>
-        <p>{{ 'mus.rules.order' | translate }}</p>
-        <p>{{ 'mus.rules.mus' | translate }}</p>
-        <p>{{ 'mus.rules.lances' | translate }}</p>
-        <p>{{ 'mus.rules.bets' | translate }}</p>
-        <p>{{ 'mus.rules.pairs' | translate }}</p>
-        <app-button variant="primary" (click)="cerrarReglas()">{{ 'common.close' | translate }}</app-button>
-      </div>
-    </div>
+    <app-rules-dialog
+      [title]="'mus.rules.title' | translate"
+      accent="yellow"
+      (closed)="cerrarReglas()"
+    >
+      <p>{{ 'mus.rules.goal' | translate }}</p>
+      <p>{{ 'mus.rules.order' | translate }}</p>
+      <p>{{ 'mus.rules.mus' | translate }}</p>
+      <p>{{ 'mus.rules.lances' | translate }}</p>
+      <p>{{ 'mus.rules.bets' | translate }}</p>
+      <p>{{ 'mus.rules.pairs' | translate }}</p>
+    </app-rules-dialog>
   }
-</div>
+</app-game-shell>

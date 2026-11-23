@@ -8,8 +8,6 @@ import {
   signal,
 } from '@angular/core';
 
-import { RouterLink } from '@angular/router';
-
 import { TranslatePipe } from '../../../i18n';
 import { Card, SpanishRank } from '../../../core/games/baraja';
 import {
@@ -28,6 +26,8 @@ import {
 import { SalaOnlineService } from '../../../core/services/sala-online.service';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { FocoDialogoDirective } from '../../../shared/directives/foco-dialogo.directive';
+import { GameShell } from '../../../shared/components/game-shell/game-shell';
+import { RulesDialog } from '../../../shared/components/rules-dialog/rules-dialog';
 import { SalaLobby } from '../../../shared/components/sala-lobby/sala-lobby';
 import { Mano } from '../../../shared/components/mano/mano';
 import { GameSound } from '../../../core/audio/game-sound';
@@ -50,7 +50,7 @@ interface LogLine {
  */
 @Component({
   selector: 'app-mentiroso',
-  imports: [ButtonComponent, RouterLink, SalaLobby, TranslatePipe, FocoDialogoDirective, Mano],
+  imports: [ButtonComponent, SalaLobby, TranslatePipe, FocoDialogoDirective, Mano, GameShell, RulesDialog],
   templateUrl: './mentiroso.html',
   styleUrl: './mentiroso.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

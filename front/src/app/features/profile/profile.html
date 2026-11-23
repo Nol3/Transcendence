@@ -1,5 +1,11 @@
 <div class="profile-page animate-fade-in">
   <div class="profile-container">
+    <header class="page-header">
+      <div class="page-header__text">
+        <app-pixel-title [level]="1" color="cyan">{{ 'profile.title' | translate }}</app-pixel-title>
+      </div>
+    </header>
+
     @if (user(); as currentUser) {
       <div class="profile-grid">
         <div class="profile-left">

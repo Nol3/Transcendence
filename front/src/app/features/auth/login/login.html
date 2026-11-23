@@ -11,7 +11,7 @@
 
     <!-- Header -->
     <div class="auth-card__header">
-      <app-pixel-title [level]="2" color="cyan">{{ 'auth.login.title' | translate }}</app-pixel-title>
+      <app-pixel-title [level]="1" color="cyan">{{ 'auth.login.title' | translate }}</app-pixel-title>
       <p class="auth-card__subtitle text-secondary text-sm">{{ 'auth.login.subtitle' | translate }}</p>
     </div>
 
@@ -20,7 +20,7 @@
 
       <app-input
         formControlName="email"
-        label="EMAIL"
+        [label]="'auth.login.email' | translate"
         type="email"
         [placeholder]="'auth.login.emailPlaceholder' | translate"
         autocomplete="email"
@@ -29,7 +29,7 @@
 
       <app-input
         formControlName="password"
-        label="PASSWORD"
+        [label]="'auth.login.password' | translate"
         type="password"
         placeholder="••••••••"
         autocomplete="current-password"
@@ -43,7 +43,7 @@
       </p>
 
       @if (error()) {
-        <div class="auth-card__error">
+        <div class="auth-card__error" role="alert">
           <span class="font-mono">✕</span>
           {{ error() }}
         </div>
@@ -55,7 +55,7 @@
         [loading]="loading()"
         [fullWidth]="true"
       >
-        SIGN IN
+        {{ 'auth.login.submit' | translate }}
       </app-button>
 
     </form>

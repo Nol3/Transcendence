@@ -18,7 +18,7 @@
 
 .games-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
   gap: var(--space-4, 1.25rem);
   margin: 0;
   padding: 0;
@@ -64,13 +64,25 @@
   }
 
   &__icon {
-    font-size: 2rem;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md, 8px);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 1.6rem;
     line-height: 1;
   }
 
   &__name {
     margin: 0 0 0.35rem;
+    min-height: 2.4em;
+    display: flex;
+    align-items: center;
     font-size: 1.05rem;
+    line-height: 1.2;
     color: var(--acento);
   }
 

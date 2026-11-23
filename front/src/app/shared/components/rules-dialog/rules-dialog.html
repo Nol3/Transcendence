@@ -1,0 +1,32 @@
+<div
+  class="rules-dialog"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="rules-dialog-title"
+  appFocoDialogo
+  (click)="alPulsarFondo($event)"
+>
+  <div [class]="'rules-dialog__box rules-dialog__box--' + accent">
+    <header class="rules-dialog__header">
+      <h2 id="rules-dialog-title" class="rules-dialog__title font-pixel">{{ title }}</h2>
+      <button
+        type="button"
+        class="rules-dialog__close"
+        (click)="close()"
+        [attr.aria-label]="'common.close' | translate"
+      >
+        ✕
+      </button>
+    </header>
+
+    <div class="rules-dialog__body">
+      <ng-content />
+    </div>
+
+    <footer class="rules-dialog__footer">
+      <app-button variant="primary" (clicked)="close()">
+        {{ 'common.close' | translate }}
+      </app-button>
+    </footer>
+  </div>
+</div>

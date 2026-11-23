@@ -10,15 +10,21 @@
       <div class="footer__nav-group">
         <h4 class="footer__nav-title font-pixel">{{ 'footer.game' | translate }}</h4>
         <a routerLink="/" class="footer__link">{{ 'nav.home' | translate }}</a>
-        <a routerLink="/game" class="footer__link">{{ 'nav.game' | translate }}</a>
+        <a routerLink="/games" class="footer__link">{{ 'nav.games' | translate }}</a>
         <a routerLink="/tournament" class="footer__link">{{ 'nav.tournament' | translate }}</a>
       </div>
 
       <div class="footer__nav-group">
         <h4 class="footer__nav-title font-pixel">{{ 'footer.account' | translate }}</h4>
-        <a routerLink="/login" class="footer__link">{{ 'nav.login' | translate }}</a>
-        <a routerLink="/register" class="footer__link">{{ 'nav.register' | translate }}</a>
-        <a routerLink="/profile" class="footer__link">{{ 'nav.profile' | translate }}</a>
+        @if (auth.isAuthenticated()) {
+          <a routerLink="/profile" class="footer__link">{{ 'nav.profile' | translate }}</a>
+          <button type="button" class="footer__link footer__link--button" (click)="auth.logout()">
+            {{ 'nav.logout' | translate }}
+          </button>
+        } @else {
+          <a routerLink="/login" class="footer__link">{{ 'nav.login' | translate }}</a>
+          <a routerLink="/register" class="footer__link">{{ 'nav.register' | translate }}</a>
+        }
       </div>
 
       <div class="footer__nav-group">

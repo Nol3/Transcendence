@@ -1,19 +1,24 @@
 <div class="poker">
   <!-- ── Cabecera ───────────────────────────────────────────────────── -->
-  <div class="poker__header container">
-    <a class="poker__history-link font-pixel" routerLink="/poker/history">
-      {{ 'poker.history.title' | translate }} →
-    </a>
-    <div class="poker__title-row">
-      <app-pixel-title [level]="2" color="yellow">{{ 'poker.title' | translate }}</app-pixel-title>
-      @switch (poker.status()) {
-        @case ('connecting') { <app-badge variant="warning">{{ 'poker.status.connecting' | translate }}</app-badge> }
-        @case ('searching')  { <app-badge variant="warning">{{ 'poker.status.searching' | translate }}</app-badge> }
-        @case ('matched')    { <app-badge variant="success">{{ 'poker.status.playing' | translate }}</app-badge> }
-        @case ('error')      { <app-badge variant="error">{{ 'poker.status.error' | translate }}</app-badge> }
-      }
+  <div class="poker__header container page-header">
+    <div class="page-header__text">
+      <div class="poker__title-row">
+        <app-pixel-title [level]="1" color="yellow">{{ 'poker.title' | translate }}</app-pixel-title>
+        @switch (poker.status()) {
+          @case ('connecting') { <app-badge variant="warning">{{ 'poker.status.connecting' | translate }}</app-badge> }
+          @case ('searching')  { <app-badge variant="warning">{{ 'poker.status.searching' | translate }}</app-badge> }
+          @case ('matched')    { <app-badge variant="success">{{ 'poker.status.playing' | translate }}</app-badge> }
+          @case ('error')      { <app-badge variant="error">{{ 'poker.status.error' | translate }}</app-badge> }
+        }
+      </div>
+      <p class="page-header__subtitle">{{ 'poker.subtitle' | translate }}</p>
     </div>
-    <p class="text-secondary text-sm">{{ 'poker.subtitle' | translate }}</p>
+
+    <div class="page-header__actions">
+      <a class="poker__history-link" routerLink="/poker/history">
+        {{ 'poker.history.title' | translate }} →
+      </a>
+    </div>
   </div>
 
   @if (poker.error()) {
@@ -143,7 +148,7 @@
               }
             </ul>
           }
-          <app-button variant="ghost" [fullWidth]="true" (clicked)="refreshLiveTables()">
+          <app-button variant="secondary" [fullWidth]="true" (clicked)="refreshLiveTables()">
             {{ 'poker.live.refresh' | translate }}
           </app-button>
         </app-card>

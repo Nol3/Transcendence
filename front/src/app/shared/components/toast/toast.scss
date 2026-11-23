@@ -40,13 +40,13 @@
   &__content { flex: 1; min-width: 0; }
 
   &__title {
-    font-size: var(--font-pixel-xs);
+    font-size: var(--font-pixel-sm);
     letter-spacing: 0.05em;
     line-height: 1.5;
   }
 
   &__message {
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
     margin-top: var(--space-1);
   }
@@ -58,6 +58,11 @@
     font-size: var(--font-size-sm);
     padding: 0;
     flex-shrink: 0;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     transition: color var(--transition-fast);
     &:hover { color: var(--color-text-primary); }
   }

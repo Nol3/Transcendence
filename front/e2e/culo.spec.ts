@@ -46,11 +46,11 @@ test.describe('Culo', () => {
     await expect(page.locator('.inicio__campo select')).toHaveCount(2);
 
     // Las reglas se pueden leer antes de empezar.
-    await page.locator('.culo__acciones button').first().click();
-    await expect(page.locator('.reglas')).toBeVisible();
+    await page.locator('.game-shell__actions button').first().click();
+    await expect(page.locator('.rules-dialog')).toBeVisible();
     expect(await page.locator('.reglas__cuerpo section').count()).toBeGreaterThan(4);
-    await page.locator('.reglas__cerrar').click();
-    await expect(page.locator('.reglas')).toHaveCount(0);
+    await page.locator('.rules-dialog__close').click();
+    await expect(page.locator('.rules-dialog')).toHaveCount(0);
 
     // Repartir: aparece la mesa con rivales y mi mano.
     await page.locator('.modo__local button').click();
@@ -103,13 +103,13 @@ test.describe('Culo', () => {
     await expect(page.locator('.mesa')).toBeVisible();
 
     // Se abre con el teclado, como haría quien no usa el ratón.
-    const abrir = page.locator('.culo__btn').first();
+    const abrir = page.locator('.game-shell__actions button').first();
     await abrir.focus();
     await abrir.press('Enter');
-    await expect(page.locator('.reglas')).toBeVisible();
+    await expect(page.locator('.rules-dialog')).toBeVisible();
 
     const dentroDelDialogo = () =>
-      page.evaluate(() => !!document.activeElement?.closest('.reglas'));
+      page.evaluate(() => !!document.activeElement?.closest('.rules-dialog'));
 
     // 1) Al abrirse, el foco entra en el diálogo (antes se quedaba en el botón de detrás,
     //    así que el primer tabulador se iba a la página de fondo).
@@ -124,10 +124,10 @@ test.describe('Culo', () => {
     expect(await dentroDelDialogo()).toBe(true);
 
     // 3) Al cerrarse, el foco vuelve a donde estaba.
-    await page.locator('.reglas__cerrar').click();
-    await expect(page.locator('.reglas')).toHaveCount(0);
+    await page.locator('.rules-dialog__close').click();
+    await expect(page.locator('.rules-dialog')).toHaveCount(0);
     expect(
-      await page.evaluate(() => document.activeElement?.classList.contains('culo__btn')),
+      await page.evaluate(() => document.activeElement?.closest('.game-shell__actions') !== null),
     ).toBe(true);
   });
 

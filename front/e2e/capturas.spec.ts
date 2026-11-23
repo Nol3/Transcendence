@@ -102,11 +102,11 @@ test('captura de las cartas', async ({ page }) => {
   await page.waitForTimeout(700);
   await page.screenshot({ path: `${SALIDA}/4-culo-ajustes.png`, fullPage: false });
 
-  await page.locator('.culo__acciones button').first().click();
-  await expect(page.locator('.reglas')).toBeVisible();
+  await page.locator('.game-shell__actions button').first().click();
+  await expect(page.locator('.rules-dialog')).toBeVisible();
   await page.waitForTimeout(400);
   await page.screenshot({ path: `${SALIDA}/5-culo-reglas.png`, fullPage: false });
-  await page.locator('.reglas__cerrar').click();
+  await page.locator('.rules-dialog__close').click();
 
   await page.locator('.modo__local button').click();
   await expect(page.locator('.mesa')).toBeVisible();

@@ -1,0 +1,100 @@
+.rules-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: rgba(3, 3, 8, 0.82);
+  backdrop-filter: blur(4px);
+  animation: fade-in var(--transition-base) both;
+
+  &__box {
+    width: min(44rem, 100%);
+    max-height: min(88dvh, 52rem);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border-bright);
+    border-radius: var(--radius-xl);
+    background: var(--color-bg-card);
+    box-shadow: var(--shadow-card), var(--glow-sm);
+    overflow: hidden;
+    animation: slide-up var(--transition-base) both;
+
+    &--cyan { border-top: 2px solid var(--color-neon-cyan); }
+    &--magenta { border-top: 2px solid var(--color-neon-magenta); }
+    &--yellow { border-top: 2px solid var(--color-neon-yellow); }
+    &--green { border-top: 2px solid var(--color-neon-green); }
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__title {
+    margin: 0;
+    font-size: clamp(0.8125rem, 2.4vw, 1rem);
+    line-height: 1.5;
+  }
+
+  &__close {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--color-danger);
+      color: var(--color-danger);
+    }
+
+    &:focus-visible {
+      outline: 3px solid var(--color-neon-magenta);
+      outline-offset: 2px;
+    }
+  }
+
+  &__body {
+    padding: var(--space-6);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--color-border);
+    background: var(--color-bg-surface);
+  }
+
+  @media (max-width: 560px) {
+    padding: var(--space-2);
+
+    &__box {
+      max-height: 92dvh;
+    }
+
+    &__header,
+    &__body {
+      padding-inline: var(--space-4);
+    }
+
+    &__footer {
+      padding-inline: var(--space-4);
+    }
+  }
+}

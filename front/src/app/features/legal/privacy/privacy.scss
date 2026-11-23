@@ -4,7 +4,6 @@
   .container {
     max-width: 800px;
   }
-
   app-pixel-title {
     display: block;
     text-align: center;
@@ -20,6 +19,7 @@
 
 .legal-text {
   line-height: 1.8;
+  overflow-wrap: anywhere;
 }
 
 .legal-updated {
@@ -42,6 +42,7 @@
     color: var(--color-neon-cyan);
     margin-bottom: var(--space-4);
     letter-spacing: 1px;
+    overflow-wrap: anywhere;
   }
 
   p {

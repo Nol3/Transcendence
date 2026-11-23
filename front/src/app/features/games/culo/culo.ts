@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 
 import { TranslatePipe } from '../../../i18n';
 import { Card, SpanishRank, sortHand, strength } from '../../../core/games/culo/culo-deck';
@@ -29,7 +29,8 @@ import { botDecision } from '../../../core/games/culo/culo-bots';
 import { CuloOnlineService } from '../../../core/services/culo-online.service';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { FocoDialogoDirective } from '../../../shared/directives/foco-dialogo.directive';
-import { PixelTitleComponent } from '../../../shared/components/pixel-title/pixel-title';
+import { GameShell } from '../../../shared/components/game-shell/game-shell';
+import { RulesDialog } from '../../../shared/components/rules-dialog/rules-dialog';
 import { Mano } from '../../../shared/components/mano/mano';
 import { QrSala } from '../../../shared/qr/qr-sala';
 import { PlayingCard } from '../../../shared/components/playing-card/playing-card';
@@ -60,12 +61,12 @@ export type ModoCulo = 'menu' | 'local' | 'online';
   imports: [
     QrSala,
     ButtonComponent,
-    PixelTitleComponent,
     PlayingCard,
     Mano,
-    RouterLink,
     TranslatePipe,
     FocoDialogoDirective,
+    GameShell,
+    RulesDialog,
   ],
   templateUrl: './culo.html',
   styleUrl: './culo.scss',

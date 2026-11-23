@@ -25,18 +25,18 @@
 
       <div class="hero__actions">
         @if (auth.isAuthenticated()) {
-          <app-button variant="primary" size="lg" (clicked)="playNow()">
-            {{ 'nav.poker' | translate }}
-          </app-button>
-          <app-button variant="secondary" size="lg" routerLink="/game">
+          <app-button variant="primary" size="lg" routerLink="/games">
             {{ 'home.play' | translate }}
+          </app-button>
+          <app-button variant="secondary" size="lg" (clicked)="playNow()">
+            {{ 'nav.poker' | translate }}
           </app-button>
           <app-button variant="ghost" size="lg" routerLink="/tournament">
             {{ 'home.tournament' | translate }}
           </app-button>
         } @else {
           <app-button variant="primary" size="lg" routerLink="/register">
-            {{ 'home.subtitle' | translate }}
+            {{ 'nav.register' | translate }}
           </app-button>
           <app-button variant="ghost" size="lg" routerLink="/login">
             {{ 'nav.login' | translate }}
@@ -69,7 +69,7 @@
         </div>
         <div class="stats-bar__item">
           <span class="stats-bar__value font-pixel neon-text-cyan">{{ leaderboard().length }}</span>
-          <span class="stats-bar__label font-pixel">{{ 'tournament.title' | translate }}</span>
+          <span class="stats-bar__label font-pixel">{{ 'home.tournaments' | translate }}</span>
         </div>
       </div>
     </div>
@@ -94,7 +94,7 @@
                     {{ rankIcon(entry.rank) }}
                   </app-badge>
                 </div>
-                <span class="leaderboard__name font-pixel">{{ entry.user.username || 'Unknown' }}</span>
+                <span class="leaderboard__name font-pixel">{{ entry.user.username || ('common.unknown' | translate) }}</span>
                 <div class="leaderboard__stats">
                   <span class="leaderboard__wins neon-text-green font-mono">{{ entry.wins }}W</span>
                   <span class="leaderboard__losses text-muted font-mono">{{ entry.losses }}L</span>
@@ -129,7 +129,7 @@
               </div>
               <div class="player-status__row">
                 <span class="text-secondary font-mono">{{ 'home.streak' | translate }}</span>
-                <span class="neon-text-green font-pixel">{{ userStats()!.currentStreak }} WINS</span>
+                <span class="neon-text-green font-pixel">{{ userStats()!.currentStreak }} {{ 'home.winsShort' | translate }}</span>
               </div>
               @if (dailyStreak() !== null) {
                 <div class="player-status__row">
@@ -141,7 +141,7 @@
                 <span class="text-secondary font-mono">{{ 'common.status' | translate }}</span>
                 <div class="player-status__online">
                   <span class="hero__live-dot animate-pulse-glow"></span>
-                  <span class="neon-text-green font-pixel">{{ userOnlineStatus() ? 'ONLINE' : 'OFFLINE' }}</span>
+                  <span class="neon-text-green font-pixel">{{ userOnlineStatus() ? ('common.online' | translate) : ('common.offline' | translate) }}</span>
                 </div>
               </div>
             </div>

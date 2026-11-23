@@ -29,6 +29,11 @@
   flex-direction: column;
   gap: var(--space-6);
 
+  @media (max-width: 400px) {
+    padding: var(--space-5);
+    gap: var(--space-5);
+  }
+
   // Neon top border accent
   border-top: 2px solid var(--color-neon-cyan) !important;
   box-shadow: var(--shadow-card), 0 -2px 20px rgba(0, 229, 255, 0.15) !important;
@@ -90,10 +95,12 @@
 .google-btn-host {
   display: flex;
   justify-content: center;
-  min-height: 44px;
+  width: 100%;
+  overflow: hidden;
 
   // Override Google's default white background to blend with dark theme
   iframe {
     color-scheme: dark;
+    max-width: 100%;
   }
 }

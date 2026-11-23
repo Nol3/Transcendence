@@ -1,17 +1,22 @@
+<!-- El contenido se proyecta una sola vez y se pinta en el heading que toque.
+     Antes había un `<ng-content>` dentro de cada `@case`; Angular solo conserva
+     una proyección y el título salía vacío. -->
+<ng-template #titulo><ng-content /></ng-template>
+
 @switch (level) {
   @case (1) {
     <h1 [class]="'pixel-title pixel-title--' + color + ' pixel-title--h1' + (flicker ? ' animate-flicker' : '')">
-      <ng-content />
+      <ng-container *ngTemplateOutlet="titulo" />
     </h1>
   }
   @case (2) {
     <h2 [class]="'pixel-title pixel-title--' + color + ' pixel-title--h2' + (flicker ? ' animate-flicker' : '')">
-      <ng-content />
+      <ng-container *ngTemplateOutlet="titulo" />
     </h2>
   }
   @case (3) {
     <h3 [class]="'pixel-title pixel-title--' + color + ' pixel-title--h3' + (flicker ? ' animate-flicker' : '')">
-      <ng-content />
+      <ng-container *ngTemplateOutlet="titulo" />
     </h3>
   }
 }

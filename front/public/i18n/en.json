@@ -27,7 +27,9 @@
     "streak": "STREAK",
     "loginStreak": "DAYS IN A ROW",
     "tagline": "🪙",
-    "cards": "CARDS"
+    "cards": "CARDS",
+    "tournaments": "TOURNAMENTS",
+    "winsShort": "WINS"
   },
   "auth": {
     "errors": {
@@ -59,6 +61,9 @@
       "hasAccount": "Have account? Login",
       "subtitle": "Create your player profile",
       "usernamePlaceholder": "player_one",
+    "usernameHint": "Letters, numbers and _ only",
+    "passwordHint": "At least 8 characters",
+    "confirmPassword": "Confirm password",
       "hasAccountShort": "Already have an account?"
     },
     "forgot": {
@@ -71,6 +76,7 @@
     "reset": {
       "title": "New password",
       "subtitle": "Pick a password you don't use anywhere else.",
+      "password": "Password",
       "repeat": "Repeat password",
       "submit": "Change password",
       "ok": "Password changed. You can sign in now.",
@@ -111,11 +117,13 @@
     },
     "tute": {
       "name": "Tute",
-      "desc": "The classic Spanish trick-taking game: king and horse sing forty."
+      "desc": "The classic Spanish trick-taking game: king and horse sing forty.",
+      "how": "Eight cards each; declare 20, 40 or tute to score."
     },
     "mus": {
       "name": "Mus",
-      "desc": "Four players in two pairs: four rounds and plenty of betting."
+      "desc": "Four players in two pairs: four rounds and plenty of betting.",
+      "how": "Four cards each; mus, betting and órdago in pairs."
     }
   },
   "lobby": {
@@ -157,6 +165,7 @@
     "create": "Create Tournament",
     "createDescription": "Organize your own tournament and challenge other players",
     "name": "Tournament Name",
+    "nameError": "The name must be at least 3 characters.",
     "description": "Tournament Description",
     "players": "Players",
     "maxPlayers": "Max Players",
@@ -199,6 +208,12 @@
     "back": "Back",
     "save": "Save",
     "cancel": "Cancel",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "soundToggle": "Toggle sound",
+    "unknown": "Unknown",
+    "online": "ONLINE",
+    "offline": "OFFLINE",
     "confirm": "Confirm",
     "status": "Status",
     "ready": "READY",
@@ -320,7 +335,7 @@
       "1": "No-limit Texas Hold'em, heads-up",
       "2": "You get 2 hole cards and there are 5 community cards",
       "3": "Betting rounds: preflop, flop, turn and river",
-      "4": "You can check, call, raise or go all-in",
+      "4": "You can check, call, raise or go all‑in",
       "5": "Best 5-card hand wins, or whoever does not fold"
     },
     "table": {

@@ -1,8 +1,10 @@
 <div class="chat-page animate-fade-in">
 
-  <div class="chat-page__header container">
-    <app-pixel-title [level]="2" color="cyan">{{ 'chat.title' | translate }}</app-pixel-title>
-    <p class="text-secondary text-sm">{{ 'chat.subtitle' | translate }}</p>
+  <div class="chat-page__header container page-header">
+    <div class="page-header__text">
+      <app-pixel-title [level]="1" color="cyan">{{ 'chat.title' | translate }}</app-pixel-title>
+      <p class="page-header__subtitle">{{ 'chat.subtitle' | translate }}</p>
+    </div>
   </div>
 
   @if (chat.error()) {
@@ -13,7 +15,7 @@
   }
 
   <div class="chat-page__body container">
-    <div class="chat-page__grid">
+    <div class="chat-page__grid" [class.chat-page__grid--empty]="chat.conversations().length === 0 && !chat.activeUserId()">
 
       <!-- ── Izquierda: conversaciones ───────────────────────────── -->
       <div class="chat-page__sidebar">
@@ -42,7 +44,7 @@
             </ul>
           }
 
-          <app-button variant="ghost" [fullWidth]="true" (clicked)="showPicker.set(!showPicker())">
+          <app-button variant="secondary" [fullWidth]="true" (clicked)="showPicker.set(!showPicker())">
             {{ 'chat.newConversation' | translate }}
           </app-button>
 

@@ -141,19 +141,30 @@
   }
 
   @if (showCreateModal()) {
-    <div class="modal-overlay" (click)="closeCreateModal()">
+    <div
+      class="modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="'tournament.create' | translate"
+      appFocoDialogo
+      (click)="closeCreateModal()"
+      (keydown.escape)="closeCreateModal()"
+    >
       <app-card [title]="'tournament.create' | translate" class="register-modal" (click)="$event.stopPropagation()">
         <form class="register-form" [formGroup]="createForm" (ngSubmit)="createTournament()">
           <p class="text-secondary">{{ 'tournament.createDescription' | translate }}</p>
 
           <div class="form-field">
-            <label class="text-sm text-secondary">{{ 'tournament.name' | translate }}</label>
-            <input type="text" formControlName="name"  class="form-input">
+            <label class="text-sm text-secondary" for="tournament-name">{{ 'tournament.name' | translate }}</label>
+            <input id="tournament-name" type="text" formControlName="name" class="form-input">
+            @if (createForm.get('name')?.touched && createForm.get('name')?.invalid) {
+              <span class="form-error" role="alert">{{ 'tournament.nameError' | translate }}</span>
+            }
           </div>
 
           <div class="form-field">
-            <label class="text-sm text-secondary">{{ 'tournament.maxPlayers' | translate }}</label>
-            <select formControlName="maxPlayers" class="form-input">
+            <label class="text-sm text-secondary" for="tournament-max">{{ 'tournament.maxPlayers' | translate }}</label>
+            <select id="tournament-max" formControlName="maxPlayers" class="form-input">
               <option [ngValue]="4">4 {{ 'tournament.players' | translate }}</option>
               <option [ngValue]="8">8 {{ 'tournament.players' | translate }}</option>
               <option [ngValue]="16">16 {{ 'tournament.players' | translate }}</option>
@@ -161,8 +172,8 @@
           </div>
 
           <div class="form-field">
-            <label class="text-sm text-secondary">{{ 'tournament.description' | translate }}</label>
-            <input type="text" formControlName="description" class="form-input">
+            <label class="text-sm text-secondary" for="tournament-description">{{ 'tournament.description' | translate }}</label>
+            <input id="tournament-description" type="text" formControlName="description" class="form-input">
           </div>
 
           <div class="form-actions">

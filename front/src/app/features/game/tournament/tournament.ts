@@ -6,6 +6,7 @@ import { BadgeComponent } from '../../../shared/components/badge/badge';
 import { ButtonComponent } from '../../../shared/components/button/button';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner';
 import { BracketComponent, Match, ReportMatchEvent, TournamentRound } from './bracket/bracket';
+import { FocoDialogoDirective } from '../../../shared/directives/foco-dialogo.directive';
 import {
   Tournament as ApiTournament,
   TournamentService,
@@ -47,6 +48,7 @@ const STATUS_API_TO_UI: Record<ApiTournamentStatus, UiTournamentStatus> = {
     SpinnerComponent,
     BracketComponent,
     TranslatePipe,
+    FocoDialogoDirective,
   ],
   templateUrl: './tournament.html',
   styleUrl: './tournament.scss',

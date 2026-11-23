@@ -27,7 +27,9 @@
     "streak": "RACHA",
     "loginStreak": "DÍAS SEGUIDOS",
     "tagline": "🪙",
-    "cards": "CARTAS"
+    "cards": "CARTAS",
+    "tournaments": "TORNEOS",
+    "winsShort": "VICTORIAS"
   },
   "auth": {
     "errors": {
@@ -59,6 +61,9 @@
       "hasAccount": "¿Tienes cuenta? Inicia sesión",
       "subtitle": "Crea tu perfil de jugador",
       "usernamePlaceholder": "jugador_uno",
+    "usernameHint": "Solo letras, números y _",
+    "passwordHint": "Mínimo 8 caracteres",
+    "confirmPassword": "Repetir contraseña",
       "hasAccountShort": "¿Ya tienes cuenta?"
     },
     "forgot": {
@@ -71,6 +76,7 @@
     "reset": {
       "title": "Nueva contraseña",
       "subtitle": "Elige una contraseña que no uses en otro sitio.",
+      "password": "Contraseña",
       "repeat": "Repite la contraseña",
       "submit": "Cambiar contraseña",
       "ok": "Contraseña cambiada. Ya puedes entrar con la nueva.",
@@ -111,11 +117,13 @@
     },
     "tute": {
       "name": "Tute",
-      "desc": "El clásico de bazas: el rey y el caballo cantan cuarenta."
+      "desc": "El clásico de bazas: el rey y el caballo cantan cuarenta.",
+      "how": "Ocho cartas por jugador; canta 20, 40 o tute para sumar."
     },
     "mus": {
       "name": "Mus",
-      "desc": "Cuatro jugadores en dos parejas: cuatro lances y muchos envites."
+      "desc": "Cuatro jugadores en dos parejas: cuatro lances y muchos envites.",
+      "how": "Cuatro cartas por jugador; mus, envite y órdago por parejas."
     }
   },
   "lobby": {
@@ -157,6 +165,7 @@
     "create": "Crear torneo",
     "createDescription": "Organiza tu propio torneo y desafía a otros jugadores",
     "name": "Nombre del torneo",
+    "nameError": "El nombre debe tener al menos 3 caracteres.",
     "description": "Descripción del torneo",
     "players": "Jugadores",
     "live": "EN VIVO",
@@ -199,6 +208,12 @@
     "back": "Volver",
     "save": "Guardar",
     "cancel": "Cancelar",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
+    "soundToggle": "Activar o silenciar el sonido",
+    "unknown": "Desconocido",
+    "online": "EN LÍNEA",
+    "offline": "DESCONECTADO",
     "confirm": "Confirmar",
     "status": "Estado",
     "ready": "LISTO",
@@ -320,7 +335,7 @@
       "1": "Texas Hold'em sin límite, 1 contra 1",
       "2": "Recibes 2 cartas privadas y hay 5 comunitarias",
       "3": "Rondas de apuesta: preflop, flop, turn y river",
-      "4": "Puedes pasar, igualar, subir o irte all-in",
+      "4": "Puedes pasar, igualar, subir o irte all‑in",
       "5": "Gana la mejor mano de 5 cartas, o quien no se retire"
     },
     "table": {

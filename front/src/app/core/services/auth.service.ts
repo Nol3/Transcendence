@@ -232,7 +232,10 @@ export class AuthService {
       size: 'large',
       shape: 'rectangular',
       logo_alignment: 'left',
-      width: 300,
+      // El iframe de Google tiene un ancho fijo: en un móvil de 320 se salía de la
+      // tarjeta. Se le da el ancho real del hueco (entre 200 y 300).
+      width: Math.min(300, Math.max(200, hostEl.clientWidth || 300)),
+      locale: document.documentElement.lang || 'en',
     });
   }
 

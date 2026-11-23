@@ -1,24 +1,11 @@
-<div class="mentiroso container">
-  <!-- ── Cabecera ──────────────────────────────────────────────────────────── -->
-  <header class="mentiroso__cabecera">
-    <h2 class="font-pixel neon-text-yellow">{{ 'game.mentiroso.name' | translate }}</h2>
-    <div class="mentiroso__acciones">
-      <app-button variant="ghost" size="sm" (click)="reglasAbiertas.set(true)">
-        📖 {{ 'mentiroso.rules.title' | translate }}
-      </app-button>
-      <button
-        type="button"
-        class="mentiroso__sonido"
-        (click)="alternarSonido()"
-        [attr.aria-pressed]="sonidoActivo()"
-        [attr.aria-label]="'culo.sound.toggle' | translate"
-      >
-        {{ sonidoActivo() ? '🔊' : '🔇' }}
-      </button>
-      <a class="mentiroso__volver" routerLink="/games">← {{ 'games.back' | translate }}</a>
-    </div>
-  </header>
-
+<app-game-shell
+  [title]="'game.mentiroso.name' | translate"
+  accent="yellow"
+  rulesLabel="mentiroso.rules.title"
+  [soundOn]="sonidoActivo()"
+  (rules)="reglasAbiertas.set(true)"
+  (sound)="alternarSonido()"
+>
   <!-- ── Sin partida: elegir modo, sala de espera o ajustes ────────────────── -->
   @if (modo() === 'menu') {
     <section class="inicio">
@@ -48,7 +35,7 @@
           <span>{{ 'mentiroso.setup.players' | translate }}</span>
           <select [value]="jugadores()" (change)="jugadores.set(+$any($event.target).value)">
             @for (n of [3, 4, 5, 6]; track n) {
-              <option [value]="n">{{ n }}</option>
+              <option [value]="n" [selected]="jugadores() === n">{{ n }}</option>
             }
           </select>
         </label>
@@ -57,7 +44,7 @@
           <span>{{ 'mentiroso.setup.hands' | translate }}</span>
           <select [value]="manosObjetivo()" (change)="manosObjetivo.set(+$any($event.target).value)">
             @for (n of [1, 3, 5]; track n) {
-              <option [value]="n">{{ n }}</option>
+              <option [value]="n" [selected]="manosObjetivo() === n">{{ n }}</option>
             }
           </select>
         </label>
@@ -76,8 +63,7 @@
 
       <ul class="mesa__rivales" [style.--n]="rivales().length">
         @for (r of rivales(); track r.id) {
-          <li class="rival" [class.rival--turno]="estado()!.turn === r.id && estado()!.phase === 'playing'">
-              [style.--i]="$index"
+          <li class="rival" [style.--i]="$index" [class.rival--turno]="estado()!.turn === r.id && estado()!.phase === 'playing'">
             <span class="rival__nombre font-pixel">{{ r.name }}</span>
             <span class="rival__cartas font-mono">{{ r.hand.length }} 🂠</span>
             <span class="rival__ganadas text-muted text-sm">
@@ -118,7 +104,7 @@
           </div>
         }
 
-        <p class="mesa__turno font-pixel">
+        <p class="mesa__turno font-pixel" role="status" aria-live="polite">
           @if (estado()!.phase === 'playing') {
             @if (miTurno()) {
               {{ 'mentiroso.turnYours' | translate }}
@@ -171,7 +157,7 @@
 
       <!-- Registro -->
       @if (registro().length > 0) {
-        <ul class="registro">
+        <ul class="registro" aria-live="polite">
           @for (l of registro(); track $index) {
             <li class="registro__linea" [class]="'registro__linea--' + l.kind">
               @if (l.rankKey) {
@@ -212,18 +198,16 @@
 
   <!-- ── Panel de reglas ───────────────────────────────────────────────────── -->
   @if (reglasAbiertas()) {
-    <div class="reglas" role="dialog" aria-modal="true" appFocoDialogo [attr.aria-label]="'mentiroso.rules.title' | translate">
-      <div class="reglas__caja">
-        <h3 class="font-pixel neon-text-yellow">{{ 'mentiroso.rules.title' | translate }}</h3>
-        <p>{{ 'mentiroso.rules.goal' | translate }}</p>
-        <p>{{ 'mentiroso.rules.round' | translate }}</p>
-        <p>{{ 'mentiroso.rules.challenge' | translate }}</p>
-        <p>{{ 'mentiroso.rules.out' | translate }}</p>
-        <p>{{ 'mentiroso.rules.four' | translate }}</p>
-        <app-button variant="primary" (click)="cerrarReglas()">
-          {{ 'common.close' | translate }}
-        </app-button>
-      </div>
-    </div>
+    <app-rules-dialog
+      [title]="'mentiroso.rules.title' | translate"
+      accent="yellow"
+      (closed)="cerrarReglas()"
+    >
+      <p>{{ 'mentiroso.rules.goal' | translate }}</p>
+      <p>{{ 'mentiroso.rules.round' | translate }}</p>
+      <p>{{ 'mentiroso.rules.challenge' | translate }}</p>
+      <p>{{ 'mentiroso.rules.out' | translate }}</p>
+      <p>{{ 'mentiroso.rules.four' | translate }}</p>
+    </app-rules-dialog>
   }
-</div>
+</app-game-shell>

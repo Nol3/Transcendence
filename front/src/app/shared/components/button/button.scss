@@ -57,9 +57,9 @@
   &__label--hidden { opacity: 0; }
 
   // Sizes
-  &--sm { font-size: var(--font-pixel-xs); padding: var(--space-2) var(--space-4); min-height: 36px; }
-  &--md { font-size: var(--font-pixel-xs); padding: var(--space-3) var(--space-6); min-height: 42px; }
-  &--lg { font-size: var(--font-pixel-sm); padding: var(--space-4) var(--space-8); min-height: 48px; }
+  &--sm { font-size: 0.6875rem; padding: var(--space-2) var(--space-4); min-height: 44px; }
+  &--md { font-size: 0.6875rem; padding: var(--space-3) var(--space-6); min-height: 44px; }
+  &--lg { font-size: var(--font-pixel-md); padding: var(--space-4) var(--space-8); min-height: 48px; }
 
   // En pantalla táctil, 44 px es el mínimo cómodo; los tamaños pequeños se
   // quedaban en 33-36 px y se fallaba el toque.

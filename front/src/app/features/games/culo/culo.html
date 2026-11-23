@@ -1,23 +1,12 @@
-<div class="culo animate-fade-in">
-
-  <header class="culo__cabecera container">
-    <div>
-      <app-pixel-title [level]="2" color="green">{{ 'game.culo.name' | translate }}</app-pixel-title>
-      <p class="text-secondary text-sm">{{ 'game.culo.desc' | translate }}</p>
-    </div>
-    <div class="culo__acciones">
-      <button type="button" class="culo__btn" (click)="reglasAbiertas.set(true)">
-        📖 {{ 'culo.rules.open' | translate }}
-      </button>
-      <button type="button" class="culo__btn" (click)="alternarSonido()"
-              [attr.aria-pressed]="sonidoActivo()"
-              [attr.aria-label]="'culo.sound.toggle' | translate">
-        {{ sonidoActivo() ? '🔊' : '🔇' }}
-      </button>
-      <a class="culo__btn font-pixel" routerLink="/games">← {{ 'culo.backToGames' | translate }}</a>
-    </div>
-  </header>
-
+<app-game-shell
+  [title]="'game.culo.name' | translate"
+  [subtitle]="'game.culo.desc' | translate"
+  accent="green"
+  rulesLabel="culo.rules.open"
+  [soundOn]="sonidoActivo()"
+  (rules)="reglasAbiertas.set(true)"
+  (sound)="alternarSonido()"
+>
   <!-- Se ha caído la conexión a mitad de partida: se puede volver sin salir de la mesa. -->
   @if (modo() === 'online' && codigoSala() && online.connection() === 'closed') {
     <div class="culo__error container" role="alert">
@@ -45,8 +34,8 @@
         <label class="inicio__campo inicio__campo--barajas">
           <span>{{ 'culo.setup.decks' | translate }}</span>
           <select [value]="barajas()" (change)="barajas.set(+$any($event.target).value === 2 ? 2 : 1)">
-            <option [value]="1">{{ 'culo.setup.oneDeck' | translate }}</option>
-            <option [value]="2">{{ 'culo.setup.twoDecks' | translate }}</option>
+            <option [value]="1" [selected]="barajas() === 1">{{ 'culo.setup.oneDeck' | translate }}</option>
+            <option [value]="2" [selected]="barajas() === 2">{{ 'culo.setup.twoDecks' | translate }}</option>
           </select>
         </label>
 
@@ -54,7 +43,7 @@
           <span>{{ 'culo.setup.players' | translate }}</span>
           <select [value]="jugadores()" (change)="jugadores.set(+$any($event.target).value)">
             @for (n of [3, 4, 5, 6]; track n) {
-              <option [value]="n">{{ n }}</option>
+              <option [value]="n" [selected]="jugadores() === n">{{ n }}</option>
             }
           </select>
         </label>
@@ -308,73 +297,69 @@
 
   <!-- ── Cómo se juega ──────────────────────────────────────────────────────── -->
   @if (reglasAbiertas()) {
-    <div class="reglas" role="dialog" [attr.aria-label]="'culo.rules.title' | translate" aria-modal="true" appFocoDialogo>
-      <div class="reglas__caja">
-        <header class="reglas__cabecera">
-          <h3 class="font-pixel neon-text-cyan">{{ 'culo.rules.title' | translate }}</h3>
-          <button type="button" class="reglas__cerrar" (click)="cerrarReglas()"
-                  [attr.aria-label]="'common.close' | translate">✕</button>
-        </header>
+    <app-rules-dialog
+      [title]="'culo.rules.title' | translate"
+      accent="green"
+      (closed)="cerrarReglas()"
+    >
+      <div class="reglas__cuerpo">
+        <section>
+          <h4>{{ 'culo.rules.goal.title' | translate }}</h4>
+          <p>{{ 'culo.rules.goal.text' | translate }}</p>
+        </section>
 
-        <div class="reglas__cuerpo">
-          <section>
-            <h4 class="font-pixel">{{ 'culo.rules.goal.title' | translate }}</h4>
-            <p>{{ 'culo.rules.goal.text' | translate }}</p>
-          </section>
+        <section>
+          <h4>{{ 'culo.rules.turn.title' | translate }}</h4>
+          <ol>
+            <li>{{ 'culo.rules.turn.1' | translate }}</li>
+            <li>{{ 'culo.rules.turn.2' | translate }}</li>
+            <li>{{ 'culo.rules.turn.3' | translate }}</li>
+            <li>{{ 'culo.rules.turn.4' | translate }}</li>
+            <li>{{ 'culo.rules.turn.5' | translate }}</li>
+          </ol>
+        </section>
 
-          <section>
-            <h4 class="font-pixel">{{ 'culo.rules.turn.title' | translate }}</h4>
-            <ol>
-              <li>{{ 'culo.rules.turn.1' | translate }}</li>
-              <li>{{ 'culo.rules.turn.2' | translate }}</li>
-              <li>{{ 'culo.rules.turn.3' | translate }}</li>
-              <li>{{ 'culo.rules.turn.4' | translate }}</li>
-              <li>{{ 'culo.rules.turn.5' | translate }}</li>
-            </ol>
-          </section>
+        <section>
+          <h4>{{ 'culo.rules.values.title' | translate }}</h4>
+          <p>{{ 'culo.rules.values.text' | translate }}</p>
+          <div class="reglas__valores">
+            @for (v of valores; track v) {
+              <span class="reglas__valor" [class.reglas__valor--top]="v === 5">
+                {{ 'culo.rank.' + v | translate }}
+              </span>
+            }
+          </div>
+        </section>
 
-          <section>
-            <h4 class="font-pixel">{{ 'culo.rules.values.title' | translate }}</h4>
-            <p>{{ 'culo.rules.values.text' | translate }}</p>
-            <div class="reglas__valores">
-              @for (v of valores; track v) {
-                <span class="reglas__valor" [class.reglas__valor--top]="v === 5">
-                  {{ 'culo.rank.' + v | translate }}
-                </span>
-              }
-            </div>
-          </section>
+        <section>
+          <h4>{{ 'culo.rules.roles.title' | translate }}</h4>
+          <ul>
+            <li>{{ 'culo.rules.roles.1' | translate }}</li>
+            <li>{{ 'culo.rules.roles.2' | translate }}</li>
+            <li>{{ 'culo.rules.roles.3' | translate }}</li>
+            <li>{{ 'culo.rules.roles.4' | translate }}</li>
+          </ul>
+        </section>
 
-          <section>
-            <h4 class="font-pixel">{{ 'culo.rules.roles.title' | translate }}</h4>
-            <ul>
-              <li>{{ 'culo.rules.roles.1' | translate }}</li>
-              <li>{{ 'culo.rules.roles.2' | translate }}</li>
-              <li>{{ 'culo.rules.roles.3' | translate }}</li>
-              <li>{{ 'culo.rules.roles.4' | translate }}</li>
-            </ul>
-          </section>
+        <section>
+          <h4>{{ 'culo.rules.exchange.title' | translate }}</h4>
+          <ul>
+            <li>{{ 'culo.rules.exchange.1' | translate }}</li>
+            <li>{{ 'culo.rules.exchange.2' | translate }}</li>
+            <li>{{ 'culo.rules.exchange.3' | translate }}</li>
+          </ul>
+        </section>
 
-          <section>
-            <h4 class="font-pixel">{{ 'culo.rules.exchange.title' | translate }}</h4>
-            <ul>
-              <li>{{ 'culo.rules.exchange.1' | translate }}</li>
-              <li>{{ 'culo.rules.exchange.2' | translate }}</li>
-              <li>{{ 'culo.rules.exchange.3' | translate }}</li>
-            </ul>
-          </section>
-
-          <section>
-            <h4 class="font-pixel">{{ 'culo.rules.tips.title' | translate }}</h4>
-            <ul>
-              <li>{{ 'culo.rules.tips.1' | translate }}</li>
-              <li>{{ 'culo.rules.tips.2' | translate }}</li>
-              <li>{{ 'culo.rules.tips.3' | translate }}</li>
-              <li>{{ 'culo.rules.tips.4' | translate }}</li>
-            </ul>
-          </section>
-        </div>
+        <section>
+          <h4>{{ 'culo.rules.tips.title' | translate }}</h4>
+          <ul>
+            <li>{{ 'culo.rules.tips.1' | translate }}</li>
+            <li>{{ 'culo.rules.tips.2' | translate }}</li>
+            <li>{{ 'culo.rules.tips.3' | translate }}</li>
+            <li>{{ 'culo.rules.tips.4' | translate }}</li>
+          </ul>
+        </section>
       </div>
-    </div>
+    </app-rules-dialog>
   }
-</div>
+</app-game-shell>

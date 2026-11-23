@@ -3,7 +3,7 @@
 .poker {
   padding-block: var(--space-8, 2rem);
 
-  &__header { margin-bottom: 1rem; }
+  &__header { margin-bottom: var(--space-6); }
 
   &__title-row {
     display: flex;
@@ -92,8 +92,8 @@
   margin-top: var(--space-2, 8px);
 
   &__btn {
-    width: 2.2rem;
-    height: 2.2rem;
+    width: var(--target-min);
+    height: var(--target-min);
     display: inline-grid;
     place-items: center;
     font-size: 1.2rem;
@@ -134,12 +134,20 @@
 }
 
 .poker__history-link {
-  display: inline-block;
-  margin-bottom: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
   color: var(--color-neon-cyan, #29e0ff);
+  font-size: var(--font-ui-sm);
   text-decoration: none;
 
-  &:hover { text-decoration: underline; }
+  &:hover {
+    border-color: var(--color-neon-cyan);
+    text-decoration: none;
+  }
 }
 
 .poker__back {
@@ -158,6 +166,11 @@
     display: grid;
     gap: 1rem;
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    min-width: 0;
+
+    > * {
+      min-width: 0;
+    }
 
     @media (max-width: 900px) { grid-template-columns: 1fr; }
   }
@@ -170,16 +183,33 @@
   gap: 1rem;
   margin: 1rem 0;
 
-  &__options { display: flex; gap: 0.5rem; }
+  &__options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(38px, 1fr));
+    gap: 0.25rem;
+    flex: 1;
+  }
+
+  @media (max-width: 560px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+
+    &__options {
+      width: 100%;
+    }
+  }
 
   &__btn {
     padding: 0.5rem 0.85rem;
+    min-width: 0;
+    min-height: 40px;
     border: 1px solid var(--color-border);
     border-radius: 4px;
     background: var(--color-bg-surface);
     color: var(--color-text-secondary);
     cursor: pointer;
-    font-size: 0.65rem;
+    font-size: 0.75rem;
 
     &.is-active {
       border-color: var(--color-neon-cyan);
@@ -312,13 +342,17 @@
 
 /* Selector de tema del lobby */
 .themes {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.4rem;
+  width: 100%;
+  max-width: 15rem;
 
   &__swatch {
-    width: 1.6rem;
-    height: 1.6rem;
-    border-radius: 4px;
+    width: 100%;
+    max-width: var(--target-min);
+    aspect-ratio: 1;
+    border-radius: 6px;
     border: 2px solid transparent;
     cursor: pointer;
 

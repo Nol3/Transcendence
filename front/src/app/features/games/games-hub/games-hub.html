@@ -1,8 +1,10 @@
 <div class="games-page animate-fade-in">
 
-  <div class="games-page__header container">
-    <app-pixel-title [level]="2" color="cyan">{{ 'games.title' | translate }}</app-pixel-title>
-    <p class="text-secondary text-sm">{{ 'games.subtitle' | translate }}</p>
+  <div class="games-page__header container page-header">
+    <div class="page-header__text">
+      <app-pixel-title [level]="1" color="cyan">{{ 'games.title' | translate }}</app-pixel-title>
+      <p class="page-header__subtitle">{{ 'games.subtitle' | translate }}</p>
+    </div>
   </div>
 
   <div class="games-page__body container">

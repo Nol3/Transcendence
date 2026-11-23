@@ -34,7 +34,7 @@
   --color-text-secondary: #9090b8;
   // Contraste AA sobre los fondos de la app (#0c0c14 → 5,7:1; #1e1e30 → 4,8:1).
   // El valor anterior (#505070) daba 2,1:1 y lo marcaba axe en todas las pantallas.
-  --color-text-muted:     #8888aa;
+  --color-text-muted:     #9a9ac0;
   --color-text-inverse:   #05050a;
 
   // Border
@@ -65,10 +65,32 @@
   --font-size-3xl:  2rem;
   --font-size-4xl:  2.5rem;
 
+  // Tipografía de interfaz: el pixel font es para display, no para leer.
+  --font-ui:    0.8125rem; // 13px
+  --font-ui-sm: 0.75rem;   // 12px
+  --leading-ui: 1.45;
+  --target-min: 44px;
+
   --font-pixel-xs: 0.5rem;
   --font-pixel-sm: 0.625rem;
   --font-pixel-md: 0.75rem;
   --font-pixel-lg: 1rem;
+  --font-pixel-xl: 1.5rem;
+
+  // Alias heredados: varios componentes ya los usaban y, al no existir, la
+  // declaración se descartaba en silencio (el bug era invisible en el SCSS).
+  --text-xs:   var(--font-size-xs);
+  --text-sm:   var(--font-size-sm);
+  --text-base: var(--font-size-base);
+  --text-md:   var(--font-size-md);
+  --text-lg:   var(--font-size-lg);
+  --text-xl:   var(--font-size-xl);
+  --border:    var(--color-border);
+  --accent:    var(--color-neon-cyan);
+  --color-bg:  var(--color-bg-primary);
+  --color-bg-tertiary: var(--color-bg-elevated);
+  --color-text: var(--color-text-primary);
+  --color-neon-pink: var(--color-neon-magenta);
 
   // Spacing scale
   --space-1:  4px;
@@ -155,6 +177,20 @@ input, textarea, select {
   font-size: var(--font-size-base);
 }
 
+input:not([type='checkbox']):not([type='radio']),
+select,
+textarea {
+  min-height: 42px;
+}
+
+@media (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']),
+  select,
+  textarea {
+    min-height: 44px;
+  }
+}
+
 img, svg { display: block; max-width: 100%; }
 ul, ol { list-style: none; }
 
@@ -224,8 +260,13 @@ ul, ol { list-style: none; }
 // ------------------------------------------------------------
 // 6. Typography Utilities
 // ------------------------------------------------------------
+// Números que cambian (relojes, botes, contadores) sin bailar.
 .font-pixel { font-family: var(--font-pixel); }
-.font-mono  { font-family: var(--font-mono); }
+.font-mono,
+.tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
 
 .text-xs   { font-size: var(--font-size-xs); }
 .text-sm   { font-size: var(--font-size-sm); }
@@ -252,6 +293,95 @@ ul, ol { list-style: none; }
   max-width: var(--container-max);
   margin-inline: auto;
   padding-inline: var(--space-6);
+}
+
+/* Cabecera de página reutilizable: un h1, subtítulo y acciones alineadas.
+   Evita que cada pantalla invente su propio margen y su propio orden. */
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-8);
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  &__subtitle {
+    color: var(--color-text-secondary);
+    max-width: 62ch;
+    line-height: 1.6;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 560px) {
+    align-items: flex-start;
+    margin-bottom: var(--space-6);
+  }
+}
+
+/* Reglas: el contenido lo proyecta cada juego, así que la tipografía de lectura
+   vive aquí y no en el componente (la encapsulación no llega al contenido proyectado). */
+.rules-dialog__body {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+
+  p {
+    margin: 0 0 var(--space-3);
+    line-height: 1.7;
+  }
+
+  ul,
+  ol {
+    margin: 0 0 var(--space-4);
+    padding-left: 1.3rem;
+    list-style: disc;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  li {
+    margin-bottom: var(--space-1);
+    line-height: 1.6;
+  }
+
+  h3,
+  h4 {
+    margin: 0 0 var(--space-2);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-md);
+  }
+
+  section + section {
+    margin-top: var(--space-5);
+  }
+
+  strong {
+    color: var(--color-text-primary);
+  }
+}
+
+@media (max-width: 560px) {
+  .legal-page .container {
+    padding-inline: var(--space-4);
+  }
+
+  .legal-page app-card .card {
+    padding: var(--space-4);
+  }
 }
 
 // ------------------------------------------------------------
@@ -441,5 +571,18 @@ html.reduce-motion .spinner {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .spinner {
+    animation-duration: 0.9s !important;
+    animation-iteration-count: infinite !important;
   }
 }

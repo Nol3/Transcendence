@@ -11,6 +11,7 @@ import { InputComponent } from '../../shared/components/input/input';
 import { BadgeComponent } from '../../shared/components/badge/badge';
 import { DividerComponent } from '../../shared/components/divider/divider';
 import { SpinnerComponent } from '../../shared/components/spinner/spinner';
+import { PixelTitleComponent } from '../../shared/components/pixel-title/pixel-title';
 import { TranslatePipe } from '../../i18n/translate.pipe';
 import { I18nService } from '../../i18n/i18n.service';
 import { MotionService } from '../../core/ui/motion.service';
@@ -36,6 +37,7 @@ interface Achievement {
     DividerComponent,
     SpinnerComponent,
     TranslatePipe,
+    PixelTitleComponent,
   ],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',

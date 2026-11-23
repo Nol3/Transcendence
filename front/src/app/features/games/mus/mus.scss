@@ -54,6 +54,25 @@
   align-items: center;
   justify-content: center;
   margin-bottom: var(--space-2, 0.6rem);
+
+  &__cuantas {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.9rem;
+  }
+
+  &__input {
+    width: 5.5rem;
+    min-height: 44px;
+    padding: 0.35rem 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--color-bg-surface, #14141f);
+    color: inherit;
+    font: inherit;
+    font-size: 1rem;
+  }
 }
 
 .fase {

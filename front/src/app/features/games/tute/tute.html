@@ -1,23 +1,11 @@
-<div class="brisca container">
-  <header class="brisca__cabecera">
-    <h2 class="font-pixel neon-text-yellow">{{ 'game.tute.name' | translate }}</h2>
-    <div class="brisca__acciones">
-      <app-button variant="ghost" size="sm" (click)="reglasAbiertas.set(true)">
-        📖 {{ 'tute.rules.title' | translate }}
-      </app-button>
-      <button
-        type="button"
-        class="brisca__sonido"
-        (click)="alternarSonido()"
-        [attr.aria-pressed]="sonidoActivo()"
-        [attr.aria-label]="'culo.sound.toggle' | translate"
-      >
-        {{ sonidoActivo() ? '🔊' : '🔇' }}
-      </button>
-      <a class="brisca__volver" routerLink="/games">← {{ 'games.back' | translate }}</a>
-    </div>
-  </header>
-
+<app-game-shell
+  [title]="'game.tute.name' | translate"
+  accent="yellow"
+  rulesLabel="tute.rules.title"
+  [soundOn]="sonidoActivo()"
+  (rules)="reglasAbiertas.set(true)"
+  (sound)="alternarSonido()"
+>
   @if (modo() === 'menu') {
     <section class="inicio">
       <p class="inicio__intro">{{ 'tute.intro' | translate }}</p>
@@ -46,7 +34,7 @@
           <span>{{ 'tute.setup.players' | translate }}</span>
           <select [value]="jugadores()" (change)="jugadores.set(+$any($event.target).value)">
             @for (n of [2, 3]; track n) {
-              <option [value]="n">{{ n }}</option>
+              <option [value]="n" [selected]="jugadores() === n">{{ n }}</option>
             }
           </select>
         </label>
@@ -61,8 +49,7 @@
       <ul class="mesa__rivales" [style.--n]="rivales().length">
         @for (m of marcador(); track m.id) {
           @if (m.id !== 0) {
-            <li class="rival" [class.rival--turno]="estado()!.turn === m.id && estado()!.phase === 'playing'">
-              [style.--i]="$index"
+            <li class="rival" [style.--i]="$index" [class.rival--turno]="estado()!.turn === m.id && estado()!.phase === 'playing'">
               <span class="rival__nombre font-pixel">{{ m.name }}</span>
               <span class="rival__cartas font-mono">{{ estado()!.players[m.id].hand.length }} 🂠</span>
               <span class="rival__tantos text-sm">{{ 'brisca.points' | translate: { n: m.tantos } }}</span>
@@ -97,7 +84,7 @@
           }
         </div>
 
-        <p class="mesa__turno font-pixel">
+        <p class="mesa__turno font-pixel" role="status" aria-live="polite">
           @if (estado()!.phase === 'playing') {
             @if (miTurno()) {
               {{ 'juego.turnYours' | translate }}
@@ -162,7 +149,7 @@
       </div>
 
       @if (registro().length > 0) {
-        <ul class="registro">
+        <ul class="registro" aria-live="polite">
           @for (l of registro(); track $index) {
             <li class="registro__linea" [class]="'registro__linea--' + l.kind">
               {{ l.key | translate: l.params }}
@@ -191,17 +178,17 @@
   }
 
   @if (reglasAbiertas()) {
-    <div class="reglas" role="dialog" aria-modal="true" appFocoDialogo [attr.aria-label]="'tute.rules.title' | translate">
-      <div class="reglas__caja">
-        <h3 class="font-pixel neon-text-yellow">{{ 'tute.rules.title' | translate }}</h3>
-        <p>{{ 'tute.rules.goal' | translate }}</p>
-        <p>{{ 'tute.rules.must' | translate }}</p>
-        <p>{{ 'tute.rules.sing' | translate }}</p>
-        <p>{{ 'tute.rules.tute' | translate }}</p>
-        <p>{{ 'tute.rules.last' | translate }}</p>
-        <p>{{ 'brisca.rules.order' | translate }}</p>
-        <app-button variant="primary" (click)="cerrarReglas()">{{ 'common.close' | translate }}</app-button>
-      </div>
-    </div>
+    <app-rules-dialog
+      [title]="'tute.rules.title' | translate"
+      accent="yellow"
+      (closed)="cerrarReglas()"
+    >
+      <p>{{ 'tute.rules.goal' | translate }}</p>
+      <p>{{ 'tute.rules.must' | translate }}</p>
+      <p>{{ 'tute.rules.sing' | translate }}</p>
+      <p>{{ 'tute.rules.tute' | translate }}</p>
+      <p>{{ 'tute.rules.last' | translate }}</p>
+      <p>{{ 'brisca.rules.order' | translate }}</p>
+    </app-rules-dialog>
   }
-</div>
+</app-game-shell>

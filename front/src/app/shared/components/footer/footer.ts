@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../../i18n/translate.pipe';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-footer',
@@ -11,4 +12,5 @@ import { TranslatePipe } from '../../../i18n/translate.pipe';
 })
 export class FooterComponent {
   readonly currentYear = new Date().getFullYear();
+  readonly auth = inject(AuthService);
 }
