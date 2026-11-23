@@ -58,8 +58,8 @@ Tres apuestas grandes, por orden: **clubes privados de póker**, **revisión pos
 | Revancha al terminar | Hecho (23-11) | `poker.ts` + `match-over__actions` |
 | Emoticonos rápidos | Hecho (23-11) | `poker.html` + `.emotes` |
 | Tarjeta de resultado PNG | Hecho (23-11) | `shareResult()` (canvas + Web Share) |
-| Ajuste de movimiento reducido | Solo `prefers-reduced-motion` | SCSS de componentes |
-| Racha/misión diaria | No | — |
+| Ajuste de movimiento reducido | Hecho (23-11) | `MotionService` + clase `.reduce-motion` |
+| Racha/misión diaria | Racha de login: hecha (23-11); misión: no | `UserProfile.login_streak`, `/api/users/me/checkin/` |
 | Clubes privados de póker | No (sí en `apps/salas/` para cartas españolas) | — |
 | Fast-fold | No | — |
 | Revisión post-mano | No | — |
@@ -188,33 +188,38 @@ Tres apuestas grandes, por orden: **clubes privados de póker**, **revisión pos
 
 ### Tanda 2 — Retención y accesibilidad (siguiente)
 
-#### I-07 · Ajuste de movimiento y velocidad · Siguiente · M
+#### I-07 · Ajuste de movimiento y velocidad · Hecho (23-11) · M
 - **Referente**: Balatro (Game Speed 0,5×-4× y Reduced Motion).
-- **Qué**: preferencia “Reducir animaciones” en el perfil y en la mesa. Por defecto se respeta
-  `prefers-reduced-motion`; el ajuste manual lo fuerza aunque el SO no lo pida.
-- **Dónde**: `core/ui/motion.service.ts` (nuevo, guarda en `localStorage`), clase
-  `reduce-motion` en `<html>`, y extender los `@media (prefers-reduced-motion: reduce)` actuales
-  con `html.reduce-motion &` en `playing-card`, `mano`, `button` y `poker`.
+- **Qué se hizo**: preferencia “Reducir animaciones” en el perfil, guardada en `localStorage` y
+  aplicada como clase `reduce-motion` en `<html>` al arrancar. Por defecto se sigue respetando
+  `prefers-reduced-motion`; el ajuste manual lo fuerza aunque el SO no lo pida. El CSS global
+  corta animaciones y transiciones, pero deja girando el spinner para que una carga no parezca
+  rota.
+- **Dónde**: `core/ui/motion.service.ts`, `app.ts`, `features/profile/` (tarjeta de
+  Accesibilidad), `styles.scss`.
 - **Hecho cuando**: activarlo desactiva tilt de cartas, rebotes y transiciones; el cambio se
   recuerda entre sesiones y se aplica sin recargar.
-- **Riesgo**: duplicar reglas SCSS. Mejor un mixin `sin-movimiento` en `styles.scss` que agrupe
-  `@media` y `.reduce-motion`.
+- **Riesgo**: la regla global es contundente a propósito. Si algún componente necesita animación
+  esencial, se re-habilita como el spinner.
 
-#### I-08 · Racha de login con recompensa · Siguiente · M
+#### I-08 · Racha de login · Hecho (23-11) · M
 - **Referente**: PokerBros (bonos crecientes), Governor of Poker 3 (bonus periódico).
 - **Aviso de diseño**: **no hay monedero**. Las fichas viven en la pila de cada mesa, no en el
   perfil. La recompensa debe ser **cosmética o de estatus** (tapete, dorso, insignia, título), o
-  hay que crear antes una economía de fichas, que es otra decisión.
-- **Qué**: al entrar, si es un día nuevo, se suma 1 a la racha; se muestra en la home y en el
-  perfil. Cada 3/7/30 días se desbloquea un cosmético. No se pierde la racha por no jugar, solo
-  por no entrar (como mucho, se congela un día).
-- **Dónde**: `UserProfile` (`login_streak`, `best_streak`, `last_seen_day`), migración en
-  `apps/users/migrations/`, acción `POST /api/users/me/checkin/` en `users/views.py`, tarjeta en
-  `features/home/` y `features/profile/`.
-- **Hecho cuando**: dos llamadas el mismo día no suben la racha; un día saltado la reinicia;
-  hay tests de los dos casos y de la zona horaria del servidor.
-- **Riesgo**: zonas horarias. Usar `django.utils.timezone.localdate()` y documentar que la racha
-  es del servidor, no del dispositivo.
+  hay que crear antes una economía de fichas, que es otra decisión. Por eso esta ficha mide la
+  racha y deja el premio para cuando exista el cosmético; no inventa fichas.
+- **Qué se hizo**: `UserProfile` guarda `login_streak`, `best_login_streak` y `last_checkin`;
+  `POST /api/users/me/checkin/` es idempotente por día, usa `timezone.localdate()` (no el reloj
+  del móvil), suma si el último fue ayer y reinicia si hubo un hueco. La home llama al fichar y
+  muestra “DÍAS SEGUIDOS” en la tarjeta de estado; los hitos 3/7/30/100 devuelven
+  `milestone: true` para cuando haya algo que desbloquear.
+- **Dónde**: `backend/apps/users/models.py`, migración `0003_...`, `users/views.py` (`checkin`),
+  `apps/users/tests_checkin.py`, `front/src/app/core/services/user.service.ts` (`checkin()`),
+  `features/home/home.ts` y `home.html`.
+- **Hecho cuando**: dos llamadas el mismo día no suben la racha; un día saltado la reinicia y el
+  mejor histórico no se pierde; hay tests de los cuatro casos y de la sesión anónima.
+- **Riesgo**: zonas horarias. La racha es del servidor, no del dispositivo; queda documentado y
+  probado con `localdate()`.
 
 #### I-09 · Misión diaria opt-in · Siguiente · M
 - **Referente**: PokerStars (misiones diarias con opt-in).
@@ -372,7 +377,7 @@ Tres apuestas grandes, por orden: **clubes privados de póker**, **revisión pos
 | Tanda | Contenido | Depende de | Estado |
 |---|---|---|---|
 | **1** | I-01…I-06 (quick seat, revancha, barra, emotes, tarjeta, copy) | — | **Hecha** |
-| **2** | I-07 movimiento, I-08 racha, I-11 filtros, I-14 compartir mano | Tanda 1 | Siguiente |
+| **2** | I-07 movimiento, I-08 racha, I-11 filtros, I-14 compartir mano | Tanda 1 | **Parcial**: I-07 e I-08 hechos; I-11 e I-14 siguientes |
 | **3** | I-09 misión, I-12 ficha de torneo, I-13 stats, I-20 RNG | Tanda 2 | Siguiente |
 | **4** | I-15 clubes privados, I-16 fold & watch, I-17 revancha real | Decidir registro de mesas | Explorar |
 | **5** | I-18 fast-fold, I-21 revisión post-mano | Tanda 4 + motor | Explorar |

@@ -1,7 +1,10 @@
 """Users app views."""
 
+from datetime import timedelta
+
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from PIL import Image
 from rest_framework import status, viewsets
@@ -139,6 +142,54 @@ class UserViewSet(viewsets.ModelViewSet):
     def stats(self, request):
         """Get current user's stats."""
         return Response({"data": self._build_stats(request.user), "error": None})
+
+    @action(detail=False, methods=["post"], url_path="me/checkin")
+    def checkin(self, request):
+        """Marca la visita del día y devuelve la racha de días seguidos.
+
+        Idempotente por día: entrar dos veces la misma fecha no sube la racha. Si se
+        saltó un día, empieza de 1; si el último fue ayer, suma. La fecha es la del
+        servidor (`localdate`), no la del dispositivo, para que no se pueda hacer
+        trampa cambiando el reloj del móvil.
+        """
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        hoy = timezone.localdate()
+        if profile.last_checkin == hoy:
+            return Response(
+                {
+                    "data": {
+                        "streak": profile.login_streak,
+                        "best": profile.best_login_streak,
+                        "already": True,
+                        "today": hoy.isoformat(),
+                    },
+                    "error": None,
+                }
+            )
+
+        if profile.last_checkin == hoy - timedelta(days=1):
+            profile.login_streak += 1
+        else:
+            profile.login_streak = 1
+        profile.last_checkin = hoy
+        profile.best_login_streak = max(profile.best_login_streak, profile.login_streak)
+        profile.save(update_fields=["login_streak", "best_login_streak", "last_checkin"])
+
+        # Los hitos son solo estatus por ahora: no hay monedero que abonar. Cuando exista
+        # un cosmético que desbloquear, este es el punto donde se concede.
+        hito = profile.login_streak in (3, 7, 30, 100)
+        return Response(
+            {
+                "data": {
+                    "streak": profile.login_streak,
+                    "best": profile.best_login_streak,
+                    "already": False,
+                    "milestone": hito,
+                    "today": hoy.isoformat(),
+                },
+                "error": None,
+            }
+        )
 
     @action(detail=True, methods=["get"], url_path="stats")
     def user_stats(self, request, pk=None):

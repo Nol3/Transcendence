@@ -131,6 +131,12 @@
                 <span class="text-secondary font-mono">{{ 'home.streak' | translate }}</span>
                 <span class="neon-text-green font-pixel">{{ userStats()!.currentStreak }} WINS</span>
               </div>
+              @if (dailyStreak() !== null) {
+                <div class="player-status__row">
+                  <span class="text-secondary font-mono">{{ 'home.loginStreak' | translate }}</span>
+                  <span class="neon-text-yellow font-pixel">{{ dailyStreak() }} 🔥</span>
+                </div>
+              }
               <div class="player-status__row">
                 <span class="text-secondary font-mono">{{ 'common.status' | translate }}</span>
                 <div class="player-status__online">

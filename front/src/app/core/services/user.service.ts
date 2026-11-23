@@ -29,6 +29,15 @@ export interface GameHistoryEntry {
   playedAt: string;
 }
 
+/** Respuesta de `POST /api/users/me/checkin/`. */
+export interface DailyCheckin {
+  streak: number;
+  best: number;
+  already: boolean;
+  milestone?: boolean;
+  today: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly api = inject(ApiService);
@@ -46,6 +55,11 @@ export class UserService {
   getUserStats(userId?: number): Observable<UserStats> {
     const endpoint = userId ? `/users/${userId}/stats/` : '/users/me/stats/';
     return this.api.get<UserStats>(endpoint).pipe(map((res) => res.data!));
+  }
+
+  /** Ficha la visita del día y devuelve la racha (idempotente dentro del día). */
+  checkin(): Observable<DailyCheckin> {
+    return this.api.post<DailyCheckin>('/users/me/checkin/', {}).pipe(map((res) => res.data!));
   }
 
   getUserHistory(userId?: number, page = 1, limit = 20): Observable<GameHistoryEntry[]> {

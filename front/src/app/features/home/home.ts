@@ -38,6 +38,9 @@ export class Home implements OnInit, OnDestroy {
   readonly gamesPlayed = signal(0);
   readonly userStats = signal<UserStats | null>(null);
   readonly userOnlineStatus = signal(true);
+  /** Racha de días entrando (la ficha el servidor en cada visita). */
+  readonly dailyStreak = signal<number | null>(null);
+  readonly bestDailyStreak = signal<number | null>(null);
 
   readonly homeRankLabel = computed(() => {
     const rank = this.userStats()?.rank ?? 0;
@@ -69,6 +72,7 @@ export class Home implements OnInit, OnDestroy {
     this.loadLeaderboard();
     if (this.auth.isAuthenticated()) {
       this.loadUserStats();
+      this.loadCheckin();
     }
     this.updateTime();
     this.timer = setInterval(() => this.updateTime(), 1000);
@@ -97,6 +101,17 @@ export class Home implements OnInit, OnDestroy {
   private loadUserStats() {
     this.userService.getUserStats().subscribe({
       next: (stats) => this.userStats.set(stats),
+      error: () => {},
+    });
+  }
+
+  private loadCheckin() {
+    this.userService.checkin().subscribe({
+      next: (r) => {
+        this.dailyStreak.set(r.streak);
+        this.bestDailyStreak.set(r.best);
+      },
+      // La racha es un extra: si falla, la home sigue igual.
       error: () => {},
     });
   }

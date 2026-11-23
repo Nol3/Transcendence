@@ -14,6 +14,11 @@ class UserProfile(models.Model):
     # cuenta cuántos van por delante, así que se recorre entero en cada consulta.
     elo_rating = models.FloatField(default=1600, db_index=True)
     is_online = models.BooleanField(default=False)
+    # Racha de días entrando (distinta de la racha de victorias que se calcula sobre las partidas).
+    # Se guarda la fecha del último check-in, no un contador que haya que resetear por cron.
+    login_streak = models.PositiveIntegerField(default=0)
+    best_login_streak = models.PositiveIntegerField(default=0)
+    last_checkin = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
