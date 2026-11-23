@@ -62,10 +62,17 @@ test.describe('Culo', () => {
     const src = await page.locator('.mano__carta app-playing-card img').first().getAttribute('src');
     // Ruta relativa a propósito (el <base href> de la app), así que sin barra inicial.
     expect(src).toContain('cards/es8bit/');
-    const cargadas = await page.locator('.mano__carta img').evaluateAll(
-      (imgs: HTMLImageElement[]) => imgs.length > 0 && imgs.every((i) => i.naturalWidth > 0),
-    );
-    expect(cargadas).toBe(true);
+    // En la suite completa hay más presión de red: se espera a que las imágenes
+    // terminen de decodificar, reevaluando en cada intento.
+    await expect
+      .poll(
+        () =>
+          page.locator('.mano__carta img').evaluateAll(
+            (imgs: HTMLImageElement[]) => imgs.length > 0 && imgs.every((i) => i.naturalWidth > 0),
+          ),
+        { timeout: 10_000 },
+      )
+      .toBe(true);
   });
 
   test('se juega un turno contra los bots', async ({ page }) => {

@@ -40,20 +40,33 @@ test.describe('Gestos de la mano', () => {
 
   test('el doble toque juega la carta sin pasar por el botón', async ({ page }) => {
     test.setTimeout(90_000);
-    const { jugar } = await miTurno(page);
+    const { jugar, pasar } = await miTurno(page);
 
-    // Se busca una carta que de verdad se pueda jugar (en el Culo no todas valen).
+    // En el Culo hay manos sin ninguna carta legal: se pasa y se prueba en el
+    // siguiente turno. El test necesita una carta jugable, no una mano cualquiera.
     const mano = page.locator('.mano__carta:not([disabled])');
-    const cuantas = await mano.count();
     let jugable = -1;
-    for (let i = 0; i < cuantas; i++) {
-      // `click()` del DOM, no del ratón: en el abanico las cartas se tapan y el clic por
-      // coordenadas cae en la vecina (y dos clics en la misma carta la juegan sin querer).
-      await mano.nth(i).evaluate((el) => (el as HTMLElement).click());
-      await page.waitForTimeout(150);
-      if (await jugar.isEnabled()) {
-        jugable = i;
-        break;
+    for (let ronda = 0; ronda < 5 && jugable < 0; ronda++) {
+      const cuantas = await mano.count();
+      for (let i = 0; i < cuantas; i++) {
+        // `click()` del DOM, no del ratón: en el abanico las cartas se tapan y el clic por
+        // coordenadas cae en la vecina (y dos clics en la misma carta la juegan sin querer).
+        await mano.nth(i).evaluate((el) => (el as HTMLElement).click());
+        const activa = await expect
+          .poll(() => jugar.isEnabled(), { timeout: 1_500 })
+          .toBe(true)
+          .then(() => true)
+          .catch(() => false);
+        if (activa) {
+          jugable = i;
+          break;
+        }
+      }
+      if (jugable < 0 && (await pasar.isEnabled())) {
+        await pasar.click();
+        await expect
+          .poll(async () => (await jugar.isEnabled()) || (await pasar.isEnabled()), { timeout: 30_000 })
+          .toBe(true);
       }
     }
     expect(jugable, 'debería haber alguna carta jugable').toBeGreaterThanOrEqual(0);

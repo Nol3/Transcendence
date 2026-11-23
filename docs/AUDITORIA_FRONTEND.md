@@ -200,7 +200,7 @@ En la misma pasada:
 - **i18n**: `game.tute.how`, `game.mus.how`, `tournament.nameError`, `common.online/offline/unknown`
   y textos de registro/recuperación.
 
-**Verificación de la segunda pasada:** build OK, **185 unitarios**, lint limpio, **65 e2e de
+**Verificación de la segunda pasada:** build OK, **185 unitarios**, lint limpio, **67 e2e de
 Chromium + 7 skipped**, **4 e2e móviles** y auditoría propia de 64 combinaciones ruta × ancho con
 `overflow: 0` y un `h1` por pantalla.
 
